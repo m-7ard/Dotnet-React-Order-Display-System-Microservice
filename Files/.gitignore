@@ -1,0 +1,4 @@
+Media/*
+!Media/include-this.txt
+!Media/Tests/
+!Media/Tests/**

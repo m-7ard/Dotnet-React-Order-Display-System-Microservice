@@ -1,0 +1,12 @@
+{
+    "moduleNameMapper": { 
+        "\\.(gif|ttf|eot|svg|png)$": "<rootDir>/src/__mocks__/fileMocks.js",
+        "\\.(css|scss)$": "<rootDir>/src/__mocks__/fileMocks.js",
+        ".*viteUtils": "<rootDir>/src/__mocks__/viteUtils.ts"
+    },
+    "preset": "ts-jest",
+    "testEnvironment": "jest-environment-jsdom",
+    "transform": {
+        "^.+\\.tsx?$": "ts-jest" 
+    }
+}

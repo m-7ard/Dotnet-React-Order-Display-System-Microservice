@@ -1,0 +1,39 @@
+stages:
+  - deploy
+
+deploy:
+  stage: deploy
+  image: ruby:3.1
+  script:
+    - mkdir -p ~/.ssh
+    - ssh-keyscan -H $HETZNER_IPV4 >> ~/.ssh/known_hosts
+    - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa_gitlab
+    - chmod 600 ~/.ssh/id_rsa_gitlab
+    
+    # SSH command to interact with the server
+    - ssh -i ~/.ssh/id_rsa_gitlab root@$HETZNER_IPV4 "
+        mkdir -p /root/Dotnet-React-Order-Display-System;
+        cd /root/Dotnet-React-Order-Display-System;
+
+        if [ ! -d .git ]; then
+          echo 'Cloning repository...';
+          git clone https://gitlab.com/m-7ard/Dotnet-React-Order-Display-System.git .;
+        else
+          echo 'Repository exists, pulling latest changes...';
+          git reset --hard;
+          git pull origin master;
+        fi;
+
+        echo 'VITE_API_URL=http://${HETZNER_IPV4}:5000' > frontend/.env.production;
+  
+        docker compose down || true;
+        echo 'XXXX AFTER DOWN XXXX';
+        docker system prune -af;
+        echo 'XXXX AFTER PRUNE XXXX';
+
+        docker compose build;
+        echo 'XXXX AFTER BUILD XXXX';
+
+      "
+  only:
+    - master

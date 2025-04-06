@@ -1,0 +1,18 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: dotnet-react-order-display-system-web
+    ports:
+      - "5000:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:5000
+      - DOCKER_ENVIRONMENT=true
+      - NODE_ENV=production
+    volumes:
+      - uploaded-media:/app/media
+
+volumes:
+  uploaded-media:

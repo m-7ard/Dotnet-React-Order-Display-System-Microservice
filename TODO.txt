@@ -1,0 +1,1 @@
+Make a config for the hetzner deployment, since rn the frontend will make a request to the wrong url

@@ -1,0 +1,133 @@
+@layer components {
+  .mixin-button-like {
+    @apply flex items-center box-border select-none;
+  }
+  .mixin-button-like--static {
+    @apply cursor-auto;
+  }
+  .mixin-button-like:not(.mixin-button-like--static) {
+    @apply transition-colors cursor-pointer;
+  }
+  .mixin-button-sm {
+    @apply gap-2 px-4 py-1.5 text-sm leading-none rounded-lg;
+  }
+  .mixin-button-base {
+    @apply gap-2 px-4 py-1 text-base rounded-lg;
+  }
+  .mixin-textarea-any {
+    @apply rounded-md overflow-hidden;
+  }
+  .mixin-textarea-any > textarea {
+    @apply block w-full transition-colors leading-none resize-none p-2 rounded-t-md;
+  }
+  .mixin-textarea-any [data-role=footer] {
+    @apply w-full border-t;
+  }
+  .mixin-textarea-any [data-role=counter] {
+    @apply w-fit ml-auto px-2 text-xs border-l;
+  }
+  .mixin-char-input-like {
+    @apply after:content-["."] relative;
+  }
+  .mixin-char-input-like > input {
+    @apply absolute inset-0 transition-colors;
+  }
+  .mixin-char-input-sm {
+    @apply mixin-button-sm;
+  }
+  .mixin-char-input-sm > input {
+    @apply mixin-button-sm absolute inset-0 transition-colors;
+  }
+  .mixin-char-input-base {
+    @apply mixin-button-base;
+    @apply px-2;
+  }
+  .mixin-char-input-base > input {
+    @apply mixin-button-base absolute inset-0 transition-colors;
+    @apply px-2;
+  }
+  .mixin-page-like {
+    @apply flex flex-col grow;
+  }
+  .mixin-page-base > [data-role=page-section] {
+    @apply p-4;
+  }
+  .mixin-panel-like {
+    @apply grow max-h-full;
+  }
+  .mixin-panel-base {
+    @apply max-w-72 sm:max-w-prose rounded-lg;
+  }
+  .mixin-panel-base > [data-role=panel-section] {
+    @apply p-4;
+  }
+  .mixin-checkbox-like {
+    @apply cursor-pointer relative rounded-full;
+  }
+  .mixin-checkbox-like [data-role=inner-part] {
+    @apply after:content-["."] 
+                after:flex 
+                after:opacity-0
+                after:aspect-square
+                after:h-2
+                after:w-2
+                after:pointer-events-none
+                transition-colors 
+                rounded-full;
+  }
+  .mixin-checkbox-like > input {
+    @apply absolute 
+            inset-0 
+            opacity-0 
+            cursor-pointer;
+  }
+  .mixin-checkbox-sm {
+    @apply p-1 text-sm leading-none;
+  }
+  .mixin-checkbox-sm > input {
+    @apply p-1 text-sm leading-none absolute inset-0 transition-colors;
+  }
+  .mixin-Pcard-like {
+    @apply rounded-lg overflow-hidden;
+  }
+  .mixin-Pcard-base > [data-role=Pcard-section] {
+    @apply px-4 py-3;
+  }
+  .mixin-content-grid[data-default-track] > * {
+    width: 100%;
+    margin: 0 auto;
+  }
+  .mixin-content-grid:not([data-default-track]) > * {
+    max-width: 700px;
+    width: 100%;
+    margin: 0 auto;
+  }
+  .mixin-content-grid[data-default-track=full] > * {
+    max-width: 100%;
+  }
+  .mixin-content-grid[data-default-track=lg] > * {
+    max-width: 900px;
+  }
+  .mixin-content-grid[data-default-track=base] > * {
+    max-width: 700px;
+  }
+  .mixin-content-grid[data-default-track=sm] > * {
+    max-width: 450px;
+  }
+  .mixin-content-grid > [data-track] {
+    width: 100%;
+    margin: 0 auto;
+  }
+  .mixin-content-grid > [data-track=full] {
+    max-width: 100%;
+  }
+  .mixin-content-grid > [data-track=lg] {
+    max-width: 900px;
+  }
+  .mixin-content-grid > [data-track=base] {
+    max-width: 700px;
+  }
+  .mixin-content-grid > [data-track=sm] {
+    max-width: 450px;
+  }
+}/*# sourceMappingURL=mixins.css.map */

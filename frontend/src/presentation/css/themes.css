@@ -1,0 +1,124 @@
+@layer components {
+  .token-card--header--primary-text {
+    @apply text-base font-semibold text-gray-800;
+  }
+  .token-card--header--secondary-text {
+    @apply text-sm text-gray-800;
+  }
+  .token-card--header--tertiary-text {
+    @apply text-sm text-gray-900;
+  }
+  .token-card--label {
+    @apply text-sm text-gray-900 font-semibold;
+  }
+  .token-card--default-text {
+    @apply text-base text-gray-900;
+  }
+  .token-default-list {
+    @apply text-base flex flex-row justify-between items-center gap-3;
+  }
+  .token-default-list__label {
+    @apply text-sm font-semibold;
+  }
+  .token-default-list__value {
+    @apply text-gray-700 text-sm;
+  }
+  .token-default-shadow {
+    box-shadow: 0 2px 8px 0px rgba(0, 0, 0, 0.1);
+  }
+  .token-default-border-color {
+    @apply border-gray-300;
+  }
+  .token-default-divide-color {
+    @apply divide-gray-300;
+  }
+  .token-default-avatar {
+    @apply aspect-square h-full overflow-hidden shrink-0 rounded-lg bg-gray-300;
+  }
+  .token-default-title {
+    @apply text-lg font-bold text-gray-800;
+  }
+}
+@layer components {
+  .theme-input-generic-white {
+    @apply border border-gray-300 flex flex-grow rounded-md overflow-hidden;
+  }
+  .theme-input-generic-white > input {
+    @apply text-gray-900 bg-white focus:bg-gray-300 rounded-md;
+  }
+  .theme-button-generic-white {
+    @apply border border-gray-300 text-gray-900;
+  }
+  .theme-button-generic-white:not(.theme-button-generic-white[data-active=true]) {
+    @apply bg-white;
+  }
+  .theme-button-generic-white[data-active=true], .theme-button-generic-white:not(.theme-button-generic-white--static):hover {
+    @apply bg-gray-200;
+  }
+  .theme-button-generic-yellow {
+    @apply text-gray-900;
+  }
+  .theme-button-generic-yellow:not(.theme-button-generic-yellow[data-active=true]) {
+    @apply bg-yellow-300;
+  }
+  .theme-button-generic-yellow[data-active=true], .theme-button-generic-yellow:not(.theme-button-generic-yellow--static):hover {
+    @apply bg-yellow-400;
+  }
+  .theme-button-generic-green {
+    @apply text-gray-900;
+  }
+  .theme-button-generic-green:not(.theme-button-generic-green[data-active=true]) {
+    @apply bg-green-300;
+  }
+  .theme-button-generic-green[data-active=true], .theme-button-generic-green:not(.theme-button-generic-green--static):hover {
+    @apply bg-green-400;
+  }
+  .theme-button-generic-red {
+    @apply text-gray-900;
+  }
+  .theme-button-generic-red:not(.theme-button-generic-red[data-active=true]) {
+    @apply bg-red-300;
+  }
+  .theme-button-generic-red[data-active=true], .theme-button-generic-red:not(.theme-button-generic-red--static):hover {
+    @apply bg-red-400;
+  }
+  .theme-button-generic-orange {
+    @apply text-gray-900;
+  }
+  .theme-button-generic-orange:not(.theme-button-generic-orange[data-active=true]) {
+    @apply bg-orange-500;
+  }
+  .theme-button-generic-orange[data-active=true], .theme-button-generic-orange:not(.theme-button-generic-orange--static):hover {
+    @apply bg-orange-600;
+  }
+  .theme-checkbox-generic-white {
+    @apply border border-gray-300 shadow;
+  }
+  .theme-checkbox-generic-white:not(.theme-checkbox-generic-white--active, .theme-checkbox-generic-white:has(:checked)) {
+    @apply bg-white hover:bg-gray-200;
+  }
+  .theme-checkbox-generic-white--active, .theme-checkbox-generic-white:has(:checked) {
+    @apply bg-gray-200;
+  }
+  .theme-checkbox-generic-white--active [data-role=inner-part], .theme-checkbox-generic-white:has(:checked) [data-role=inner-part] {
+    @apply bg-gray-700;
+  }
+  .theme-textarea-generic-white {
+    @apply border border-gray-300 text-gray-900 bg-white;
+  }
+  .theme-textarea-generic-white > textarea {
+    @apply bg-white focus:bg-gray-300;
+  }
+  .theme-textarea-generic-white [data-role=footer] {
+    @apply bg-transparent border-gray-300;
+  }
+  .theme-textarea-generic-white [data-role=counter] {
+    @apply border-gray-300;
+  }
+  .theme-Pcard-generic-white {
+    @apply bg-white;
+  }
+  .theme-panel-generic-white {
+    @apply bg-white;
+  }
+}/*# sourceMappingURL=themes.css.map */
