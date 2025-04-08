@@ -62,8 +62,8 @@ export function useFluentResponseHandler() {
         }
 
         withFallback<T>(fallback: T): ResponseHandlerBuilder<SuccessType, ErrorType, T> {
-            this.fallbackValue = fallback;
-            return this as any;
+            this.fallbackValue = fallback as never;
+            return this as never;
         }
 
         async execute(): Promise<FallbackType extends undefined ? SuccessType | ErrorType | undefined : SuccessType | ErrorType | FallbackType> {
@@ -71,22 +71,22 @@ export function useFluentResponseHandler() {
                 const responseResult = await tryHandleRequest(this.requestFn!());
                 if (responseResult.isErr()) {
                     dispatchException(responseResult.error);
-                    return this.fallbackValue as any;
+                    return this.fallbackValue as never;
                 }
 
                 const response = responseResult.value;
                 const result = await this.onResponseFn!(response);
 
                 if (result.isOk()) {
-                    return result.value;
+                    return result.value as never;
                 }
 
                 const error = await handleInvalidResponse(response);
                 dispatchException(error);
-                return result.error;
+                return result.error as never;
             } catch (err) {
                 dispatchException(err);
-                return this.fallbackValue as any;
+                return this.fallbackValue as never;
             }
         }
     }

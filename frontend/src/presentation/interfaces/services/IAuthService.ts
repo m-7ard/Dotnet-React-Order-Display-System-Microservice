@@ -1,6 +1,8 @@
+import { Result } from "neverthrow";
 import User from "../../../domain/models/User"
 import ICurrentUserRequestDTO from "../../../infrastructure/contracts/auth/currentUser/ICurrentUserRequestDTO"
 import ILoginUserRequestDTO from "../../../infrastructure/contracts/auth/login/ILoginUserRequestDTO"
+import IPlainApiError from "../../../infrastructure/interfaces/IPlainApiError";
 
 export interface IRegisterUserContract {
     username: string;
@@ -10,8 +12,6 @@ export interface IRegisterUserContract {
 
 interface IAuthService {
     user: User | null;
-    register(request: IRegisterUserContract): Promise<void>
-    login(request: ILoginUserRequestDTO): Promise<void>
     currentUser(request: ICurrentUserRequestDTO): Promise<User | null>;
 }
 

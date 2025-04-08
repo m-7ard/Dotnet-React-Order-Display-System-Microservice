@@ -5,7 +5,7 @@ import User from "../../domain/models/User";
 import IAuthService from "../interfaces/services/IAuthService";
 import ICurrentUserResponseDTO from "../../infrastructure/contracts/auth/currentUser/ICurrentUserResponseDTO";
 import userMapper from "../../infrastructure/mappers/userMapper";
-import useResponseHandler, { useFluentResponseHandler } from "../hooks/useResponseHandler";
+import { useFluentResponseHandler } from "../hooks/useResponseHandler";
 import { err, ok } from "neverthrow";
 
 export default function AuthServiceProvider(props: PropsWithChildren) {
@@ -36,15 +36,11 @@ export default function AuthServiceProvider(props: PropsWithChildren) {
             .execute();
     }, [fluentResponseHandler, userDataAccess]);
 
-    
-
     return (
         <AuthServiceContext.Provider
             value={{
                 user: user,
                 currentUser: currentUser,
-                register: register,
-                login: login
             }}
         >
             {children}

@@ -109,7 +109,7 @@ export default function CreateProductController() {
 
             const data = validation.value;
 
-            const test = await responseHandler({
+            await responseHandler({
                 requestFn: () =>
                     productDataAccess.createProduct({
                         name: data.name,
@@ -130,9 +130,9 @@ export default function CreateProductController() {
                         return ok(2);
                     }
 
-                    return err(undefined);
+                    return err(5);
                 },
-                fallbackValue: undefined
+                fallbackValue: 2
             });
         },
     });
