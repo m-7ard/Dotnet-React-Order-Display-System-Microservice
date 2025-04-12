@@ -10,5 +10,5 @@ export const getApiUrl = () => {
 };
 
 export const getAuthUrl = () => {
-    return import.meta.env.AUTH_URL;
+    return import.meta.env.VITE_AUTH_URL;
 };

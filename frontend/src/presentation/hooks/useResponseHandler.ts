@@ -69,6 +69,7 @@ export function useFluentResponseHandler() {
         async execute(): Promise<FallbackType extends undefined ? SuccessType | ErrorType | undefined : SuccessType | ErrorType | FallbackType> {
             try {
                 const responseResult = await tryHandleRequest(this.requestFn!());
+
                 if (responseResult.isErr()) {
                     dispatchException(responseResult.error);
                     return this.fallbackValue as never;

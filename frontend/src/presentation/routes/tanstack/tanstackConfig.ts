@@ -1,11 +1,13 @@
 import { IRouteConfigMapping } from "../routeTypes";
 
 export const tanstackConfigs: IRouteConfigMapping = {
+    // Base
     FRONTPAGE: {
         build: () => "/",
         pattern: "/",
     },
 
+    // Orders
     LIST_ORDERS: {
         pattern: "/orders",
         build: () => "/orders",
@@ -19,6 +21,7 @@ export const tanstackConfigs: IRouteConfigMapping = {
         build: ({ id }) => `/order/${id}/manage`,
     },
 
+    // Products
     LIST_PRODUCTS: {
         pattern: "/products",
         build: () => "/products",
@@ -36,11 +39,23 @@ export const tanstackConfigs: IRouteConfigMapping = {
         build: ({ id }) => `/products/${id}/update-amount`,
     },
 
+    // Product Histories
     LIST_PRODUCT_HISTORIES: {
         pattern: "/product_histories",
         build: () => "/product_histories",
     },
 
+    // Users
+    REGISTER_USER: {
+        pattern: "/users/register",
+        build: () => "/users/register",
+    },
+    LOGIN_USER: {
+        pattern: "/users/login",
+        build: () => "/users/login",
+    },
+
+    // Errors
     LOADER_ERROR: {
         pattern: "/errors/loader",
         build: () => "/errors/loader",

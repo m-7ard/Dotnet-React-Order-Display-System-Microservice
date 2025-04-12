@@ -1,11 +1,13 @@
+import { TokenStorage } from "../../presentation/deps/tokenStorage";
 import IUserDataAccess from "../../presentation/interfaces/dataAccess/IUserDataAccess";
 import { getAuthUrl } from "../../viteUtils";
-import ICurrentUserRequestDTO from "../contracts/auth/currentUser/ICurrentUserRequestDTO";
 import ILoginUserRequestDTO from "../contracts/auth/login/ILoginUserRequestDTO";
 import IRegisterUserRequestDTO from "../contracts/auth/register/IRegisterUserRequestDTO";
 
 export default class UserDataAccess implements IUserDataAccess {
     private readonly authRoute = `${getAuthUrl()}`;
+    
+    constructor(private readonly tokenStorage: TokenStorage) {}
 
     async register(request: IRegisterUserRequestDTO): Promise<Response> {
         const response = await fetch(`${this.authRoute}/register`, {
@@ -19,6 +21,7 @@ export default class UserDataAccess implements IUserDataAccess {
         return response;
     }
     async login(request: ILoginUserRequestDTO): Promise<Response> {
+        console.log("req: ", request)
         const response = await fetch(`${this.authRoute}/login`, {
             method: "POST",
             headers: {
@@ -30,13 +33,13 @@ export default class UserDataAccess implements IUserDataAccess {
         return response;
     }
 
-    async currentUser(request: ICurrentUserRequestDTO): Promise<Response> {
+    async currentUser(): Promise<Response> {
         const response = await fetch(`${this.authRoute}/current-user`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
+                'Authorization': `Bearer ${this.tokenStorage.getAccessToken()}`
             },
-            body: JSON.stringify(request)
         });
 
         return response;

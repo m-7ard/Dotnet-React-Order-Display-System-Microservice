@@ -72,6 +72,7 @@
         "path": "^0.12.7",
         "quicktype": "^23.0.171",
         "quicktype-core": "^23.0.171",
+        "redis": "^4.7.0",
         "resend": "^4.2.0",
         "sql-template-tag": "^5.2.1",
         "superstruct": "^2.0.2",

@@ -51,7 +51,6 @@ const manageOrder: ICommonRoute<IRouteConfig<IManageOrderParams>, never> = {
 };
 
 // products
-
 const listProducts: ICommonRoute<IRouteConfig<TEmptyParams>, never> = {
     parent: frontpage,
     config: tanstackConfigs.LIST_PRODUCTS,
@@ -88,7 +87,28 @@ const listProductHistories: ICommonRoute<IRouteConfig<TEmptyParams>, never> = {
     isLayout: false,
 };
 
-// errors
+// Users
+const __usersLayout__: ICommonRoute<IRouteConfig<TEmptyParams>, never> = {
+    parent: frontpage,
+    label: "Users",
+    isLayout: true,
+};
+
+const registerUser: ICommonRoute<IRouteConfig<TEmptyParams>, never> = {
+    parent: __usersLayout__,
+    config: tanstackConfigs.REGISTER_USER,
+    label: "Register",
+    isLayout: false,
+};
+
+const loginUser: ICommonRoute<IRouteConfig<TEmptyParams>, never> = {
+    parent: __usersLayout__,
+    config: tanstackConfigs.LOGIN_USER,
+    label: "Login",
+    isLayout: false,
+};
+
+// Errors
 const __errorsLayout__: ICommonRoute<IRouteConfig<TEmptyParams>, never> = {
     parent: frontpage,
     label: "Errors",
@@ -127,19 +147,28 @@ const clientSideError: ICommonRoute<IRouteConfig<TEmptyParams>, never> = {
 };
 
 const genericRoutes: ICommonRouteMapping = {
+    // Base
     FRONTPAGE: frontpage,
 
+    // Orders
     LIST_ORDERS: listOrders,
     CREATE_ORDER: createOrder,
     MANAGE_ORDER: manageOrder,
 
+    // Products
     LIST_PRODUCTS: listProducts,
     CREATE_PRODUCT: createProduct,
     UPDATE_PRODUCT: updateProduct,
     UPDATE_PRODUCT_AMOUNT: updateProductAmount,
 
+    // Product Histories
     LIST_PRODUCT_HISTORIES: listProductHistories,
 
+    // Users
+    REGISTER_USER: registerUser,
+    LOGIN_USER: loginUser,
+
+    // Errors
     LOADER_ERROR: loaderError,
     UNKNOWN_ERROR: unknownError,
     NOT_FOUND_ERROR: notFoundError,
@@ -182,12 +211,17 @@ function useRouterNavigate() {
 
     return navigateFn;
 }
+function useRouterHref() {
+    const location = useLocation();
+    return location.href;
+}
 
 const tanstackRouterModule: IRouterModule = {
     genericRoutes: genericRoutes,
     useRouterLoaderData: useRouterLoaderData,
     useRouterLocationEq: useRouterLocationEq,
     useRouterNavigate: useRouterNavigate,
+    useRouterHref: useRouterHref
 };
 
 export default tanstackRouterModule;

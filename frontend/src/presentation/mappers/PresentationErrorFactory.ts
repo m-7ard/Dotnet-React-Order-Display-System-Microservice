@@ -1,6 +1,7 @@
 import JSONPointer from "jsonpointer";
 import IPresentationError from "../interfaces/IPresentationError";
 import IPlainApiError from "../../infrastructure/interfaces/IPlainApiError";
+import IDjangoErrors from "../../infrastructure/interfaces/IDjangoError";
 
 class PresentationErrorFactory {
     static ApiErrorsToPresentationErrors<T>(errors: IPlainApiError[]) {
@@ -16,6 +17,16 @@ class PresentationErrorFactory {
         });
     
         return result;
+    }
+
+    static DjangoErrorsToPresentationErrors<T>(errors: IDjangoErrors) {
+        const { non_field_errors, ...fieldErrors } = errors;
+        const results: IPresentationError<T> = { ...fieldErrors };
+        if (non_field_errors != null) {
+            results._ = non_field_errors;
+        }
+        
+        return results;
     }
 }
 

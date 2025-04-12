@@ -125,7 +125,6 @@ export default function CreateProductController() {
                     } else if (response.status === 400) {
                         const apiErrors = await response.json();
                         const errors = PresentationErrorFactory.ApiErrorsToPresentationErrors(apiErrors);
-                        console.log(errors)
                         errorManager.setAll(errors);
                         return ok(2);
                     }

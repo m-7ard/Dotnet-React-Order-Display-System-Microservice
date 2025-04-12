@@ -1,3 +1,4 @@
+import { TokenStorage } from "../deps/tokenStorage";
 import IDraftImageDataAccess from "../interfaces/dataAccess/IDraftImageDataAccess";
 import IOrderDataAccess from "../interfaces/dataAccess/IOrderDataAccess";
 import IProductDataAccess from "../interfaces/dataAccess/IProductDataAccess";
@@ -11,4 +12,5 @@ export const [DataAccessContext, useDataAccessContext] = createSafeContext<{
     orderDataAccess: IOrderDataAccess;
     draftImageDataAccess: IDraftImageDataAccess;
     userDataAccess: IUserDataAccess;
+    tokenStorage: TokenStorage
 }>("useDataAccessContext must be used within DataAccessContext.Provider");
