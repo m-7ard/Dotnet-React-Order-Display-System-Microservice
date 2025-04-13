@@ -27,10 +27,7 @@ async function main() {
     assert(host, hostValidator);
 
     const diContainer = new ProductionDIContainer();
-    const authUrl = process.env.AUTH_URL;
-    if (authUrl == null) {
-        throw new Error("Auth Url was not configured.");
-    }
+
 
     const redis = createClient();
     await redis.connect();
@@ -40,8 +37,7 @@ async function main() {
         middleware: [responseLogger],
         mode: environment,
         diContainer: diContainer,
-        redis: redis,
-        authUrl: authUrl
+        redis: redis
     });
 
     const server = app.listen(port, host, () => {

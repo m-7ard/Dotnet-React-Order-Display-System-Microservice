@@ -4,7 +4,10 @@ import cors from "cors";
 import { IDIContainer } from "./services/DIContainer";
 import { STATIC_DIR } from "config";
 import { createProxyMiddleware } from "http-proxy-middleware";
-import { createClient, RedisClientType  } from "redis";
+import { createClient } from "redis";
+import { validateTokenMiddlewareFactory } from "./middleware/validateTokenMiddleware";
+import AuthDataAccess from "infrastructure/dataAccess/AuthDataAccess";
+import RedisTokenRepository from "infrastructure/persistence/RedisTokenRepository";
 
 export type RedisClientConnection = ReturnType<typeof createClient>
 
@@ -14,7 +17,6 @@ export default function createApplication(config: {
     mode: "PRODUCTION" | "DEVELOPMENT" | "DOCKER";
     diContainer: IDIContainer;
     redis: RedisClientConnection;
-    authUrl: string;
 }) {
     const { redis } = config;
     const app = express();
@@ -27,57 +29,10 @@ export default function createApplication(config: {
         app.use(middleware);
     });
 
-    app.all("*", async (req, res, next) => {
-        const keys = await redis.keys('*');
-        console.log(keys)
-        const authHeader = req.headers['authorization'];
-        if (authHeader == null) {
-            res.status(401).send();
-            return;
-        }
+    const authDataAccess = new AuthDataAccess();
+    const tokenRepository = new RedisTokenRepository(redis);
 
-        const [_, token] = authHeader.split(" ");
-        if (token == null) {
-            res.status(401).send();
-            return;
-        }
-
-        const expirationTimestamp = await redis.get(token);
-        if (expirationTimestamp != null) {
-            const expirationDate = new Date(expirationTimestamp);
-            console.log(expirationDate, new Date())
-            if (expirationDate > new Date()) {
-                await redis.del(token);
-                next();
-                return;
-            }
-        }
-
-        const response = await fetch(`${config.authUrl}/validate-token`, {
-            headers: {
-                "Content-Type": "application/json",
-                'Authorization': authHeader
-            },
-        });
-
-        const data: {
-            valid: boolean;
-            expiration: string;
-        } = await response.json();
-
-        if (response.ok && data.valid) {
-            const EX = Math.floor((new Date(data.expiration).getTime() - Date.now()) / 1000);
-            console.log(EX)
-            await redis.set(token, data.expiration, {
-                EX: EX
-            });
-
-            next();
-            return;
-        }
-
-        res.status(401).send();
-    });
+    app.all("*", validateTokenMiddlewareFactory({ tokenRepository: tokenRepository, authDataAccess: authDataAccess }));
 
     app.use(
         createProxyMiddleware({
