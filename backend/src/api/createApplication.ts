@@ -38,7 +38,7 @@ export default function createApplication(config: {
 
     registerAction({ 
         router: authRouter, 
-        initialiseAction: () => new LogoutAction(authDataAccess), 
+        initialiseAction: () => new LogoutAction(authDataAccess, tokenRepository), 
         method: "POST",
         path: "/logout",
         

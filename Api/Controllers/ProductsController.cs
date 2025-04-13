@@ -99,6 +99,12 @@ public class ProductsController : ControllerBase
         [FromQuery] DateTime? createdAfter,
         [FromQuery] string? orderBy)
     {
+        Console.WriteLine($"------------------ ******************* ------------------");
+        if (Request.Headers.TryGetValue("X-Client-Id", out var headerValue))
+        {
+            Console.WriteLine($"X-Client-Id: {headerValue}");
+        }
+        
         var parameters = new ListProductsRequestDTO(
             id: id,
             name: name,

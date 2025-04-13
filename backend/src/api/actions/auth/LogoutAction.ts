@@ -6,12 +6,13 @@ import JsonResponse from "api/responses/JsonResponse";
 import IApiError from "api/errors/IApiError";
 import API_ERROR_CODES from "api/errors/API_ERROR_CODES";
 import ILogoutUserRequestDTO from "api/contracts/logout/ILogoutUserRequestDTO";
+import ITokenRepository from "api/interfaces/ITokenRepository";
 
 type ActionRequest = { dto: ILogoutUserRequestDTO };
 type ActionResponse = JsonResponse<ILogoutUserResponseDTO | IApiError[]>;
 
 class LogoutAction implements IAction<ActionRequest, ActionResponse> {
-    constructor(private readonly authDataAccess: IAuthDataAccess) {}
+    constructor(private readonly authDataAccess: IAuthDataAccess, private readonly tokenRepository: ITokenRepository) {}
 
     async handle(request: ActionRequest): Promise<ActionResponse> {
         const response = await this.authDataAccess.logout(request.dto.bearerToken, { refresh: request.dto.refreshToken });
@@ -35,6 +36,11 @@ class LogoutAction implements IAction<ActionRequest, ActionResponse> {
             });
         }
 
+        const token = await this.tokenRepository.getToken(request.dto.bearerToken);
+        if (token != null) {
+            await this.tokenRepository.expireToken(token);            
+        }
+
         return new JsonResponse({
             status: 200,
             body: {}
@@ -42,7 +48,6 @@ class LogoutAction implements IAction<ActionRequest, ActionResponse> {
     }
 
     bind(request: Request): ActionRequest {
-        console.log("incoming: ", request.body)
         return {
             dto: {
                 bearerToken: request.body.bearerToken,

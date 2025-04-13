@@ -4,6 +4,8 @@ import { NextFunction, Request, Response } from "express";
 import ValidateTokenResponseDTO from "infrastructure/contracts/auth/validateToken/ValidateTokenResponseDTO";
 import IAuthDataAccess from "infrastructure/interfaces/IAuthDataAccess";
 
+const CLIENT_ID_HEADER_KEY = "X-Client-Id";
+
 export function validateTokenMiddlewareFactory(props: { tokenRepository: ITokenRepository; authDataAccess: IAuthDataAccess; }) {
     async function validateTokenMiddleware(req: Request, res: Response, next: NextFunction) {
         const authHeader = req.headers['authorization'];
@@ -21,6 +23,7 @@ export function validateTokenMiddlewareFactory(props: { tokenRepository: ITokenR
         const tokenDomain = await tokenRepository.getToken(token)
         if (tokenDomain != null) {
             if (tokenDomain.isValid()) {
+                req.headers[CLIENT_ID_HEADER_KEY] = tokenDomain.userId;
                 next();
                 return;
             } else {
@@ -33,8 +36,9 @@ export function validateTokenMiddlewareFactory(props: { tokenRepository: ITokenR
         if (response.ok) {
             const data: ValidateTokenResponseDTO = await response.json();
             
-            const tokenDomain = JwtToken.executeCreate({ expiryDate: new Date(data.expiration), value: token });
+            const tokenDomain = JwtToken.executeCreate({ expiryDate: new Date(data.expiration), value: token, userId: data.user_id });
             await tokenRepository.create(tokenDomain);
+            req.headers[CLIENT_ID_HEADER_KEY] = tokenDomain.userId;
     
             next();
             return;

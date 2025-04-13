@@ -56,7 +56,6 @@ class ValidateTokenView(APIView):
 
     def get(self, request: HttpRequest):
         authorization_header = request.headers.get("Authorization")
-        print(authorization_header)
 
         if not authorization_header:
             return Response({ "non_field_errors": ["Authorization Header is required."] }, status=status.HTTP_400_BAD_REQUEST)
@@ -69,6 +68,7 @@ class ValidateTokenView(APIView):
         try:
             # Decode the token
             access_token = AccessToken(token) # type: ignore
+            user_id = access_token['user_id']
             
             # Extract expiration date
             expiration_timestamp = access_token["exp"]
@@ -76,9 +76,9 @@ class ValidateTokenView(APIView):
 
             # Check if the token is expired
             if datetime.now(timezone.utc) > expiration_date:
-                return Response({ "valid": False, "expiration": str(expiration_date) }, status=status.HTTP_400_BAD_REQUEST)
+                return Response({ "valid": False, "expiration": str(expiration_date), "user_id": user_id }, status=status.HTTP_400_BAD_REQUEST)
 
-            return Response({ "valid": True, "expiration": str(expiration_date) }, status=status.HTTP_200_OK)
+            return Response({ "valid": True, "expiration": str(expiration_date), "user_id": user_id }, status=status.HTTP_200_OK)
 
         except Exception as e:
             return Response({ "non_field_errors": [str(e)] }, status=status.HTTP_401_UNAUTHORIZED)
