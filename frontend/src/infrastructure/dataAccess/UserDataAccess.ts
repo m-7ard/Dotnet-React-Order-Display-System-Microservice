@@ -1,11 +1,13 @@
 import { TokenStorage } from "../../presentation/deps/tokenStorage";
 import IUserDataAccess from "../../presentation/interfaces/dataAccess/IUserDataAccess";
-import { getAuthUrl } from "../../viteUtils";
+import { getApiUrl, getAuthUrl } from "../../viteUtils";
 import ILoginUserRequestDTO from "../contracts/auth/login/ILoginUserRequestDTO";
+import ILogoutUserRequestDTO from "../contracts/auth/logout/ILogoutUserRequestDTO";
 import IRegisterUserRequestDTO from "../contracts/auth/register/IRegisterUserRequestDTO";
 
 export default class UserDataAccess implements IUserDataAccess {
     private readonly authRoute = `${getAuthUrl()}`;
+    private readonly apiUrl = `${getApiUrl()}`;
     
     constructor(private readonly tokenStorage: TokenStorage) {}
 
@@ -40,6 +42,26 @@ export default class UserDataAccess implements IUserDataAccess {
                 "Content-Type": "application/json",
                 'Authorization': `Bearer ${this.tokenStorage.getAccessToken()}`
             },
+        });
+
+        return response;
+    }
+
+    async logout(): Promise<Response> {
+        const request: ILogoutUserRequestDTO = {
+            refreshToken: this.tokenStorage.getRefreshToken(),
+            bearerToken: this.tokenStorage.getAccessToken()
+        } 
+
+        console.log(request)
+
+        // Logout through the proxy
+        const response = await fetch(`${this.apiUrl}/logout`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(request)
         });
 
         return response;

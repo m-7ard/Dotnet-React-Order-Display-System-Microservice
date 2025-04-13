@@ -9,7 +9,7 @@ import { useAuthServiceContext } from "./Application.AuthServiceProvider.Context
 
 export default function ApplicationHeader() {
     const locationEq = useRouterLocationEq();
-    const { user } = useAuthServiceContext();
+    const { user, logout } = useAuthServiceContext();
 
     return (
         <>
@@ -119,6 +119,7 @@ export default function ApplicationHeader() {
                             }}
                             type="button"
                             active={locationEq((routes) => routes.LIST_ORDERS)}
+                            onClick={logout}
                         >
                             Logout
                         </MixinButton>

@@ -6,6 +6,7 @@ interface IUserDataAccess {
     register(request: IRegisterUserRequestDTO): Promise<Response>
     login(request: ILoginUserRequestDTO): Promise<Response>
     currentUser(request: ICurrentUserRequestDTO): Promise<Response>;
+    logout(): Promise<Response>
 }
 
 export default IUserDataAccess;

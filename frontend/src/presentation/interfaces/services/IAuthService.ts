@@ -16,9 +16,10 @@ export interface ILoginUserContract {
 
 interface IAuthService {
     user: User | null;
-    currentUser(request: ICurrentUserRequestDTO): Promise<User | null>;
-    register(request: IRegisterUserContract): Promise<Result<boolean, IPresentationError<object>>>;
-    login(request: ILoginUserContract): Promise<Result<boolean, IPresentationError<object>>>;
+    currentUser(contract: ICurrentUserRequestDTO): Promise<User | null>;
+    register(contract: IRegisterUserContract): Promise<Result<boolean, IPresentationError<object>>>;
+    login(contract: ILoginUserContract): Promise<Result<boolean, IPresentationError<object>>>;
+    logout(): Promise<void>;
 }
 
 export default IAuthService;

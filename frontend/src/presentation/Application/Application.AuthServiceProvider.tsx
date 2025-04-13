@@ -12,6 +12,7 @@ import tryHandleRequest from "../utils/routableErrors/tryHandleRequest";
 import PresentationErrorFactory from "../mappers/PresentationErrorFactory";
 import IDjangoErrors from "../../infrastructure/interfaces/IDjangoError";
 import ILoginUserResponseDTO from "../../infrastructure/contracts/auth/login/ILoginUserResponseDTO";
+import IPlainApiError from "../../infrastructure/interfaces/IPlainApiError";
 
 export default function AuthServiceProvider(props: React.PropsWithChildren<{ href: string }>) {
     // Props
@@ -90,6 +91,7 @@ export default function AuthServiceProvider(props: React.PropsWithChildren<{ hre
 
                     const data: ILoginUserResponseDTO = await response.json();
                     tokenStorage.setAccessToken(data.access);
+                    tokenStorage.setRefreshToken(data.refresh);
                     await currentUser({});
                     return ok(true);
                 }
@@ -99,6 +101,33 @@ export default function AuthServiceProvider(props: React.PropsWithChildren<{ hre
             } catch (error: unknown) {
                 dispatchException(error);
                 return err({ _: [JSON.stringify(error)] });
+            }
+        },
+        [dispatchException, userDataAccess, currentUser, tokenStorage],
+    );
+
+    const logout = useCallback<IAuthService["logout"]>(
+        async () => {
+            try {
+                const result = await tryHandleRequest(userDataAccess.logout());
+
+                if (result.isErr()) {
+                    dispatchException(result.error);
+                    return;
+                }
+
+                const response = result.value;
+                if (response.ok) {
+                    tokenStorage.setAccessToken(null);
+                    tokenStorage.setRefreshToken(null);
+                    await currentUser({});
+                    return;
+                }
+
+                const errors: IPlainApiError[] = await response.json();
+                dispatchException(JSON.stringify(errors));
+            } catch (error: unknown) {
+                dispatchException(error);
             }
         },
         [dispatchException, userDataAccess, currentUser, tokenStorage],
@@ -120,6 +149,7 @@ export default function AuthServiceProvider(props: React.PropsWithChildren<{ hre
         currentUser: currentUser,
         register: register,
         login: login,
+        logout: logout
     };
 
     return <AuthServiceContext.Provider value={authService}>{children}</AuthServiceContext.Provider>;

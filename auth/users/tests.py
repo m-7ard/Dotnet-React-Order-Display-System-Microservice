@@ -123,3 +123,132 @@ class AuthTests(APITestCase):
         # Assert
         assert isinstance(response, Response)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_validate_token_success(self):
+        # Setup
+        self.client.post(self.register_url, self.user_data)
+        login_response = cast(Response, self.client.post(self.login_url, {
+            'username': self.user_data['username'],
+            'password': self.user_data['password']
+        }))
+
+        assert isinstance(login_response, Response)
+        assert login_response.data is not None
+
+        access_token = login_response.data['access']
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_token)
+
+        # Act
+        validate_url = reverse(NAMES.VALIDATE_TOKEN)
+        response = cast(Response, self.client.get(validate_url))
+
+        # Assert
+        assert isinstance(response, Response)
+        assert response.data is not None
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data['valid'])
+        self.assertIn('expiration', response.data)
+
+    def test_validate_token_missing_authorization_header(self):
+        # Act
+        validate_url = reverse(NAMES.VALIDATE_TOKEN)
+        response = cast(Response, self.client.get(validate_url))  # No token set
+
+        # Assert
+        assert isinstance(response, Response)
+        assert response.data is not None
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('non_field_errors', response.data)
+
+    def test_validate_token_malformed_token(self):
+        # Setup
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer malformed.token.value')
+
+        # Act
+        validate_url = reverse(NAMES.VALIDATE_TOKEN)
+        response = cast(Response, self.client.get(validate_url))
+
+        # Assert
+        assert isinstance(response, Response)
+        assert response.data is not None
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertIn('non_field_errors', response.data)
+
+    def test_logout_success(self):
+        # Setup
+        self.client.post(self.register_url, self.user_data)
+        login_response = cast(Response, self.client.post(self.login_url, {
+            'username': self.user_data['username'],
+            'password': self.user_data['password']
+        }))
+        
+        assert isinstance(login_response, Response)
+        assert login_response.data is not None
+
+        access_token = login_response.data['access']
+        refresh_token = login_response.data['refresh']
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_token)
+
+        # Act
+        logout_url = reverse(NAMES.LOGOUT)
+        response = cast(Response, self.client.post(logout_url, {'refresh': refresh_token}))
+
+        # Assert
+        assert isinstance(response, Response)
+        assert response.data is not None
+
+        self.assertEqual(response.status_code, status.HTTP_205_RESET_CONTENT)
+        self.assertIn('message', response.data)
+
+    def test_logout_invalid_token(self):
+        # Setup
+        self.client.post(self.register_url, self.user_data)
+        login_response = cast(Response, self.client.post(self.login_url, {
+            'username': self.user_data['username'],
+            'password': self.user_data['password']
+        }))
+        
+        assert isinstance(login_response, Response)
+        assert login_response.data is not None
+
+        access_token = login_response.data['access']
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_token)
+
+        # Act
+        logout_url = reverse(NAMES.LOGOUT)
+        response = cast(Response, self.client.post(logout_url, {'refresh': 'invalidtoken'}))
+
+        # Assert
+        assert isinstance(response, Response)
+        assert response.data is not None
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('non_field_errors', response.data)
+
+    def test_logout_missing_token(self):
+        # Setup
+        self.client.post(self.register_url, self.user_data)
+        login_response = cast(Response, self.client.post(self.login_url, {
+            'username': self.user_data['username'],
+            'password': self.user_data['password']
+        }))
+        
+        assert isinstance(login_response, Response)
+        assert login_response.data is not None
+
+        access_token = login_response.data['access']
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_token)
+
+        # Act
+        logout_url = reverse(NAMES.LOGOUT)
+        response = cast(Response, self.client.post(logout_url, {}))
+
+        # Assert
+        assert isinstance(response, Response)
+        assert response.data is not None
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('non_field_errors', response.data)

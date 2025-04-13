@@ -1,4 +1,4 @@
-import express, { NextFunction, Request, Response } from "express";
+import express, { NextFunction, Request, Response, Router } from "express";
 import errorLogger from "./middleware/errorLogger";
 import cors from "cors";
 import { IDIContainer } from "./services/DIContainer";
@@ -8,6 +8,8 @@ import { createClient } from "redis";
 import { validateTokenMiddlewareFactory } from "./middleware/validateTokenMiddleware";
 import AuthDataAccess from "infrastructure/dataAccess/AuthDataAccess";
 import RedisTokenRepository from "infrastructure/persistence/RedisTokenRepository";
+import registerAction from "./utils/registerAction";
+import LogoutAction from "./actions/auth/LogoutAction";
 
 export type RedisClientConnection = ReturnType<typeof createClient>
 
@@ -23,7 +25,7 @@ export default function createApplication(config: {
     app.options("*", cors());
     app.use(cors());
 
-    // app.use(express.json({ limit: 1028 ** 2 * 100 }));
+    app.use(express.json({ limit: "1mb" }));
     app.use(express.urlencoded({ extended: false }));
     config.middleware.forEach((middleware) => {
         app.use(middleware);
@@ -32,7 +34,19 @@ export default function createApplication(config: {
     const authDataAccess = new AuthDataAccess();
     const tokenRepository = new RedisTokenRepository(redis);
 
-    app.all("*", validateTokenMiddlewareFactory({ tokenRepository: tokenRepository, authDataAccess: authDataAccess }));
+    const authRouter = Router();
+
+    registerAction({ 
+        router: authRouter, 
+        initialiseAction: () => new LogoutAction(authDataAccess), 
+        method: "POST",
+        path: "/logout",
+        
+    })
+
+    app.use(authRouter);
+
+    app.use(validateTokenMiddlewareFactory({ tokenRepository: tokenRepository, authDataAccess: authDataAccess }));
 
     app.use(
         createProxyMiddleware({

@@ -1,3 +1,4 @@
+import ILogoutUserRequestDTO from "infrastructure/contracts/auth/logout/ILogoutUserRequestDTO";
 import IAuthDataAccess from "infrastructure/interfaces/IAuthDataAccess";
 
 class AuthDataAccess implements IAuthDataAccess {
@@ -21,8 +22,16 @@ class AuthDataAccess implements IAuthDataAccess {
         });
     }
 
-    logout(token: string): Promise<Response> {
-        throw new Error("Method not implemented.");
+    async logout(accessToken: string, contract: ILogoutUserRequestDTO): Promise<Response> {
+        console.log(accessToken, contract)
+        return await fetch(`${this.authUrl}/logout`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify(contract)
+        });
     }
 }
 
