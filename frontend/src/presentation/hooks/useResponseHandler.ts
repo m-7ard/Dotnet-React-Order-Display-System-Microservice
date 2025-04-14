@@ -12,31 +12,87 @@ export default function useResponseHandler() {
             requestFn: () => Promise<Response>;
             onResponseFn: (response: Response) => Promise<Result<SuccessType, ErrorType>>;
             fallbackValue?: FallbackType;
-        }) => {
+        }): Promise<FallbackType extends undefined ? SuccessType | ErrorType | undefined : SuccessType | ErrorType | FallbackType> => {
             const { requestFn, onResponseFn, fallbackValue } = props;
 
             try {
                 const responseResult = await tryHandleRequest(requestFn());
                 if (responseResult.isErr()) {
                     dispatchException(responseResult.error);
-                    return fallbackValue;
+                    return fallbackValue as never;
                 }
 
                 const response = responseResult.value;
                 const result = await onResponseFn(response);
                 if (result.isOk()) {
-                    return result.value;
+                    return result.value as never;
                 }
 
                 const error = await handleInvalidResponse(response);
-                console.log(error)
+                console.log(error);
                 dispatchException(error);
-                return result.error;
+                return result.error as never;
             } catch (err: unknown) {
                 dispatchException(err);
-                return fallbackValue;
+                return fallbackValue as never;
             }
         },
         [dispatchException],
     );
+}
+
+type RequestFn = () => Promise<Response>;
+
+export function useFluentResponseHandler() {
+    const { dispatchException } = useApplicationExceptionContext();
+
+    class ResponseHandlerBuilder<SuccessType, ErrorType, FallbackType = undefined> {
+        private requestFn?: RequestFn;
+        private onResponseFn?: (res: Response) => Promise<Result<SuccessType, ErrorType>>;
+        private fallbackValue?: FallbackType;
+
+        withRequest(fn: RequestFn) {
+            this.requestFn = fn;
+            return this;
+        }
+
+        onResponse(fn: (res: Response) => Promise<Result<SuccessType, ErrorType>>) {
+            this.onResponseFn = fn;
+            return this;
+        }
+
+        withFallback<T>(fallback: T): ResponseHandlerBuilder<SuccessType, ErrorType, T> {
+            this.fallbackValue = fallback as never;
+            return this as never;
+        }
+
+        async execute(): Promise<FallbackType extends undefined ? SuccessType | ErrorType | undefined : SuccessType | ErrorType | FallbackType> {
+            try {
+                const responseResult = await tryHandleRequest(this.requestFn!());
+
+                if (responseResult.isErr()) {
+                    dispatchException(responseResult.error);
+                    return this.fallbackValue as never;
+                }
+
+                const response = responseResult.value;
+                const result = await this.onResponseFn!(response);
+
+                if (result.isOk()) {
+                    return result.value as never;
+                }
+
+                const error = await handleInvalidResponse(response);
+                dispatchException(error);
+                return result.error as never;
+            } catch (err) {
+                dispatchException(err);
+                return this.fallbackValue as never;
+            }
+        }
+    }
+
+    return function responseHandler<SuccessType, ErrorType>() {
+        return new ResponseHandlerBuilder<SuccessType, ErrorType>();
+    };
 }

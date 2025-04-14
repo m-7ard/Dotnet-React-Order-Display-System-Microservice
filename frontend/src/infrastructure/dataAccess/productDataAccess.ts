@@ -7,14 +7,22 @@ import IDeleteProductRequestDTO from "../contracts/products/delete/IDeleteProduc
 import { getApiUrl } from "../../viteUtils";
 import getUrlParams from "../../presentation/utils/getUrlParams";
 import IUpdateProductAmountRequestDTO from "../contracts/products/updateAmount/IUpdateProductAmountRequestDTO";
+import { TokenStorage } from "../../presentation/deps/tokenStorage";
 
 export default class ProductDataAccess implements IProductDataAccess {
     private readonly _apiRoute = `${getApiUrl()}/api/products`;
 
+    constructor(private readonly tokenStorage: TokenStorage) {}
+    
     async listProducts(request: IListProductsRequestDTO): Promise<Response> {
         const urlParams = getUrlParams(request);
+        console.log(this.tokenStorage.getAccessToken())
         const response = await fetch(`${this._apiRoute}/list?${urlParams}`, {
             method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                'Authorization': `Bearer ${this.tokenStorage.getAccessToken()}`
+            },
         });
 
         return response;
@@ -25,6 +33,7 @@ export default class ProductDataAccess implements IProductDataAccess {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                'Authorization': `Bearer ${this.tokenStorage.getAccessToken()}`
             },
             body: JSON.stringify(request),
         });
@@ -37,6 +46,7 @@ export default class ProductDataAccess implements IProductDataAccess {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
+                'Authorization': `Bearer ${this.tokenStorage.getAccessToken()}`
             },
         });
 
@@ -48,6 +58,7 @@ export default class ProductDataAccess implements IProductDataAccess {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
+                'Authorization': `Bearer ${this.tokenStorage.getAccessToken()}`
             },
             body: JSON.stringify(request),
         });
@@ -60,6 +71,7 @@ export default class ProductDataAccess implements IProductDataAccess {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
+                'Authorization': `Bearer ${this.tokenStorage.getAccessToken()}`
             },
             body: JSON.stringify(request),
         });
@@ -72,6 +84,7 @@ export default class ProductDataAccess implements IProductDataAccess {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                'Authorization': `Bearer ${this.tokenStorage.getAccessToken()}`
             },
             body: JSON.stringify(request),
         });

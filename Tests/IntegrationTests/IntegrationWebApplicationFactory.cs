@@ -7,7 +7,6 @@ using Application.Common;
 using Infrastructure;
 using Infrastructure.Interfaces;
 using Api.Services;
-using Infrastructure.Values;
 
 namespace Tests.IntegrationTests;
 

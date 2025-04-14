@@ -11,6 +11,7 @@ export interface IRouterModule {
         params: TExtractGenericRouteParams<T>;
         search?: Record<string, string>;
     }) => void;
+    useRouterHref: () => string;
 }
 
 export default function RouterModule({ children, ...routerModule }: PropsWithChildren<IRouterModule>) {

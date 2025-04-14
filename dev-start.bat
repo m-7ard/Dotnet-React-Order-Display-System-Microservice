@@ -1,0 +1,13 @@
+@echo off
+
+echo Starting Server 1...
+start cmd /k "cd /d Api && dotnet watch run"
+
+echo Starting Server 2...
+start cmd /k "cd /d frontend && npm run dev"
+
+echo Starting Server 3...
+start cmd /k "cd /d auth && env\scripts\activate && python manage.py runserver"
+
+echo Starting Server 4...
+start cmd /k "cd /d backend && npm run dev"

@@ -6,3 +6,7 @@ export const getLocalUrl = (_path: string) => {
 export const getApiUrl = () => {
     return "some.url";
 };
+
+export const getAuthUrl = () => {
+    return "auth.url";
+}

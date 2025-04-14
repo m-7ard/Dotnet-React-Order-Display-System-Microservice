@@ -1,14 +1,5 @@
-import IPasswordHasher from "application/interfaces/IPasswordHasher";
-import IJwtTokenService from "application/interfaces/IJwtTokenService";
 import { Knex } from "knex";
-import IClientDomainService from "application/interfaces/domainServices/IClientDomainService";
-import IClientRepository from "application/interfaces/persistence/IClientRepository";
-import IUnitOfWork from "application/interfaces/persistence/IUnitOfWork";
-import IUserRepository from "application/interfaces/persistence/IUserRepository";
 import { AsyncLocalStorage } from "async_hooks";
-import IUserDomainService from "application/interfaces/domainServices/IUserDomainService";
-import IRealEstateListingRepository from "application/interfaces/persistence/IRealEstateListingRepository";
-import IRealEstateListingDomainService from "application/interfaces/domainServices/IRealEstateListingDomainService";
 
 type TokenType<T> = T extends { __service: infer S } ? S : never;
 
@@ -27,15 +18,6 @@ const makeToken = <Service>(literal: string) => literal as string & { __service:
 
 export const DI_TOKENS = {
     KNEX_CLIENT: makeToken<Knex>("KNEX_CLIENT"),
-    PASSWORD_HASHER: makeToken<IPasswordHasher>("PASSWORD_HASHER"),
-    JWT_TOKEN_SERVICE: makeToken<IJwtTokenService>("JWT_TOKEN_SERVICE"),
-    CLIENT_DOMAIN_SERVICE: makeToken<IClientDomainService>("CLIENT_DOMAIN_SERVICE"),
-    CLIENT_REPOSITORY: makeToken<IClientRepository>("CLIENT_REPOSITORY"),
-    REAL_ESTATE_LISTING_REPOSITORY: makeToken<IRealEstateListingRepository>("REAL_ESTATE_LISTING_REPOSITORY"),
-    UNIT_OF_WORK: makeToken<IUnitOfWork>("UNIT_OF_WORK"),
-    USER_REPOSITORY: makeToken<IUserRepository>("USER_REPOSITORY"),
-    USER_DOMAIN_SERVICE: makeToken<IUserDomainService>("USER_DOMAIN_SERVICE"),
-    REAL_ESTATE_LISTING_DOMAIN_SERVICE: makeToken<IRealEstateListingDomainService>("REAL_ESTATE_LISTING_DOMAIN_SERVICE"),
 } as const;
 
 const scopeContext = new AsyncLocalStorage<Map<string, unknown>>();

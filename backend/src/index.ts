@@ -1,6 +1,7 @@
 import createApplication from "api/createApplication";
 import responseLogger from "api/middleware/responseLogger";
 import { ProductionDIContainer } from "api/services/DIContainer";
+import { createClient } from "redis";
 import { assert, literal, union } from "superstruct";
 
 if (global.crypto == null) {
@@ -27,11 +28,16 @@ async function main() {
 
     const diContainer = new ProductionDIContainer();
 
+
+    const redis = createClient();
+    await redis.connect();
+
     const app = createApplication({
         port: port,
         middleware: [responseLogger],
         mode: environment,
-        diContainer: diContainer
+        diContainer: diContainer,
+        redis: redis
     });
 
     const server = app.listen(port, host, () => {
