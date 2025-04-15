@@ -1,5 +1,6 @@
 using System.Globalization;
 using Api.Interfaces;
+using Api.Middleware;
 using Api.Services;
 using Api.Validators;
 using Application.Common;
@@ -8,13 +9,11 @@ using Application.Handlers.Products.Create;
 using Application.Interfaces.Persistence;
 using Application.Interfaces.Services;
 using FluentValidation;
-using Infrastructure;
 using Infrastructure.Files;
 using Infrastructure.Interfaces;
 using Infrastructure.Persistence;
 using Infrastructure.Querying;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 
 // dotnet ef migrations add <Name> --project Infrastructure --startup-project Api
@@ -23,13 +22,25 @@ var builder = WebApplication.CreateBuilder(args);
 var appSettings = BuilderUtils.ReadAppSettings(builder.Configuration);
 var databaseProviderSingleton = new DatabaseProviderSingleton(appSettings.DatabaseProviderValue);
 
+
+// HttpContextAccessor
+builder.Services.AddHttpContextAccessor();
+
 ///
 ///
 /// DB / database / dbcontext
 /// 
 
 builder.Services.AddSingleton<TenantDatabaseService>();
-builder.Services.AddScoped<TenantDbContextFactory>();
+builder.Services.AddScoped<TenantDbContextFactory>(sp =>
+{
+    return new TenantDbContextFactory(
+        sp.GetRequiredService<TenantDatabaseService>(),
+        sp.GetRequiredService<IHttpContextAccessor>(),
+        sp.GetRequiredService<IDatabaseProviderSingleton>(),
+        null // Explicitly pass null for test context in regular operation
+    );
+});
 builder.Services.AddScoped(sp => sp.GetRequiredService<TenantDbContextFactory>().CreateDbContext());
 
 var services = builder.Services;
@@ -124,25 +135,8 @@ builder.Services.AddValidatorsFromAssembly(typeof(UpdateProductValidator).Assemb
 
 ///
 ///
-/// JWT
+/// Media Discovery
 /// 
-
-/*
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
-        };
-    });
-*/
 
 builder.Services.AddAuthorization();
 builder.Services.AddDirectoryBrowser(); // For media
@@ -153,11 +147,19 @@ app.UseRequestLocalization();
 
 ///
 ///
+/// Middlware
+/// 
+
+app.UseMiddleware<TenantMiddleware>();
+
+///
+///
 /// Startup behaviour
 /// 
 
 using (var scope = app.Services.CreateScope())
 {
+    /*
     var localService = scope.ServiceProvider;
     var context = localService.GetRequiredService<SimpleProductOrderServiceDbContext>();
 
@@ -171,6 +173,7 @@ using (var scope = app.Services.CreateScope())
         var logger = localService.GetRequiredService<ILogger<Program>>();
         logger.LogError(ex, "An error occurred while resetting the database.");
     }
+    */
 }
 
 

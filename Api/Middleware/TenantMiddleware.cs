@@ -19,6 +19,7 @@ public class TenantMiddleware
         if (_databaseProvider.IsTesting)
         {
             await _next(context);
+            return;
         }
 
         if (!context.Request.Headers.TryGetValue("X-Client-Id", out var clientIdValues))
@@ -45,6 +46,7 @@ public class TenantMiddleware
             
             // Continue processing the request
             await _next(context);
+
         }
         catch (Exception ex)
         {

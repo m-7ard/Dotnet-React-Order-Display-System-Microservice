@@ -23,7 +23,6 @@ export default class UserDataAccess implements IUserDataAccess {
         return response;
     }
     async login(request: ILoginUserRequestDTO): Promise<Response> {
-        console.log("req: ", request)
         const response = await fetch(`${this.authRoute}/login`, {
             method: "POST",
             headers: {
@@ -53,7 +52,7 @@ export default class UserDataAccess implements IUserDataAccess {
             bearerToken: this.tokenStorage.getAccessToken()
         } 
 
-        console.log(request)
+        console.log("login: ", request)
 
         // Logout through the proxy
         const response = await fetch(`${this.apiUrl}/logout`, {

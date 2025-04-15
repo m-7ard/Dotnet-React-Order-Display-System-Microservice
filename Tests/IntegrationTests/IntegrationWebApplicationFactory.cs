@@ -54,7 +54,7 @@ public class IntegrationWebApplicationFactory<TProgram> : WebApplicationFactory<
             services.AddSingleton<TenantDatabaseService>();
             
             // Register DbContext factory options
-            services.AddSingleton<DbContextOptions<SimpleProductOrderServiceDbContext>>(provider => {
+            services.AddSingleton(provider => {
                 var options = new DbContextOptionsBuilder<SimpleProductOrderServiceDbContext>();
                 if (databaseProviderSingleton.IsSQLite)
                 {
