@@ -15,6 +15,7 @@ class LogoutAction implements IAction<ActionRequest, ActionResponse> {
     constructor(private readonly authDataAccess: IAuthDataAccess, private readonly tokenRepository: ITokenRepository) {}
 
     async handle(request: ActionRequest): Promise<ActionResponse> {
+        console.log("logout: ", request)
         const response = await this.authDataAccess.logout(request.dto.bearerToken, { refresh: request.dto.refreshToken });
         if (response.status >= 400 && response.status < 500) {
             return new JsonResponse({
@@ -48,6 +49,7 @@ class LogoutAction implements IAction<ActionRequest, ActionResponse> {
     }
 
     bind(request: Request): ActionRequest {
+        console.log(request.body)
         return {
             dto: {
                 bearerToken: request.body.bearerToken,

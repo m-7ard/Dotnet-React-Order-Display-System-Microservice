@@ -26,7 +26,6 @@ export default function AuthServiceProvider(props: React.PropsWithChildren<{ hre
     // State
     const currentHref = useRef(href);
     const [user, setUser] = useState<User | null>(null);
-    console.log("user: ", user);
 
     const currentUser = useCallback<IAuthService["currentUser"]>(async () => {
         return fluentResponseHandler<User | null, null>()
@@ -87,8 +86,6 @@ export default function AuthServiceProvider(props: React.PropsWithChildren<{ hre
 
                 const response = result.value;
                 if (response.ok) {
-                    console.log("Login Worked")
-
                     const data: ILoginUserResponseDTO = await response.json();
                     tokenStorage.setAccessToken(data.access);
                     tokenStorage.setRefreshToken(data.refresh);

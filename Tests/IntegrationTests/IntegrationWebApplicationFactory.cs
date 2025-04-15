@@ -17,32 +17,48 @@ public class IntegrationWebApplicationFactory<TProgram> : WebApplicationFactory<
         builder.ConfigureServices(services =>
         {
             // Remove development database service config
-            // **DbContext (Remove)
-            var dbContextDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<SimpleProductOrderServiceDbContext>));
+            var dbContextDescriptor = services.SingleOrDefault(d => 
+                d.ServiceType == typeof(DbContextOptions<SimpleProductOrderServiceDbContext>));
             if (dbContextDescriptor != null)
             {
                 services.Remove(dbContextDescriptor);
             }
-            // **DbProviderSingleton
-            var dbProviderDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IDatabaseProviderSingleton));
+            
+            var dbProviderDescriptor = services.SingleOrDefault(d => 
+                d.ServiceType == typeof(IDatabaseProviderSingleton));
             if (dbProviderDescriptor != null)
             {
                 services.Remove(dbProviderDescriptor);
             }
+            
+            var tenantFactoryDescriptor = services.SingleOrDefault(d => 
+                d.ServiceType == typeof(TenantDbContextFactory));
+            if (tenantFactoryDescriptor != null)
+            {
+                services.Remove(tenantFactoryDescriptor);
+            }
+
+            // Add HttpContextAccessor
+            services.AddHttpContextAccessor();
 
             var configuration = services.BuildServiceProvider().GetRequiredService<IConfiguration>();
             var appSettings = BuilderUtils.ReadTestAppSettings(configuration);
-            var databaseProviderSingleton = new DatabaseProviderSingleton(appSettings.DatabaseProviderValue);
+            var databaseProviderSingleton = new DatabaseProviderSingleton(
+                value: appSettings.DatabaseProviderValue, 
+                isTesting: true);
 
-            // **DbProviderSingleton (Override)
+            // Register singleton provider
             services.AddSingleton<IDatabaseProviderSingleton>(databaseProviderSingleton);
-
-            // **DbContext (Override)
-            services.AddDbContext<SimpleProductOrderServiceDbContext>((sp, options) =>
-            {
+            
+            // Register TenantDatabaseService
+            services.AddSingleton<TenantDatabaseService>();
+            
+            // Register DbContext factory options
+            services.AddSingleton(provider => {
+                var options = new DbContextOptionsBuilder<SimpleProductOrderServiceDbContext>();
                 if (databaseProviderSingleton.IsSQLite)
                 {
-                    options.UseSqlite(appSettings.ConnectionString);
+                    options.UseSqlite("Data Source=XYZ_SQLITE_TESTING.db");
                 }
                 else if (databaseProviderSingleton.IsMSSQL)
                 {
@@ -52,10 +68,21 @@ public class IntegrationWebApplicationFactory<TProgram> : WebApplicationFactory<
                 {
                     throw new InvalidOperationException("Unsupported database provider.");
                 }
+                
+                return options.Options;
             });
+            
+            // Register DbContext as SCOPED (not singleton)
+            services.AddScoped<SimpleProductOrderServiceDbContext>(provider => {
+                var options = provider.GetRequiredService<DbContextOptions<SimpleProductOrderServiceDbContext>>();
+                return new SimpleProductOrderServiceDbContext(options);
+            });
+            
+            // Configure TenantDbContextFactory to use scoped DbContext
+            services.AddScoped<TenantDbContextFactory>();
 
+            // Create and initialize the database just once
             var sp = services.BuildServiceProvider();
-
             using (var scope = sp.CreateScope())
             {
                 var scopedServices = scope.ServiceProvider;
