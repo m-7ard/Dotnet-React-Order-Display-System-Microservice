@@ -7,7 +7,7 @@ public class TenantDatabaseService
 {
     private readonly string _baseConnectionString;
     
-    public TenantDatabaseService(IConfiguration configuration)
+    public TenantDatabaseService()
     {
         _baseConnectionString = "Data Source=client_{clientId}.db";
     }

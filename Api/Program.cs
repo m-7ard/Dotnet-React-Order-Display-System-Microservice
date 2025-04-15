@@ -28,22 +28,9 @@ var databaseProviderSingleton = new DatabaseProviderSingleton(appSettings.Databa
 /// DB / database / dbcontext
 /// 
 
-builder.Services.AddDbContext<SimpleProductOrderServiceDbContext>(options =>
-    {
-        if (databaseProviderSingleton.IsSQLite)
-        {
-            options.UseSqlite(appSettings.ConnectionString);
-        }
-        else if (databaseProviderSingleton.IsMSSQL)
-        {
-            options.UseSqlServer(appSettings.ConnectionString);
-        }
-        else
-        {
-            throw new InvalidOperationException("Unsupported database provider.");
-        }
-    }
-);
+builder.Services.AddSingleton<TenantDatabaseService>();
+builder.Services.AddScoped<TenantDbContextFactory>();
+builder.Services.AddScoped(sp => sp.GetRequiredService<TenantDbContextFactory>().CreateDbContext());
 
 var services = builder.Services;
 

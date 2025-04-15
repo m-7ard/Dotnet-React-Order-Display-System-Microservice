@@ -6,8 +6,8 @@ public class CreateManyProductResult
 {
     public CreateManyProductResult(List<ProductId> ids)
     {
-        Ids = ids;
+        Id = ids;
     }
 
-    public List<ProductId> Ids { get; set; }
+    public List<ProductId> Id { get; set; }
 }
