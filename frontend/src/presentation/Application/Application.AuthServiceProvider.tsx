@@ -26,6 +26,7 @@ export default function AuthServiceProvider(props: React.PropsWithChildren<{ hre
     // State
     const currentHref = useRef(href);
     const [user, setUser] = useState<User | null>(null);
+    const [hasInitialised, setHasInitialised] = useState(false);
 
     const currentUser = useCallback<IAuthService["currentUser"]>(async () => {
         return fluentResponseHandler<User | null, null>()
@@ -103,42 +104,45 @@ export default function AuthServiceProvider(props: React.PropsWithChildren<{ hre
         [dispatchException, userDataAccess, currentUser, tokenStorage],
     );
 
-    const logout = useCallback<IAuthService["logout"]>(
-        async () => {
-            try {
-                const result = await tryHandleRequest(userDataAccess.logout());
+    const logout = useCallback<IAuthService["logout"]>(async () => {
+        try {
+            const result = await tryHandleRequest(userDataAccess.logout());
 
-                if (result.isErr()) {
-                    dispatchException(result.error);
-                    return;
-                }
-
-                const response = result.value;
-                if (response.ok) {
-                    tokenStorage.setAccessToken(null);
-                    tokenStorage.setRefreshToken(null);
-                    await currentUser({});
-                    return;
-                }
-
-                const errors: IPlainApiError[] = await response.json();
-                dispatchException(JSON.stringify(errors));
-            } catch (error: unknown) {
-                dispatchException(error);
+            if (result.isErr()) {
+                dispatchException(result.error);
+                return;
             }
-        },
-        [dispatchException, userDataAccess, currentUser, tokenStorage],
-    );
+
+            const response = result.value;
+            if (response.ok) {
+                tokenStorage.setAccessToken(null);
+                tokenStorage.setRefreshToken(null);
+                await currentUser({});
+                return;
+            }
+
+            const errors: IPlainApiError[] = await response.json();
+            dispatchException(JSON.stringify(errors));
+        } catch (error: unknown) {
+            dispatchException(error);
+        }
+    }, [dispatchException, userDataAccess, currentUser, tokenStorage]);
 
     // On Navigation
     useEffect(() => {
-        if (currentHref.current === href) {
+        if (hasInitialised && currentHref.current === href) {
             return;
         }
 
-        currentUser({});
+        currentUser({})
+            .then(() => {
+                setHasInitialised(true);
+            })
+            .catch(() => {
+                setHasInitialised(true);
+            });
         currentHref.current = href;
-    }, [currentUser, dispatchException, href]);
+    }, [currentUser, dispatchException, href, hasInitialised]);
 
     // Service
     const authService: IAuthService = {
@@ -146,8 +150,8 @@ export default function AuthServiceProvider(props: React.PropsWithChildren<{ hre
         currentUser: currentUser,
         register: register,
         login: login,
-        logout: logout
+        logout: logout,
     };
 
-    return <AuthServiceContext.Provider value={authService}>{children}</AuthServiceContext.Provider>;
+    return hasInitialised && <AuthServiceContext.Provider value={authService}>{children}</AuthServiceContext.Provider>;
 }

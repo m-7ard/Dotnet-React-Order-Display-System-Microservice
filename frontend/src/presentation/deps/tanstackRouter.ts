@@ -1,5 +1,5 @@
 import { createRouter } from "@tanstack/react-router";
-import rootRoute from "../routes/tanstack/rootRoute";
+import rootRoute, { authRootRoute } from "../routes/tanstack/rootRoute";
 import productRoutes from "../routes/tanstack/children/products/productRoutes";
 import applicationRoutes from "../routes/tanstack/children/applicationRoutes";
 import orderRoutes from "../routes/tanstack/children/orders/orderRoutes";
@@ -14,7 +14,9 @@ const routeTree = rootRoute.addChildren([
     ...orderRoutes,
     ...productHistoryRoutes,
     ...errorRoutes,
-    ...userRoutes    
+    ...userRoutes,
+    authRootRoute,
+
 ]);
 
 const tanstackRouter = createRouter({

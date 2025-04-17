@@ -42,7 +42,7 @@ export default function RegisterUserPage(props: {
             directives={[contentGridDirective(() => ({}))]}
         >
             <MixinPageSection className="flex flex-row gap-3 items-center">
-                <LinkBoxV2 exp={(routes) => routes.CREATE_PRODUCT} params={{}} />
+                <LinkBoxV2 exp={(routes) => routes.REGISTER_USER} params={{}} />
             </MixinPageSection>
             <Divider />
             <MixinPageSection className="flex flex-col gap-3">

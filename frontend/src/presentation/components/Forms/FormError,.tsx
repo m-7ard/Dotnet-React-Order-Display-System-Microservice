@@ -12,10 +12,11 @@ function FormError(props: { title: string; errors?: string[] } & React.HtmlHTMLA
             hasBorder
             hasDivide
             {...htmlAttributes}
+            className="rounded-none"
         >
             <MixinPrototypeCardSection>
-                <div className="token-card--header--primary-text">{title}</div>
-                <div className="token-card--header--secondary-text">Form Errors</div>
+                <div className="text-sm font-bold">{title}</div>
+                <div className="text-xs">Form Errors</div>
             </MixinPrototypeCardSection>
             <MixinPrototypeCardSection>
                 {errors.map((error) => (

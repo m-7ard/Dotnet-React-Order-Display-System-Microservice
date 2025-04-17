@@ -7,12 +7,12 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.request import HttpRequest
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.authentication import BasicAuthentication
 from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth.models import User
 
-from .serializers import RegisterSerializer
+from .serializers import RegisterSerializer, CustomTokenObtainPairSerializer
 
 
 class RegisterView(CreateAPIView):
@@ -96,4 +96,7 @@ class LogoutView(APIView):
         except Exception as e:
             return Response({ "non_field_errors": [str(e)] }, status=status.HTTP_400_BAD_REQUEST)
     
-    
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+
