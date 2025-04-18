@@ -15,8 +15,7 @@ public class CreateProductIntegrationTest : ProductsIntegrationTest
         await base.InitializeAsync();
         var mixins = CreateMixins();
         _validImage = await mixins.CreateDraftImage(
-            fileRoute: TestFileRoute.ValidImage,
-            destinationFileName: "saved-valid-image.png"
+            destinationFileName: "valid-image.png"
         );
     }
 

@@ -1,125 +1,74 @@
 using System.Net;
 using System.Net.Http.Json;
 using Api.DTOs.DraftImages.UploadImages;
-using Application.Common;
+using Application.Contracts.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Tests.IntegrationTests.DraftImages;
 
 [Collection("Sequential")]
 public class UploadDraftImageIntegrationTest : DraftImageIntegrationTest
 {
-    [Fact]
-    public async Task UploadImages_ValidFiles_Success()
+    private UploadDraftImagesRequestDTO _defaultRequest = null!;
+    public async override Task InitializeAsync()
     {
-        var projectRoot = DirectoryService.GetProjectRoot();
-        var appRoot = Path.Combine(projectRoot, "Tests");
-        var imageRoute = Path.Combine(
-            appRoot,
-            "TestFiles",
-            "Images",
-            "valid-1.jpg"
-        );
-
-        using (var file = File.OpenRead(imageRoute))
-        using (var content = new StreamContent(file))
-        using (var formData = new MultipartFormDataContent())
-        {
-            formData.Add(content, "Files", "valid-1.jpg");
-            var response = await _client.PostAsync($"{_route}/upload_images", formData);
-
-            Assert.NotNull(response);
-            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-
-            var responseContent = await response.Content.ReadFromJsonAsync<UploadDraftImagesResponseDTO>();
-            Assert.NotNull(responseContent);
-            Assert.NotNull(responseContent.Images);
-            Assert.StrictEqual(1, responseContent.Images.Count);
-        }
+        await base.InitializeAsync();
+        _defaultRequest = new UploadDraftImagesRequestDTO(imageData: []);
     }
 
     [Fact]
-    public async Task UploadImages_TooLargeFiles_Failure()
+    public async Task UploadImages_ValidFiles_Success()
     {
-        var projectRoot = DirectoryService.GetProjectRoot();
-        var appRoot = Path.Combine(projectRoot, "Tests");
-        var imageRoute = Path.Combine(
-            appRoot,
-            "TestFiles",
-            "Images",
-            "too-large-image.png"
-        );
-
-        using (var file = File.OpenRead(imageRoute))
-        using (var content = new StreamContent(file))
-        using (var formData = new MultipartFormDataContent())
+        _defaultRequest.ImageData = new List<UploadImageData>()
         {
-            formData.Add(content, "Files", "too-large-image.png");
-            var response = await _client.PostAsync($"{_route}/upload_images", formData);
+            new UploadImageData(fileName: "validFileName-1.png", originalFileName: "original-validFileName-1.png", url: "url-1"),
+            new UploadImageData(fileName: "validFileName-2.png", originalFileName: "original-validFileName-2.png", url: "url-2")
+        };
+        var response = await _client.PostAsync($"{_route}/upload_images", JsonContent.Create(_defaultRequest));
 
-            Assert.NotNull(response);
-            Assert.Equal(HttpStatusCode.RequestEntityTooLarge, response.StatusCode);
-        }
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+        var responseContent = await response.Content.ReadFromJsonAsync<UploadDraftImagesResponseDTO>();
+        Assert.NotNull(responseContent);
+
+        var db = _factory.CreateDbContext();
+        var draftImages = await db.DraftImage.ToListAsync();
+        Assert.StrictEqual(2, draftImages.Count);
     }
 
     [Fact]
     public async Task UploadImages_InvalidFormat_Failure()
     {
-        var projectRoot = DirectoryService.GetProjectRoot();
-        var appRoot = Path.Combine(projectRoot, "Tests");
-        var imageRoute = Path.Combine(
-            appRoot,
-            "TestFiles",
-            "Images",
-            "text-file.txt"
-        );
-
-        using (var file = File.OpenRead(imageRoute))
-        using (var content = new StreamContent(file))
-        using (var formData = new MultipartFormDataContent())
+        _defaultRequest.ImageData = new List<UploadImageData>()
         {
-            formData.Add(content, "Files", "text-file.txt");
-            var response = await _client.PostAsync($"{_route}/upload_images", formData);
+            new UploadImageData(fileName: "validFileName-1.txt", originalFileName: "original-validFileName-1.txt", url: "url-1")
+        };
 
-            Assert.NotNull(response);
-            Assert.Equal(HttpStatusCode.UnsupportedMediaType, response.StatusCode);
-        }
+        var response = await _client.PostAsync($"{_route}/upload_images", JsonContent.Create(_defaultRequest));
+
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.UnsupportedMediaType, response.StatusCode);
     }
 
     [Fact]
     public async Task UploadImages_ZeroFilesAttached_Failure()
     {
-        using (var formData = new MultipartFormDataContent())
-        {
-            var response = await _client.PostAsync($"{_route}/upload_images", formData);
-            Assert.NotNull(response);
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        }
+        var response = await _client.PostAsync($"{_route}/upload_images", JsonContent.Create(_defaultRequest));
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
     [Fact]
     public async Task UploadImages_TooManyFilesAttached_Failure()
     {
-        var projectRoot = DirectoryService.GetProjectRoot();
-        var appRoot = Path.Combine(projectRoot, "Tests");
-        var imageRoute = Path.Combine(
-            appRoot,
-            "TestFiles",
-            "Images",
-            "valid-1.jpg"
-        );
-
-        using (var file = File.OpenRead(imageRoute))
-        using (var content = new StreamContent(file))
-        using (var formData = new MultipartFormDataContent())
+        for (var i = 0; i < 9; i++)
         {
-            for (var i = 0; i < 9; i++)
-            {
-                formData.Add(content, "Files", "valid-1.jpg");
-            }
-            var response = await _client.PostAsync($"{_route}/upload_images", formData);
-
-            Assert.NotNull(response);
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            _defaultRequest.ImageData.Add(new UploadImageData(fileName: $"valid-{i}.jpg", originalFileName: $"original-valid-{i}.jpg", url: $"url-{i}"));
         }
+        var response = await _client.PostAsync($"{_route}/upload_images", JsonContent.Create(_defaultRequest));
+
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 }

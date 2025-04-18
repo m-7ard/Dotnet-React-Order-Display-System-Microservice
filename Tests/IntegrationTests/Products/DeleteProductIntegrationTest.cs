@@ -19,7 +19,6 @@ public class DeleteProductIntegrationTest : ProductsIntegrationTest
         var db = _factory.CreateDbContext();
         var mixins = CreateMixins();
         _validImage = await mixins.CreateDraftImage(
-            fileRoute: TestFileRoute.ValidImage,
             destinationFileName: "saved-valid-image.png"
         );
         _product001 = await mixins.CreateProductAndProductHistory(number: 1, images: [_validImage]);
