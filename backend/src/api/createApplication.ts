@@ -3,7 +3,7 @@ import errorLogger from "./middleware/errorLogger";
 import cors from "cors";
 import { IDIContainer } from "./services/DIContainer";
 import { STATIC_DIR } from "config";
-import { createProxyMiddleware } from "http-proxy-middleware";
+import { createProxyMiddleware, responseInterceptor } from "http-proxy-middleware";
 import { createClient } from "redis";
 import { validateTokenMiddlewareFactory } from "./middleware/validateTokenMiddleware";
 import AuthDataAccess from "infrastructure/dataAccess/AuthDataAccess";
@@ -46,6 +46,24 @@ export default function createApplication(config: {
     app.use(authRouter);
 
     app.use(validateTokenMiddlewareFactory({ tokenRepository: tokenRepository, authDataAccess: authDataAccess }));
+
+    app.post("/upload", createProxyMiddleware({
+        target: "http://127.0.0.1:4300",
+        changeOrigin: true,
+        selfHandleResponse: true,
+        on: {
+            proxyRes: responseInterceptor(async (responseBuffer, proxyRes, req, res) => {
+                if (proxyRes.statusCode === 200) {
+                    const responseJson = JSON.parse(responseBuffer.toString('utf8'));
+                    console.log(responseJson);
+                }
+                
+                return responseBuffer;
+            })
+        },
+        timeout: 10000, // 10 seconds
+        proxyTimeout: 10000, // 10 seconds
+    }))
 
     app.use(
         createProxyMiddleware({

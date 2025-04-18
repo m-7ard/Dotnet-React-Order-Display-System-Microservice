@@ -7,6 +7,10 @@ export const getApiUrl = () => {
     return "some.url";
 };
 
+export const getFileServerUrl = () => {
+    return "fileServer.url";
+};
+
 export const getAuthUrl = () => {
     return "auth.url";
 }
