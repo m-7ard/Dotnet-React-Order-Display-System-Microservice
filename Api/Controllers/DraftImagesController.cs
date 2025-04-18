@@ -24,9 +24,9 @@ public class DraftImagesController : ControllerBase
     }
 
     [HttpPost("upload_images")]
-    public async Task<ActionResult<UploadDraftImagesRequestDTO>> UploadImages(List<IFormFile> files)
+    public async Task<ActionResult<UploadDraftImagesResponseDTO>> UploadImages(UploadDraftImagesRequestDTO request)
     {
-        if (files == null || files.Count == 0)
+        if (request.ImageData == null || request.ImageData.Count == 0)
         {
             return BadRequest(new List<ApiError>() {
                 PlainApiErrorHandlingService.CreateError(
@@ -37,7 +37,7 @@ public class DraftImagesController : ControllerBase
             });
         }
 
-        if (files.Count > 8)
+        if (request.ImageData.Count > 8)
         {
             return BadRequest(new List<ApiError>() {
                 PlainApiErrorHandlingService.CreateError(
@@ -48,38 +48,17 @@ public class DraftImagesController : ControllerBase
             });
         }
 
-        var contentTooLargeErrors = new List<ApiError>();
-
-        foreach (var file in files)
-        {
-            if (file.Length > _fileSizeLimit)
-            {
-                contentTooLargeErrors.Add(
-                    PlainApiErrorHandlingService.CreateError(
-                        path: [file.FileName],
-                        message: $"File \"{file.FileName}\" exceeds the 8 MB size limit.",
-                        code: "VALIDATION_ERROR"
-                    )
-                );
-            }
-        }
-
-        if (contentTooLargeErrors.Count > 0)
-        {
-            return StatusCode(StatusCodes.Status413PayloadTooLarge, contentTooLargeErrors);
-        }
-
         var invalidFileFormatErrors = new List<ApiError>();
 
-        foreach (var file in files)
+        foreach (var filename in request.ImageData.Select(data => data.FileName))
         {
-            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+            var extension = Path.GetExtension(filename).ToLowerInvariant();
             if (string.IsNullOrEmpty(extension) || !_permittedExtensions.Contains(extension))
             {
                 invalidFileFormatErrors.Add(
                     PlainApiErrorHandlingService.CreateError(
-                        path: [file.FileName],
-                        message: $"File \"{file.FileName}\" has an invalid file extension.",
+                        path: [filename],
+                        message: $"File \"{filename}\" has an invalid file extension.",
                         code: "VALIDATION_ERROR"
                     )
                 );
@@ -91,7 +70,7 @@ public class DraftImagesController : ControllerBase
             }
         }
 
-        var command = new UploadDraftImagesCommand(files: files);
+        var command = new UploadDraftImagesCommand(imageData: request.ImageData);
         var result = await _mediator.Send(command);
 
         if (result.TryPickT1(out var errors, out var value))
@@ -99,7 +78,7 @@ public class DraftImagesController : ControllerBase
             return BadRequest(PlainApiErrorHandlingService.MapApplicationErrors(errors));
         }
 
-        var response = new UploadDraftImagesResponseDTO(images: value.DraftImage.Select(ApiModelMapper.DraftImageToImageData).ToList());
+        var response = new UploadDraftImagesResponseDTO();
         return StatusCode(StatusCodes.Status201Created, response);
     }
 }

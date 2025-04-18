@@ -10,10 +10,14 @@ import AuthDataAccess from "infrastructure/dataAccess/AuthDataAccess";
 import RedisTokenRepository from "infrastructure/persistence/RedisTokenRepository";
 import registerAction from "./utils/registerAction";
 import LogoutAction from "./actions/auth/LogoutAction";
+import DraftImageDataAccess from "infrastructure/dataAccess/DraftImageDataAccess";
+import { UploadImagesResponseDTO } from "infrastructure/contracts/fileServer/upload-images/UploadImagesResponseDTO";
+import IUploadDraftImagesRequestDTO from "infrastructure/contracts/draftImages/upload/IUploadDraftImagesRequestDTO";
+import ExpressHttpService from "./services/ExpressHttpService";
 
 export type RedisClientConnection = ReturnType<typeof createClient>
 
-export default function createApplication(config: {
+export default function createProxyServer(config: {
     port: 3000 | 4200;
     middleware: Array<(req: Request, res: Response, next: NextFunction) => void>;
     mode: "PRODUCTION" | "DEVELOPMENT" | "DOCKER";
@@ -31,6 +35,7 @@ export default function createApplication(config: {
     });
 
     const authDataAccess = new AuthDataAccess();
+    const draftImageDataAccess = new DraftImageDataAccess();
     const tokenRepository = new RedisTokenRepository(redis);
 
     const authRouter = Router();
@@ -53,9 +58,32 @@ export default function createApplication(config: {
         selfHandleResponse: true,
         on: {
             proxyRes: responseInterceptor(async (responseBuffer, proxyRes, req, res) => {
+                const httpService = new ExpressHttpService(req);
+                
                 if (proxyRes.statusCode === 200) {
-                    const responseJson = JSON.parse(responseBuffer.toString('utf8'));
-                    console.log(responseJson);
+                    try {
+                        const responseJson: UploadImagesResponseDTO = JSON.parse(responseBuffer.toString('utf8'));
+                        const bearerToken = httpService.getBearerTokenOrThrow();
+    
+                        const apiRequest: IUploadDraftImagesRequestDTO = {
+                            imageData: responseJson.images.map((data) => ({
+                                fileName: data.fileName,
+                                originalFileName: data.originalFileName,
+                                url: data.url
+                            }))
+                        }
+    
+                        const apiResponse = await draftImageDataAccess.uploadDraftImages(bearerToken, apiRequest)
+                        if (!apiResponse || apiResponse.ok === false) {
+                            res.writeHead(400, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({ message: "Something went wrong trying to persist image data" }));
+                            return Buffer.from('');
+                        }
+                    } catch (e: unknown) {
+                        res.writeHead(400, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ message: "Something went wrong trying to persist image data" }));
+                        return Buffer.from('');
+                    }
                 }
                 
                 return responseBuffer;

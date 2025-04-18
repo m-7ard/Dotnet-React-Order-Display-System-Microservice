@@ -1,5 +1,4 @@
 import IProduct from "../../../domain/models/IProduct";
-import { getApiUrl } from "../../../viteUtils";
 import CoverImage from "../Resuables/CoverImage";
 import MixinButton from "../Resuables/MixinButton";
 import MixinPrototypeCard, { MixinPrototypeCardSection } from "../Resuables/MixinPrototypeCard";
@@ -8,7 +7,7 @@ type CountTrackerProductProps = { product: IProduct; onAdd: () => void; quantity
 
 export default function CountTrackerProduct(props: CountTrackerProductProps) {
     const { product, onAdd, quantity } = props;
-    const productImages = product.images.map((image) => `${getApiUrl()}/Media/${image.fileName}`);
+    const productImages = product.images.map((image) => `${image.url}`);
 
     const isAdded = quantity != null;
 

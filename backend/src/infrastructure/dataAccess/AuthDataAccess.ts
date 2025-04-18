@@ -2,7 +2,7 @@ import ILogoutUserRequestDTO from "infrastructure/contracts/auth/logout/ILogoutU
 import IAuthDataAccess from "infrastructure/interfaces/IAuthDataAccess";
 
 class AuthDataAccess implements IAuthDataAccess {
-    authUrl: string;
+    private authUrl: string;
 
     constructor() {
         const authUrl = process.env.AUTH_URL;

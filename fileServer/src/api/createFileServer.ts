@@ -12,7 +12,7 @@ import path from "path";
 import { writeFileSync } from "fs";
 import API_ERROR_CODES from "./errors/API_ERROR_CODES";
 
-export default function createApplication(config: {
+export default function createFileServer(config: {
     port: 3000 | 4300;
     middleware: Array<(req: Request, res: Response, next: NextFunction) => void>;
     mode: "PRODUCTION" | "DEVELOPMENT" | "DOCKER";
@@ -73,16 +73,20 @@ export default function createApplication(config: {
         files.forEach((file) => {
             const generatedFilename = crypto.randomUUID();
             const extension = path.extname(file.originalname);
-            const url = generatedFilename + extension;
+            const generatedFileNameWithExtension = generatedFilename + extension;
 
-            const uploadPath = path.join(MEDIA_ROOT, url);
+            const uploadPath = path.join(MEDIA_ROOT, generatedFileNameWithExtension);
             try {
                 writeFileSync(uploadPath, file.buffer);
             } catch (e) {
                 throw e;
             }
 
-            response.images.push({ url: `${req.protocol}://` + path.join(`${req.hostname}:${req.socket.localPort}`.toString(), MEDIA_FOLDER_NAME, url) });
+            response.images.push({
+                url: `${req.protocol}://` + path.join(`${req.hostname}:${req.socket.localPort}`.toString(), MEDIA_FOLDER_NAME, generatedFileNameWithExtension),
+                originalFileName: file.originalname,
+                fileName: generatedFileNameWithExtension,
+            });
         });
 
         res.json(response);

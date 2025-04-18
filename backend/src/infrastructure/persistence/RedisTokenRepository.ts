@@ -1,4 +1,4 @@
-import { RedisClientConnection } from "api/createApplication";
+import { RedisClientConnection } from "api/createProxyServer";
 import ITokenRepository from "api/interfaces/ITokenRepository";
 import JwtToken from "domain/entities/JwtToken";
 import IJwtTokenSchema from "infrastructure/schemas/IJwtTokenSchema";

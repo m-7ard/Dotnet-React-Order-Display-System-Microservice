@@ -147,7 +147,6 @@ public class ProductsController : ControllerBase
             createdAfter: parameters.CreatedAfter,
             orderBy: parameters.OrderBy
         );
-        Console.WriteLine("Before send (?)");
 
         var result = await _mediator.Send(query);
 
@@ -157,7 +156,6 @@ public class ProductsController : ControllerBase
         }
 
         var response = new ListProductsResponseDTO(products: value.Products.Select(ApiModelMapper.ProductToApiModel).ToList());
-        Console.WriteLine("List Products did respond");
         return Ok(response);
     }
     

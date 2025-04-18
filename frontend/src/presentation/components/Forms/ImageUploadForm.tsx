@@ -53,6 +53,7 @@ export default function UploadImagesForm(props: {
                         multiple
                         className="opacity-0 absolute inset-0 cursor-pointer file:cursor-pointer h-full w-full"
                         onChange={async (e) => await uploadImages(e)}
+                        tabIndex={-1}
                     ></input>
                 </MixinButton>
             </MixinPrototypeCardSection>

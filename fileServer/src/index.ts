@@ -1,4 +1,4 @@
-import createApplication from "api/createApplication";
+import createFileServer from "api/createFileServer";
 import responseLogger from "api/middleware/responseLogger";
 import { ProductionDIContainer } from "api/services/DIContainer";
 import { assert, literal, union } from "superstruct";
@@ -27,7 +27,7 @@ async function main() {
 
     const diContainer = new ProductionDIContainer();
 
-    const app = createApplication({
+    const app = createFileServer({
         port: port,
         middleware: [responseLogger],
         mode: environment,

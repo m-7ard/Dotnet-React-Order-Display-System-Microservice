@@ -1,4 +1,4 @@
-import createApplication from "api/createApplication";
+import createProxyServer from "api/createProxyServer";
 import responseLogger from "api/middleware/responseLogger";
 import { ProductionDIContainer } from "api/services/DIContainer";
 import { createClient } from "redis";
@@ -32,7 +32,7 @@ async function main() {
     const redis = createClient();
     await redis.connect();
 
-    const app = createApplication({
+    const app = createProxyServer({
         port: port,
         middleware: [responseLogger],
         mode: environment,
