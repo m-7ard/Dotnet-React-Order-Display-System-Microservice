@@ -3,7 +3,6 @@ using Api.Interfaces;
 using Api.Middleware;
 using Api.Services;
 using Api.Validators;
-using Application.Common;
 using Application.DomainService;
 using Application.Handlers.Products.Create;
 using Application.Interfaces.Persistence;
@@ -14,7 +13,6 @@ using Infrastructure.Interfaces;
 using Infrastructure.Persistence;
 using Infrastructure.Querying;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.Extensions.FileProviders;
 
 // dotnet ef migrations add <Name> --project Infrastructure --startup-project Api
 var builder = WebApplication.CreateBuilder(args);

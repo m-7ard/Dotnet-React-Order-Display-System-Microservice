@@ -1,3 +1,4 @@
+import { CLIENT_ID_HEADER_KEY } from "api/middleware/validateTokenMiddleware";
 import { IncomingMessage } from "http";
 
 class ExpressHttpService {
@@ -15,6 +16,19 @@ class ExpressHttpService {
         }
 
         return token;
+    }
+
+    getClientHeaderOrThrow(): string {
+        const clientId = this.req.headers[CLIENT_ID_HEADER_KEY];
+        if (clientId == null) {
+            throw new Error(`"${CLIENT_ID_HEADER_KEY}" header is missing from the request.`);
+        }
+
+        if (typeof clientId !== "string") {
+            throw new Error(`"${CLIENT_ID_HEADER_KEY}" header is must be a string.`);
+        }
+
+        return clientId;
     }
 }
 

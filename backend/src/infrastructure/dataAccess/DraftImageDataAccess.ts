@@ -1,3 +1,4 @@
+import { CLIENT_ID_HEADER_KEY } from "api/middleware/validateTokenMiddleware";
 import IUploadDraftImagesRequestDTO from "infrastructure/contracts/draftImages/upload/IUploadDraftImagesRequestDTO";
 import IDraftImageDataAccess from "infrastructure/interfaces/IDraftImageDataAccess";
 
@@ -6,6 +7,7 @@ class DraftImageDataAccess implements IDraftImageDataAccess {
 
     constructor() {
         const apiUrl = process.env.API_URL;
+        console.log(apiUrl);
         if (apiUrl == null) {
             throw new Error("Apis Url was not configured.");
         }
@@ -13,12 +15,13 @@ class DraftImageDataAccess implements IDraftImageDataAccess {
         this.apiUrl = `${apiUrl}/api/draft_images`;
     }
 
-    async uploadDraftImages(bearerToken: string, request: IUploadDraftImagesRequestDTO): Promise<Response> {
+    async uploadDraftImages(clientId: string, bearerToken: string, request: IUploadDraftImagesRequestDTO): Promise<Response> {
         return await fetch(`${this.apiUrl}/upload_images`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${bearerToken}`,
+                [CLIENT_ID_HEADER_KEY]: clientId
             },
             body: JSON.stringify(request),
         });

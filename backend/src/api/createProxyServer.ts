@@ -100,6 +100,7 @@ export default function createProxyServer(config: {
             try {
                 const responseJson: UploadImagesResponseDTO = await response.json() as any;
                 const bearerToken = httpService.getBearerTokenOrThrow();
+                const clientHeader = httpService.getClientHeaderOrThrow();
 
                 const apiRequest: IUploadDraftImagesRequestDTO = {
                     imageData: responseJson.images.map((data) => ({
@@ -109,7 +110,7 @@ export default function createProxyServer(config: {
                     })),
                 };
 
-                const apiResponse = await draftImageDataAccess.uploadDraftImages(bearerToken, apiRequest);
+                const apiResponse = await draftImageDataAccess.uploadDraftImages(clientHeader, bearerToken, apiRequest);
                 if (!apiResponse.ok) {
                     const apiErrors: IApiError[] = ApiErrorFactory.createSingleErrorList({ message: "Something went wrong trying to persist image data", code: API_ERROR_CODES.VALIDATION_ERROR, path: "_" })
                     res.status(400).json(apiErrors);
@@ -117,6 +118,7 @@ export default function createProxyServer(config: {
                     res.status(200).json(responseJson);
                 }
             } catch (e: unknown) {
+                console.log("Ezzor: ", e);
                 const apiErrors: IApiError[] = ApiErrorFactory.createSingleErrorList({ message: "Something went wrong trying to persist image data", code: API_ERROR_CODES.VALIDATION_ERROR, path: "_" })
                 res.status(400).json(apiErrors);
             }

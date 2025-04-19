@@ -1,7 +1,7 @@
 import { TokenValidationErrorCode, TokenValidationService } from "api/services/TokenValidationService";
 import { NextFunction, Request, Response } from "express";
 
-const CLIENT_ID_HEADER_KEY = "X-Client-Id";
+export const CLIENT_ID_HEADER_KEY = "X-Client-Id";
 
 export function validateTokenMiddlewareFactory(props: { tokenValidationService: TokenValidationService }) {
     async function validateTokenMiddleware(req: Request, res: Response, next: NextFunction) {

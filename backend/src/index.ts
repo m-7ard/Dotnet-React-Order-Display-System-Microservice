@@ -31,6 +31,7 @@ async function main() {
 
     const redis = createClient();
     await redis.connect();
+    await redis.flushDb();
 
     const app = createProxyServer({
         port: port,

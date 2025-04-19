@@ -30,7 +30,7 @@ export default class ReadRemoteTokenQueryHandler implements IRequestHandler<Read
     
         if (response.ok) {
             const data: ValidateTokenResponseDTO = await response.json();
-            const tokenDomain = JwtToken.executeCreate({ expiryDate: new Date(data.expiration), value: command.bearerToken, userId: data.user_id });
+            const tokenDomain = JwtToken.executeCreate({ expiryDate: new Date(data.expiration), value: command.bearerToken, userId: data.user_id.toString() });
             return ok(tokenDomain);
         } 
 
