@@ -1,5 +1,5 @@
 import { RedisClientConnection } from "api/createProxyServer";
-import ITokenRepository from "api/interfaces/ITokenRepository";
+import ITokenRepository from "application/interfaces/ITokenRepository";
 import JwtToken from "domain/entities/JwtToken";
 import IJwtTokenSchema from "infrastructure/schemas/IJwtTokenSchema";
 

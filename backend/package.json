@@ -68,7 +68,7 @@
         "luxon": "^3.5.0",
         "multer": "^1.4.5-lts.1",
         "mysql2": "^3.11.3",
-        "neverthrow": "^8.1.1",
+        "neverthrow": "^8.2.0",
         "path": "^0.12.7",
         "quicktype": "^23.0.171",
         "quicktype-core": "^23.0.171",

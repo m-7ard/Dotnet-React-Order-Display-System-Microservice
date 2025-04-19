@@ -23,7 +23,6 @@ class AuthDataAccess implements IAuthDataAccess {
     }
 
     async logout(accessToken: string, contract: ILogoutUserRequestDTO): Promise<Response> {
-        console.log(accessToken, contract)
         return await fetch(`${this.authUrl}/logout`, {
             method: "POST",
             headers: {

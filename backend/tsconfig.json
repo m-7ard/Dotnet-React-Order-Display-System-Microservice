@@ -14,5 +14,5 @@
         "rootDirs": ["./src"],
         "resolveJsonModule": true
     },
-    "include": ["src/**/*", "babel.config.js", "static", "../fileServer/src/api/contracts/upload-images"]
+    "include": ["src/**/*", "babel.config.js", "static", "tests/**/*"]
 }

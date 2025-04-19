@@ -1,53 +1,33 @@
-import ITokenRepository from "api/interfaces/ITokenRepository";
-import JwtToken from "domain/entities/JwtToken";
+import { TokenValidationErrorCode, TokenValidationService } from "api/services/TokenValidationService";
 import { NextFunction, Request, Response } from "express";
-import ValidateTokenResponseDTO from "infrastructure/contracts/auth/validateToken/ValidateTokenResponseDTO";
-import IAuthDataAccess from "infrastructure/interfaces/IAuthDataAccess";
 
 const CLIENT_ID_HEADER_KEY = "X-Client-Id";
 
-export function validateTokenMiddlewareFactory(props: { tokenRepository: ITokenRepository; authDataAccess: IAuthDataAccess; }) {
+export function validateTokenMiddlewareFactory(props: { tokenValidationService: TokenValidationService }) {
     async function validateTokenMiddleware(req: Request, res: Response, next: NextFunction) {
-        const authHeader = req.headers['authorization'];
-        if (authHeader == null) {
-            res.status(401).send();
-            return;
-        }
-    
-        const [_, token] = authHeader.split(" ");
-        if (token == null) {
-            res.status(401).send();
-            return;
-        }
-        
-        const tokenDomain = await tokenRepository.getToken(token)
-        if (tokenDomain != null) {
-            if (tokenDomain.isValid()) {
-                req.headers[CLIENT_ID_HEADER_KEY] = tokenDomain.userId;
-                next();
-                return;
+        const result = await tokenValidationService.validate(req.headers["authorization"]);
+        if (result.isErr()) {
+            if (
+                result.error === TokenValidationErrorCode.MISSING_AUTH_HEADER ||
+                result.error === TokenValidationErrorCode.INVALID_AUTH_HEADER ||
+                result.error === TokenValidationErrorCode.INVALID_TOKEN
+            ) {
+                res.status(401).json();
+            } else if (result.error === TokenValidationErrorCode.TOKEN_LOOKUP_FAILED || result.error === TokenValidationErrorCode.TOKEN_CREATION_FAILED) {
+                res.status(500).json();
             } else {
-                await tokenRepository.expireToken(tokenDomain);
+                throw new Error(`No handler for TokenValidationErrorCode of value ${result.error}.`)
             }
-        }
-    
-        const response = await authDataAccess.validateToken(token);
-    
-        if (response.ok) {
-            const data: ValidateTokenResponseDTO = await response.json();
-            
-            const tokenDomain = JwtToken.executeCreate({ expiryDate: new Date(data.expiration), value: token, userId: data.user_id });
-            await tokenRepository.create(tokenDomain);
-            req.headers[CLIENT_ID_HEADER_KEY] = tokenDomain.userId;
-    
-            next();
+
             return;
         }
-    
-        res.status(401).send();
+
+        const jwt = result.value;
+        req.headers[CLIENT_ID_HEADER_KEY] = jwt.userId;
+        next();
     }
 
-    const { tokenRepository, authDataAccess } = props;
+    const { tokenValidationService } = props;
 
     return validateTokenMiddleware;
 }
