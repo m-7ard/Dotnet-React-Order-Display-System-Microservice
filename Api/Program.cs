@@ -133,13 +133,7 @@ builder.Services.AddScoped<IProductDomainService, ProductDomainService>();
 
 builder.Services.AddValidatorsFromAssembly(typeof(UpdateProductValidator).Assembly);
 
-///
-///
-/// Media Discovery
-/// 
-
 builder.Services.AddAuthorization();
-builder.Services.AddDirectoryBrowser(); // For media
 
 var app = builder.Build();
 
@@ -180,20 +174,6 @@ using (var scope = app.Services.CreateScope())
 app.UseCors(apiCorsPolicy);
 app.UseAuthentication();
 app.UseAuthorization();
-
-///
-///
-/// Media config
-/// 
-
-var mediaProvider = new PhysicalFileProvider(DirectoryService.GetMediaDirectory());
-
-app.UseFileServer(new FileServerOptions
-{
-    FileProvider = mediaProvider,
-    RequestPath = "/media",
-    EnableDirectoryBrowsing = true
-});
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
