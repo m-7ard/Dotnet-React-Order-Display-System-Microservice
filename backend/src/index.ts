@@ -19,7 +19,7 @@ async function main() {
     });
 
     const port = process.env.PORT == null ? null : parseInt(process.env.PORT);
-    const portValidator = union([literal(4200), literal(3000)]);
+    const portValidator = union([literal(4200), literal(3100)]);
     assert(port, portValidator);
 
     const host = process.env.HOST;

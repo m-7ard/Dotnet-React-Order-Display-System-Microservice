@@ -147,7 +147,8 @@ REST_FRAMEWORK = {
 }
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173"
+    "http://localhost:5173", # vite dev server
+    "http://127.0.0.1:4300" # fileserver hosting built vite app
 ]
 
 SIMPLE_JWT = {
