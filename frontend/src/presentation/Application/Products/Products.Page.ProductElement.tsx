@@ -1,5 +1,4 @@
 import IProduct from "../../../domain/models/IProduct";
-import { getApiUrl } from "../../../viteUtils";
 import CoverImage from "../../components/Resuables/CoverImage";
 import MixinButton from "../../components/Resuables/MixinButton";
 import ProductOptionMenu from "./Products.Page.Product.OptionsMenu";
@@ -9,7 +8,7 @@ import { useRouterNavigate } from "../../routes/RouterModule/RouterModule.hooks"
 
 export default function ProductElement(props: { product: IProduct }) {
     const { product } = props;
-    const productImages = product.images.map((image) => `${getApiUrl()}/Media/${image.fileName}`);
+    const productImages = product.images.map((image) => `${image.url}`);
     const navigate = useRouterNavigate();
 
     return (

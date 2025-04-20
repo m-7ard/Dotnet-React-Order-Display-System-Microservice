@@ -3,7 +3,6 @@ using Api.Interfaces;
 using Api.Middleware;
 using Api.Services;
 using Api.Validators;
-using Application.Common;
 using Application.DomainService;
 using Application.Handlers.Products.Create;
 using Application.Interfaces.Persistence;
@@ -14,7 +13,6 @@ using Infrastructure.Interfaces;
 using Infrastructure.Persistence;
 using Infrastructure.Querying;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.Extensions.FileProviders;
 
 // dotnet ef migrations add <Name> --project Infrastructure --startup-project Api
 var builder = WebApplication.CreateBuilder(args);
@@ -133,13 +131,7 @@ builder.Services.AddScoped<IProductDomainService, ProductDomainService>();
 
 builder.Services.AddValidatorsFromAssembly(typeof(UpdateProductValidator).Assembly);
 
-///
-///
-/// Media Discovery
-/// 
-
 builder.Services.AddAuthorization();
-builder.Services.AddDirectoryBrowser(); // For media
 
 var app = builder.Build();
 
@@ -180,20 +172,6 @@ using (var scope = app.Services.CreateScope())
 app.UseCors(apiCorsPolicy);
 app.UseAuthentication();
 app.UseAuthorization();
-
-///
-///
-/// Media config
-/// 
-
-var mediaProvider = new PhysicalFileProvider(DirectoryService.GetMediaDirectory());
-
-app.UseFileServer(new FileServerOptions
-{
-    FileProvider = mediaProvider,
-    RequestPath = "/media",
-    EnableDirectoryBrowsing = true
-});
 
 app.UseDefaultFiles();
 app.UseStaticFiles();

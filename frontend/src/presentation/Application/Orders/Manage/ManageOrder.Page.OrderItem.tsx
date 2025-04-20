@@ -1,6 +1,5 @@
 import OrderItem from "../../../../domain/models/OrderItem";
 import OrderItemStatus from "../../../../domain/valueObjects/OrderItem/OrderItemStatus";
-import { getApiUrl } from "../../../../viteUtils";
 import GlobalDialog from "../../../components/Dialog/GlobalDialog";
 import CoverImage from "../../../components/Resuables/CoverImage";
 import MixinButton from "../../../components/Resuables/MixinButton";
@@ -31,7 +30,7 @@ export default function OrderItemElement(props: { orderItem: OrderItem; onMarkOr
                     {Array.from({ length: 4 }).map((_, i) => (
                         <CoverImage
                             className="token-default-avatar"
-                            src={orderItem.productHistory.images[i] == null ? undefined : `${getApiUrl()}/Media/${orderItem.productHistory.images[i]}`}
+                            src={orderItem.productHistory.images[i] == null ? undefined : `${orderItem.productHistory.images[i]}`}
                             key={i}
                         />
                     ))}
@@ -88,7 +87,7 @@ export default function OrderItemElement(props: { orderItem: OrderItem; onMarkOr
                                     </MixinButton>
                                 )}
                                 Panel={OrderItemProgressPanel}
-                                panelProps={{ orderItem: orderItem}}
+                                panelProps={{ orderItem: orderItem }}
                             />
                             <MixinButton className="basis-1/2 justify-center" options={{ size: "mixin-button-sm", theme: "theme-button-generic-white" }}>
                                 Other Options

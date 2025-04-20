@@ -1,4 +1,3 @@
-import { getApiUrl } from "../../../viteUtils";
 import CoverImage from "../../components/Resuables/CoverImage";
 import MixinButton from "../../components/Resuables/MixinButton";
 import OptionMenu from "./ProductHistories.Page.ProductHistoryElement.OptionMenu";
@@ -9,7 +8,7 @@ import { useRouterNavigate } from "../../routes/RouterModule/RouterModule.hooks"
 
 export default function ProductHistoryElement(props: { productHistory: ProductHistory }) {
     const { productHistory } = props;
-    const productImages = productHistory.images.map((image) => `${getApiUrl()}/Media/${image}`);
+    const productImages = productHistory.images.map((url) => `${url}`);
     const navigate = useRouterNavigate();
 
     return (

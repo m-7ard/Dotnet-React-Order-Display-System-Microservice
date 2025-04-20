@@ -38,9 +38,5 @@ public class TenantDatabaseService
             await context.Database.EnsureCreatedAsync();
             Console.WriteLine($"Database created for client {clientId}");
         }
-        else
-        {
-            Console.WriteLine($"Database already exists for client {clientId}");
-        }
     }
 }

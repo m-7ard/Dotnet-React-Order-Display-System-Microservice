@@ -15,7 +15,7 @@ const validatorSchema = Type.Object({
     }),
     email: Type.String({
         minLength: 1,
-        maxLength: 255
+        maxLength: 255,
     }),
     password: Type.String({
         minLength: 8,
@@ -65,8 +65,7 @@ export default function RegisterUserController() {
 
             if (validation.isErr()) {
                 const errors = typeboxToDomainCompatibleFormError(validation.error);
-            console.log(errors)
-            errorManager.setAll(errors);
+                errorManager.setAll(errors);
                 return;
             }
 
@@ -77,7 +76,6 @@ export default function RegisterUserController() {
                 email: data.email,
                 password: data.password,
             });
-
 
             if (result.isOk()) {
                 navigate({ exp: (routes) => routes.LOGIN_USER, params: {} });

@@ -1,5 +1,4 @@
 import { createRoute } from "@tanstack/react-router";
-import rootRoute from "../../rootRoute";
 import UpdateProductController from "../../../../Application/Products/Update/UpdateProduct.Controller";
 import { productDataAccess } from "../../../../deps/dataAccess";
 import ProductsController from "../../../../Application/Products/Products.Controller";
@@ -12,9 +11,10 @@ import { IUpdateProductAmountParams, IUpdateProductParams, TListProductsLoaderDa
 import { tanstackConfigs } from "../../tanstackConfig";
 import diContainer, { DI_TOKENS } from "../../../../deps/diContainer";
 import UpdateProductAmountController from "../../../../Application/Products/UpdateAmount/UpdateProductAmount.Controller";
+import { authRootRoute } from "../../rootRoute";
 
 const listProductsRoute = createRoute({
-    getParentRoute: () => rootRoute,
+    getParentRoute: () => authRootRoute,
     path: tanstackConfigs.LIST_PRODUCTS.pattern,
     loaderDeps: ({ search }: { search: Record<string, string> }) => search,
     loader: async ({ deps }): Promise<TListProductsLoaderData> => {
@@ -35,15 +35,15 @@ const listProductsRoute = createRoute({
 });
 
 const createProductRoute = createRoute({
-    getParentRoute: () => rootRoute,
+    getParentRoute: () => authRootRoute,
     path: tanstackConfigs.CREATE_PRODUCT.pattern,
-    component: CreateProductController,
+    component: () => <CreateProductController />,
 });
 
 const updateProductRoute = createRoute({
-    getParentRoute: () => rootRoute,
+    getParentRoute: () => authRootRoute,
     path: tanstackConfigs.UPDATE_PRODUCT.pattern,
-    component: UpdateProductController,
+    component: () => <UpdateProductController />,
     loader: async ({ params }: { params: IUpdateProductParams }): Promise<TUpdateProductLoaderData> => {
         const id = params.id;
         const { requestHandler } = diContainer.resolve(DI_TOKENS.ROUTER_CONTEXT);
@@ -63,9 +63,9 @@ const updateProductRoute = createRoute({
 });
 
 const updateProductAmountRoute = createRoute({
-    getParentRoute: () => rootRoute,
+    getParentRoute: () => authRootRoute,
     path: tanstackConfigs.UPDATE_PRODUCT_AMOUNT.pattern,
-    component: UpdateProductAmountController,
+    component: () => <UpdateProductAmountController />,
     loader: async ({ params }: { params: IUpdateProductAmountParams }): Promise<TUpdateProductAmountLoaderData> => {
         const id = params.id;
         const { requestHandler } = diContainer.resolve(DI_TOKENS.ROUTER_CONTEXT);

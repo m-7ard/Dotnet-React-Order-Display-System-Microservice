@@ -48,15 +48,15 @@ export default function LoginUserController() {
     // Actions
     const loginUserMutation = useMutation({
         mutationFn: async () => {
+            errorManager.setAll({});
             const values = itemManager.items;
 
             const validation = validateTypeboxSchema(validatorSchema, {
                 password: values.password,
-                username: values.username
+                username: values.username,
             });
             if (validation.isErr()) {
-            console.log(typeboxToDomainCompatibleFormError(validation.error))
-            const errors = typeboxToDomainCompatibleFormError(validation.error);
+                const errors = typeboxToDomainCompatibleFormError(validation.error);
                 errorManager.setAll(errors);
                 return;
             }
@@ -69,7 +69,10 @@ export default function LoginUserController() {
             });
 
             if (result.isOk()) {
-                navigate({ exp: (routes) => routes.LOGIN_USER, params: {} });
+                setTimeout(() => {
+                    // Wait for user state to be updated
+                    navigate({ exp: (routes) => routes.FRONTPAGE, params: {} });
+                }, 0);
                 return;
             }
 

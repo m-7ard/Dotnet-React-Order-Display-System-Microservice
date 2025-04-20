@@ -8,6 +8,7 @@ import parseListProductHistoriesRequestDTO from "../../../../../infrastructure/p
 import { TListProductHistoriesLoaderData } from "../../../routeTypes";
 import { tanstackConfigs } from "../../tanstackConfig";
 import diContainer, { DI_TOKENS } from "../../../../deps/diContainer";
+import AuthRouteGuard from "../../../../components/RouteGuards/AuthRouteGuard";
 
 const listProductHistoriesRoute = createRoute({
     getParentRoute: () => rootRoute,
@@ -27,7 +28,11 @@ const listProductHistoriesRoute = createRoute({
             productHistories: dto.productHistories.map(productHistoryMapper.apiToDomain),
         };
     },
-    component: ProductHistoriesController,
+    component: () => (
+        <AuthRouteGuard>
+            <ProductHistoriesController />
+        </AuthRouteGuard>
+    ),
 });
 
 export default [listProductHistoriesRoute];

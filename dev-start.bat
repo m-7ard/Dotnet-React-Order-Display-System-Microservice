@@ -1,13 +1,16 @@
 @echo off
 
-echo Starting Server 1...
+echo Starting .Net Server
 start cmd /k "cd /d Api && dotnet watch run"
 
-echo Starting Server 2...
+echo Starting Vite App
 start cmd /k "cd /d frontend && npm run dev"
 
-echo Starting Server 3...
-start cmd /k "cd /d auth && env\scripts\activate && python manage.py runserver"
+echo Starting Django Auth Server
+start cmd /k "cd /d auth && env\scripts\activate && python manage.py migrate && python manage.py runserver"
 
-echo Starting Server 4...
+echo Starting Node Proxy Server
 start cmd /k "cd /d backend && npm run dev"
+
+echo Starting Node File Server
+start cmd /k "cd /d fileServer && npm run dev"

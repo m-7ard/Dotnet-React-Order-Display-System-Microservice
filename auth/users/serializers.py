@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework.serializers import ModelSerializer
-
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework.exceptions import AuthenticationFailed
 
 class RegisterSerializer(ModelSerializer):
     class Meta:
@@ -16,3 +17,13 @@ class RegisterSerializer(ModelSerializer):
         )
 
         return user
+    
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        try:
+            data = super().validate(attrs)
+        except AuthenticationFailed:
+            raise AuthenticationFailed({'non_field_errors': ['Password or email is wrong.']})
+        return data
+    

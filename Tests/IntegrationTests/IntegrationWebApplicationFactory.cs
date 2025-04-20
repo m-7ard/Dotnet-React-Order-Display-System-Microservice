@@ -90,8 +90,6 @@ public class IntegrationWebApplicationFactory<TProgram> : WebApplicationFactory<
                 db.Database.EnsureDeleted();
                 db.Database.EnsureCreated();
             }
-
-            var projectRoot = DirectoryService.GetMediaDirectory();
         });
     }
 

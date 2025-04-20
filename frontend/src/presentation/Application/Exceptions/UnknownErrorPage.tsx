@@ -12,7 +12,7 @@ export default function UnknownErrorPage() {
     return (
         <MixinPage exp={(options) => ({ size: options.SIZE.BASE })} directives={[contentGridDirective(() => ({}))]} className={`flex flex-col items-center justify-center`}>
             <MixinPageSection className="text-4xl font-bold text-gray-800 text-center">An Unknown Error Occured.</MixinPageSection>
-            <MixinPageSection className="text-xl font-bold text-gray-700 text-center whitespace-pre">{errorRef.current.name}</MixinPageSection>
+            <MixinPageSection className="text-xl font-bold text-gray-700 text-center whitespace-pre">{errorRef.current.message}</MixinPageSection>
         </MixinPage>
     );
 }
