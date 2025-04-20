@@ -47,10 +47,6 @@ coverage/
 dist/
 build/
 
-# Docker files (if applicable)
-docker-compose.yml
-Dockerfile
-
 # Miscellaneous
 .DS_Store
 Thumbs.db
