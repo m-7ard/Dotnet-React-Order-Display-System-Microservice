@@ -5,14 +5,8 @@ import IDraftImageDataAccess from "infrastructure/interfaces/IDraftImageDataAcce
 class DraftImageDataAccess implements IDraftImageDataAccess {
     private apiUrl: string;
 
-    constructor() {
-        const apiUrl = process.env.API_URL;
-        console.log(apiUrl);
-        if (apiUrl == null) {
-            throw new Error("Apis Url was not configured.");
-        }
-
-        this.apiUrl = `${apiUrl}/api/draft_images`;
+    constructor(mainAppUrl: string) {
+        this.apiUrl = `${mainAppUrl}/api/draft_images`;
     }
 
     async uploadDraftImages(clientId: string, bearerToken: string, request: IUploadDraftImagesRequestDTO): Promise<Response> {

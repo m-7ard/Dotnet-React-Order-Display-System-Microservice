@@ -26,6 +26,18 @@ async function main() {
     const hostValidator = union([literal("127.0.0.1"), literal("0.0.0.0")]);
     assert(host, hostValidator);
 
+    const fileServerUrl = process.env.FILE_SERVER_URL;
+    const fileServerUrlValidator = union([literal("http://127.0.0.1:4300"), literal("http://127.0.0.1:3000"), literal("http://file:3000")]);
+    assert(fileServerUrl, fileServerUrlValidator);
+
+    const authServerUrl = process.env.AUTH_URL;
+    const authServerUrlValidator = union([literal("http://127.0.0.1:8000"), literal("http://auth:8000")]);
+    assert(authServerUrl, authServerUrlValidator);
+
+    const mainApiServerUrl = process.env.API_URL;
+    const mainApiServerUrlValidator = union([literal("http://localhost:5102"), literal("http://web:5000")]);
+    assert(mainApiServerUrl, mainApiServerUrlValidator);
+
     const diContainer = new ProductionDIContainer();
 
 
@@ -34,11 +46,12 @@ async function main() {
     await redis.flushDb();
 
     const app = createProxyServer({
-        port: port,
         middleware: [responseLogger],
-        mode: environment,
         diContainer: diContainer,
-        redis: redis
+        redis: redis,
+        fileServerUrl: fileServerUrl,
+        authServerUrl: authServerUrl,
+        mainAppServerUrl: mainApiServerUrl
     });
 
     const server = app.listen(port, host, () => {

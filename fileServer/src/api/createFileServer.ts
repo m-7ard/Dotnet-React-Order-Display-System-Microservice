@@ -83,7 +83,7 @@ export default function createFileServer(config: {
             }
 
             response.images.push({
-                url: `${req.protocol}://` + path.join(`${req.hostname}:${req.socket.localPort}`.toString(), MEDIA_FOLDER_NAME, generatedFileNameWithExtension),
+                url: `${req.protocol}://` + path.join(`${"127.0.0.1"}:${req.socket.localPort}`.toString(), MEDIA_FOLDER_NAME, generatedFileNameWithExtension),
                 originalFileName: file.originalname,
                 fileName: generatedFileNameWithExtension,
             });

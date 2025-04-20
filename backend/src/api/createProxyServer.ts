@@ -19,7 +19,7 @@ import JwtTokenGateway from "application/gateways/JwtTokenGateway";
 import { TokenValidationService } from "./services/TokenValidationService";
 import multer from "multer";
 import FormData from "form-data";
-import fetch from 'node-fetch';
+import fetch from "node-fetch";
 import IApiError from "./errors/IApiError";
 import ApiErrorFactory from "./errors/ApiErrorFactory";
 import API_ERROR_CODES from "./errors/API_ERROR_CODES";
@@ -27,13 +27,14 @@ import API_ERROR_CODES from "./errors/API_ERROR_CODES";
 export type RedisClientConnection = ReturnType<typeof createClient>;
 
 export default function createProxyServer(config: {
-    port: 3100 | 4200;
     middleware: Array<(req: Request, res: Response, next: NextFunction) => void>;
-    mode: "PRODUCTION" | "DEVELOPMENT" | "DOCKER";
     diContainer: IDIContainer;
     redis: RedisClientConnection;
+    authServerUrl: "http://127.0.0.1:8000" | "http://auth:8000";
+    fileServerUrl: "http://127.0.0.1:4300" | "http://127.0.0.1:3000" | "http://file:3000";
+    mainAppServerUrl: "http://localhost:5102" | "http://web:5000";
 }) {
-    const { redis } = config;
+    const { redis, authServerUrl, fileServerUrl, mainAppServerUrl } = config;
     const app = express();
     app.options("*", cors());
     app.use(cors());
@@ -43,8 +44,8 @@ export default function createProxyServer(config: {
         app.use(middleware);
     });
 
-    const authDataAccess = new AuthDataAccess();
-    const draftImageDataAccess = new DraftImageDataAccess();
+    const authDataAccess = new AuthDataAccess(authServerUrl);
+    const draftImageDataAccess = new DraftImageDataAccess(mainAppServerUrl);
     const tokenRepository = new RedisTokenRepository(redis);
 
     const authRouter = Router();
@@ -86,19 +87,19 @@ export default function createProxyServer(config: {
             });
         }
 
-        const response = await fetch("http://127.0.0.1:4300/upload", {
-            method: 'POST',
+        const response = await fetch(`${fileServerUrl}/upload`, {
+            method: "POST",
             body: formData,
             headers: {
-              ...formData.getHeaders(),
-            }
-          });
-          
+                ...formData.getHeaders(),
+            },
+        });
+
         const httpService = new ExpressHttpService(req);
 
         if (response.status === 200) {
             try {
-                const responseJson: UploadImagesResponseDTO = await response.json() as any;
+                const responseJson: UploadImagesResponseDTO = (await response.json()) as any;
                 const bearerToken = httpService.getBearerTokenOrThrow();
                 const clientHeader = httpService.getClientHeaderOrThrow();
 
@@ -112,14 +113,21 @@ export default function createProxyServer(config: {
 
                 const apiResponse = await draftImageDataAccess.uploadDraftImages(clientHeader, bearerToken, apiRequest);
                 if (!apiResponse.ok) {
-                    const apiErrors: IApiError[] = ApiErrorFactory.createSingleErrorList({ message: "Something went wrong trying to persist image data", code: API_ERROR_CODES.VALIDATION_ERROR, path: "_" })
+                    const apiErrors: IApiError[] = ApiErrorFactory.createSingleErrorList({
+                        message: "Something went wrong trying to persist image data",
+                        code: API_ERROR_CODES.VALIDATION_ERROR,
+                        path: "_",
+                    });
                     res.status(400).json(apiErrors);
                 } else {
                     res.status(200).json(responseJson);
                 }
             } catch (e: unknown) {
-                console.log("Ezzor: ", e);
-                const apiErrors: IApiError[] = ApiErrorFactory.createSingleErrorList({ message: "Something went wrong trying to persist image data", code: API_ERROR_CODES.VALIDATION_ERROR, path: "_" })
+                const apiErrors: IApiError[] = ApiErrorFactory.createSingleErrorList({
+                    message: "Something went wrong trying to persist image data",
+                    code: API_ERROR_CODES.VALIDATION_ERROR,
+                    path: "_",
+                });
                 res.status(400).json(apiErrors);
             }
 
@@ -138,7 +146,7 @@ export default function createProxyServer(config: {
 
     app.use(
         createProxyMiddleware({
-            target: "http://localhost:5102",
+            target: process.env.NODE_ENV === "DOCKER" ? "http://web:5000" : "http://localhost:5102",
             selfHandleResponse: false,
             changeOrigin: true,
             timeout: 10000,

@@ -7,7 +7,7 @@ echo Starting Vite App
 start cmd /k "cd /d frontend && npm run dev"
 
 echo Starting Django Auth Server
-start cmd /k "cd /d auth && env\scripts\activate && python manage.py runserver"
+start cmd /k "cd /d auth && env\scripts\activate && python manage.py migrate && python manage.py runserver"
 
 echo Starting Node Proxy Server
 start cmd /k "cd /d backend && npm run dev"
