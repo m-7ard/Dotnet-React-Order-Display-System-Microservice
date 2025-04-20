@@ -1,18 +1,63 @@
 services:
-  web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: dotnet-react-order-display-system-web
-    ports:
-      - "5000:5000"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Production
-      - ASPNETCORE_URLS=http://+:5000
-      - DOCKER_ENVIRONMENT=true
-      - NODE_ENV=production
-    volumes:
-      - uploaded-media:/app/media
+    redis:
+        image: redis
+        ports:
+            - "6379:6379"
+        networks:
+            - app-net
+
+    frontend:
+        build: 
+            context: ./frontend
+            dockerfile: Dockerfile
+        volumes:
+            - frontend-build:/app/react
+        networks:
+            - app-net
+        environment:
+            - NODE_ENV=production
+
+    file:
+        build: 
+            context: ./fileServer
+            dockerfile: Dockerfile
+        volumes:
+            - frontend-build:/app/static
+            - uploaded-media:/app/media
+        ports:
+            - "3000:3000"
+        networks:
+            - app-net
+
+    proxy:
+        build: 
+            context: ./backend
+            dockerfile: Dockerfile
+        ports:
+            - "3100:3100"
+        networks:
+            - app-net
+        depends_on:
+            - redis
+        environment:
+            REDIS_URL: redis://redis:6379
+
+    web:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        ports:
+            - "5000:5000"
+        environment:
+            - ASPNETCORE_ENVIRONMENT=Production
+            - ASPNETCORE_URLS=http://+:5000
+        networks:
+            - app-net
+
+networks:
+    app-net:
+        driver: bridge
 
 volumes:
-  uploaded-media:
+    uploaded-media:
+    frontend-build:

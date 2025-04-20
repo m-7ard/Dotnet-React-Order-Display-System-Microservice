@@ -29,7 +29,7 @@ async function main() {
     const diContainer = new ProductionDIContainer();
 
 
-    const redis = createClient();
+    const redis = createClient({ url: environment === "DOCKER" ? 'redis://redis:6379' : undefined });
     await redis.connect();
     await redis.flushDb();
 
