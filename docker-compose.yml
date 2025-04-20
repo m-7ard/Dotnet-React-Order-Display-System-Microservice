@@ -7,7 +7,7 @@ services:
             - app-net
 
     frontend:
-        build: 
+        build:
             context: ./frontend
             dockerfile: Dockerfile
         volumes:
@@ -16,9 +16,10 @@ services:
             - app-net
         environment:
             - NODE_ENV=production
+        image: order-platform-microservice/frontend:latest
 
     file:
-        build: 
+        build:
             context: ./fileServer
             dockerfile: Dockerfile
         volumes:
@@ -28,9 +29,10 @@ services:
             - "3000:3000"
         networks:
             - app-net
+        image: order-platform-microservice/file-server:latest
 
     proxy:
-        build: 
+        build:
             context: ./backend
             dockerfile: Dockerfile
         ports:
@@ -41,6 +43,15 @@ services:
             - redis
         environment:
             REDIS_URL: redis://redis:6379
+        image: order-platform-microservice/proxy:latest
+
+    auth:
+        build:
+            context: ./auth
+            dockerfile: Dockerfile
+        ports:
+            - "8000:8000"
+        image: order-platform-microservice/auth-server:latest
 
     web:
         build:
@@ -53,6 +64,7 @@ services:
             - ASPNETCORE_URLS=http://+:5000
         networks:
             - app-net
+        image: order-platform-microservice/main-api:latest
 
 networks:
     app-net:

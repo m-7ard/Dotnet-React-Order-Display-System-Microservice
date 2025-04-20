@@ -19,7 +19,7 @@ import JwtTokenGateway from "application/gateways/JwtTokenGateway";
 import { TokenValidationService } from "./services/TokenValidationService";
 import multer from "multer";
 import FormData from "form-data";
-import fetch from 'node-fetch'; // You'll need to install this
+import fetch from 'node-fetch';
 import IApiError from "./errors/IApiError";
 import ApiErrorFactory from "./errors/ApiErrorFactory";
 import API_ERROR_CODES from "./errors/API_ERROR_CODES";
