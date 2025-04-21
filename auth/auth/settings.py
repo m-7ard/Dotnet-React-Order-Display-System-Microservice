@@ -149,12 +149,17 @@ REST_FRAMEWORK = {
     ],
 }
 
+HETZNER_URL = os.getenv('HETZNER_URL', None)
+
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173", # vite dev server
     "http://127.0.0.1:4300", # fileserver hosting built vite app
     "http://localhost:3000", # fileserver hosting built vite app for docker (?)
     "http://localhost:3100" # for docker
 ]
+
+if HETZNER_URL is not None:
+    CORS_ALLOWED_ORIGINS.append(HETZNER_URL)
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
