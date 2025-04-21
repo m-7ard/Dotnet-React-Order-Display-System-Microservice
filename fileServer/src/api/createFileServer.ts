@@ -12,12 +12,8 @@ import path from "path";
 import { writeFileSync } from "fs";
 import API_ERROR_CODES from "./errors/API_ERROR_CODES";
 
-export default function createFileServer(config: {
-    port: 3000 | 4300;
-    middleware: Array<(req: Request, res: Response, next: NextFunction) => void>;
-    mode: "PRODUCTION" | "DEVELOPMENT" | "DOCKER";
-    diContainer: IDIContainer;
-}) {
+export default function createFileServer(config: { middleware: Array<(req: Request, res: Response, next: NextFunction) => void>; diContainer: IDIContainer; publicUrl: string }) {
+    const { publicUrl } = config;
     const app = express();
     app.options("*", cors());
     app.use(cors());
@@ -83,7 +79,7 @@ export default function createFileServer(config: {
             }
 
             response.images.push({
-                url: `${req.protocol}://` + path.join(`${"127.0.0.1"}:${req.socket.localPort}`.toString(), MEDIA_FOLDER_NAME, generatedFileNameWithExtension),
+                url: publicUrl + "/" + path.join(MEDIA_FOLDER_NAME, generatedFileNameWithExtension),
                 originalFileName: file.originalname,
                 fileName: generatedFileNameWithExtension,
             });

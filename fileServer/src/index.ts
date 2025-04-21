@@ -1,7 +1,7 @@
 import createFileServer from "api/createFileServer";
 import responseLogger from "api/middleware/responseLogger";
 import { ProductionDIContainer } from "api/services/DIContainer";
-import { assert, literal, union } from "superstruct";
+import { assert, literal, string, union } from "superstruct";
 
 if (global.crypto == null) {
     global.crypto = require('crypto');
@@ -25,13 +25,17 @@ async function main() {
     const hostValidator = union([literal("127.0.0.1"), literal("0.0.0.0")]);
     assert(host, hostValidator);
 
+    const publicUrl = process.env.PUBLIC_URL;
+    const publicUrlValidator = string();
+    assert(publicUrl, publicUrlValidator);
+
+
     const diContainer = new ProductionDIContainer();
 
     const app = createFileServer({
-        port: port,
         middleware: [responseLogger],
-        mode: environment,
         diContainer: diContainer,
+        publicUrl: publicUrl
     });
 
     const server = app.listen(port, host, () => {
