@@ -28,11 +28,15 @@ SECRET_KEY = 'django-insecure-14ijfhm_s7$^-!wkf-3-3q#fpj5&(x(_w(tmdv3r2ddiq!u$8o
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+HETZNER_URL = os.getenv('HETZNER_URL', None)
+
 ALLOWED_HOSTS = [
     "auth", # for docker
     "127.0.0.1" # for docker
 ]
 
+if HETZNER_URL is not None:
+    ALLOWED_HOSTS.append(HETZNER_URL)
 
 # Application definition
 
@@ -148,8 +152,6 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
 }
-
-HETZNER_URL = os.getenv('HETZNER_URL', None)
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173", # vite dev server
