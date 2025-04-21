@@ -10,7 +10,6 @@ export default class UserDataAccess implements IUserDataAccess {
     private readonly apiUrl = `${getApiUrl()}`;
     
     constructor(private readonly tokenStorage: TokenStorage) {
-        console.log(`test123`)
     }
 
     async register(request: IRegisterUserRequestDTO): Promise<Response> {
