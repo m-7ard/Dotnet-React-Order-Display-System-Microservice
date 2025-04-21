@@ -24,9 +24,9 @@ deploy:
           git pull origin master;
         fi;
 
-        echo 'VITE_API_URL=http://${HETZNER_IPV4}:3100 \
-        VITE_FILE_SERVER_URL=http://${HETZNER_IPV4}:3000 \
-        VITE_AUTH_URL=http://${HETZNER_IPV4}:8000 \' > frontend/.env.production;
+        echo "VITE_API_URL=http://${HETZNER_IPV4}:3100" > frontend/.env.production;
+        echo "VITE_FILE_SERVER_URL=http://${HETZNER_IPV4}:3000" >> frontend/.env.production;
+        echo "VITE_AUTH_URL=http://${HETZNER_IPV4}:8000" >> frontend/.env.production;
 
         echo 'VITE_API_URL=http://${HETZNER_IPV4}:3000' > auth/.env;
   
