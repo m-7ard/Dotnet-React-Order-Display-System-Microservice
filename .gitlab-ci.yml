@@ -35,7 +35,7 @@ deploy:
         docker system prune -af;
         echo 'XXXX AFTER PRUNE XXXX';
 
-        docker compose build;
+        docker compose build --no-cache;
         echo 'XXXX AFTER BUILD XXXX';
 
       "
