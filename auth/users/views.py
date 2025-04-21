@@ -1,4 +1,6 @@
 from datetime import datetime, timezone
+from django.conf import settings
+import logging
 
 from rest_framework import status
 from rest_framework.generics import CreateAPIView
@@ -13,7 +15,6 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth.models import User
 
 from .serializers import RegisterSerializer, CustomTokenObtainPairSerializer
-
 
 class RegisterView(CreateAPIView):
     queryset = User.objects.all()

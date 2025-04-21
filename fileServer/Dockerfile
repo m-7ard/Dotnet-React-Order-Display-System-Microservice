@@ -10,6 +10,7 @@ RUN npm run export:docker
 FROM node:20-alpine
 
 WORKDIR /app
+COPY --from=order-platform-microservice/frontend /app/react /app/static
 COPY --from=builder /app .
 EXPOSE 3000
 CMD ["node", "dist/index.mjs"]

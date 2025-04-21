@@ -12,10 +12,6 @@ db.sqlite3
 *.pyc
 *.mo
 
-# Environment files
-.env
-.env.*
-
 # Virtual environments
 venv/
 .venv/

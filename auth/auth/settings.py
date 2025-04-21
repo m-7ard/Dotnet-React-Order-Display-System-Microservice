@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 import os
+from decouple import config, Csv
 
 from pathlib import Path
 from datetime import timedelta
@@ -28,15 +29,7 @@ SECRET_KEY = 'django-insecure-14ijfhm_s7$^-!wkf-3-3q#fpj5&(x(_w(tmdv3r2ddiq!u$8o
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-HETZNER_URL = os.getenv('HETZNER_URL', None)
-
-ALLOWED_HOSTS = [
-    "auth", # for docker
-    "127.0.0.1" # for docker
-]
-
-if HETZNER_URL is not None:
-    ALLOWED_HOSTS.append(HETZNER_URL)
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default=None, cast=Csv())
 
 # Application definition
 
@@ -153,15 +146,7 @@ REST_FRAMEWORK = {
     ],
 }
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173", # vite dev server
-    "http://127.0.0.1:4300", # fileserver hosting built vite app
-    "http://localhost:3000", # fileserver hosting built vite app for docker (?)
-    "http://localhost:3100" # for docker
-]
-
-if HETZNER_URL is not None:
-    CORS_ALLOWED_ORIGINS.append(HETZNER_URL)
+CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default=None, cast=Csv())
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),

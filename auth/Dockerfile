@@ -14,12 +14,6 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code (if you need to install your app as a package)
-# Uncomment these if needed:
-# COPY setup.py .
-# COPY yourappname/ .
-# RUN pip install .
-
 # Runtime stage
 FROM python:3.11-slim AS runtime-image
 
