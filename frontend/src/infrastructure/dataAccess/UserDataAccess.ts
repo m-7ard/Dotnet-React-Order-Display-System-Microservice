@@ -35,14 +35,7 @@ export default class UserDataAccess implements IUserDataAccess {
     }
 
     async currentUser(): Promise<Response> {
-        console.log(`${this.authRoute}/current-user`)
-        const response1 = await fetch(`${this.authRoute}/current-user`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                'Authorization': `Bearer ${this.tokenStorage.getAccessToken()}`
-            },
-        });
+        console.log(`${this.authRoute}/current-user`);
         const response = await fetch(`${this.authRoute}/current-user`, {
             method: "GET",
             headers: {
