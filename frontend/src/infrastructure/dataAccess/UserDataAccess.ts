@@ -9,7 +9,9 @@ export default class UserDataAccess implements IUserDataAccess {
     private readonly authRoute = `${getAuthUrl()}`;
     private readonly apiUrl = `${getApiUrl()}`;
     
-    constructor(private readonly tokenStorage: TokenStorage) {}
+    constructor(private readonly tokenStorage: TokenStorage) {
+        console.log(this.authRoute);
+    }
 
     async register(request: IRegisterUserRequestDTO): Promise<Response> {
         const response = await fetch(`${this.authRoute}/register`, {
@@ -35,7 +37,15 @@ export default class UserDataAccess implements IUserDataAccess {
     }
 
     async currentUser(): Promise<Response> {
-        console.log(`${this.authRoute}/current-user`);
+        const response1 = await fetch(`${this.authRoute}/current-user`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                'Authorization': `Bearer ${this.tokenStorage.getAccessToken()}`
+            },
+        });
+        console.log(response1);
+        console.log(this.authRoute);
         const response = await fetch(`${this.authRoute}/current-user`, {
             method: "GET",
             headers: {
