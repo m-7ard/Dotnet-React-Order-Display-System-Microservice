@@ -1,0 +1,46 @@
+{
+	# Global options
+	auto_https off # Disable automatic HTTPS for localhost
+	http_port 80
+	https_port 443
+}
+
+:80 {
+	log {
+		output stdout
+		format json
+	}
+
+    handle /upload {
+        reverse_proxy proxy:3100
+    }
+
+	handle {
+		reverse_proxy file:3000
+	}
+
+	handle_path /media/* {
+		reverse_proxy file:3000
+	}
+
+    handle /api/auth/logout {
+        rewrite * /logout
+        reverse_proxy proxy:3100
+    }
+
+    handle_path /api/auth/* {
+        reverse_proxy auth:8000
+    }
+
+    handle /api/* {
+        reverse_proxy proxy:3100 {
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote_host}
+            header_up Host {host}
+        }
+    }
+}
+
+:8080 {
+	reverse_proxy file:3000
+}

@@ -1,6 +1,5 @@
 using Api.DTOs.DraftImages.UploadImages;
 using Api.Errors;
-using Api.Mappers;
 using Api.Services;
 using Application.Handlers.DraftImages.UploadImages;
 using MediatR;
@@ -16,7 +15,6 @@ public class DraftImagesController : ControllerBase
 {
     private readonly ISender _mediator;
     private readonly List<string> _permittedExtensions = [".jpg", ".jpeg", ".png"];
-    private readonly long _fileSizeLimit = 8 * 1024 * 1024; // 8 MB
 
     public DraftImagesController(ISender mediator)
     {

@@ -1,6 +1,4 @@
 from datetime import datetime, timezone
-from django.conf import settings
-import logging
 
 from rest_framework import status
 from rest_framework.generics import CreateAPIView
@@ -45,6 +43,7 @@ class CurrentUserView(APIView):
 
     def get(self, request):
         user = request.user
+
         return Response({
             "username": user.username,
             "email": user.email,

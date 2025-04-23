@@ -16,7 +16,6 @@ export default class ProductDataAccess implements IProductDataAccess {
     
     async listProducts(request: IListProductsRequestDTO): Promise<Response> {
         const urlParams = getUrlParams(request);
-        console.log(this.tokenStorage.getAccessToken())
         const response = await fetch(`${this._apiRoute}/list?${urlParams}`, {
             method: "GET",
             headers: {

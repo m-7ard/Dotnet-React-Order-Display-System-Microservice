@@ -52,6 +52,9 @@ export default function AuthServiceProvider(props: React.PropsWithChildren<{ hre
 
     const register = useCallback<IAuthService["register"]>(
         async (params) => {
+            tokenStorage.setAccessToken(null);
+            tokenStorage.setRefreshToken(null);
+
             try {
                 const result = await tryHandleRequest(userDataAccess.register({ email: params.email, password: params.password, username: params.username }));
 
@@ -72,7 +75,7 @@ export default function AuthServiceProvider(props: React.PropsWithChildren<{ hre
                 return err({ _: [JSON.stringify(error)] });
             }
         },
-        [dispatchException, userDataAccess],
+        [dispatchException, userDataAccess, tokenStorage],
     );
 
     const login = useCallback<IAuthService["login"]>(
@@ -114,7 +117,7 @@ export default function AuthServiceProvider(props: React.PropsWithChildren<{ hre
             }
 
             const response = result.value;
-            if (response.ok) {
+            if (response.ok || response.status === 401) {
                 tokenStorage.setAccessToken(null);
                 tokenStorage.setRefreshToken(null);
                 await currentUser({});
