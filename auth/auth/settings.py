@@ -146,7 +146,8 @@ REST_FRAMEWORK = {
     ],
 }
 
-CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default=None, cast=Csv())
+# CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default=None, cast=Csv())
+CORS_ALLOW_ALL_ORIGINS  = True # config('CORS_ALLOWED_ORIGINS', default=None, cast=Csv())
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),

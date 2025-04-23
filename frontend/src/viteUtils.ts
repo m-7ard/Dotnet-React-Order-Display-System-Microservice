@@ -16,3 +16,7 @@ export const getFileServerUrl = () => {
 export const getAuthUrl = () => {
     return import.meta.env.VITE_AUTH_URL;
 };
+
+export const getLogoutUrl = () => {
+    return import.meta.env.VITE_LOGOUT_URL;
+};

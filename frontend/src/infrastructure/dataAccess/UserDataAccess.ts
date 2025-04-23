@@ -1,15 +1,16 @@
 import { TokenStorage } from "../../presentation/deps/tokenStorage";
 import IUserDataAccess from "../../presentation/interfaces/dataAccess/IUserDataAccess";
-import { getApiUrl, getAuthUrl } from "../../viteUtils";
+import { getAuthUrl, getLogoutUrl } from "../../viteUtils";
 import ILoginUserRequestDTO from "../contracts/auth/login/ILoginUserRequestDTO";
 import ILogoutUserRequestDTO from "../contracts/auth/logout/ILogoutUserRequestDTO";
 import IRegisterUserRequestDTO from "../contracts/auth/register/IRegisterUserRequestDTO";
 
 export default class UserDataAccess implements IUserDataAccess {
     private readonly authRoute = `${getAuthUrl()}`;
-    private readonly apiUrl = `${getApiUrl()}`;
+    private readonly logoutUrl = `${getLogoutUrl()}`;
     
     constructor(private readonly tokenStorage: TokenStorage) {
+        console.log(this.authRoute, this.logoutUrl)
     }
 
     async register(request: IRegisterUserRequestDTO): Promise<Response> {
@@ -54,7 +55,7 @@ export default class UserDataAccess implements IUserDataAccess {
         } 
 
         // Logout through the proxy
-        const response = await fetch(`${this.apiUrl}/logout`, {
+        const response = await fetch(`${this.logoutUrl}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

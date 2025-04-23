@@ -112,6 +112,7 @@ export default function createProxyServer(config: {
                 };
 
                 const apiResponse = await draftImageDataAccess.uploadDraftImages(clientHeader, bearerToken, apiRequest);
+
                 if (!apiResponse.ok) {
                     const apiErrors: IApiError[] = ApiErrorFactory.createSingleErrorList({
                         message: "Something went wrong trying to persist image data",
@@ -151,6 +152,8 @@ export default function createProxyServer(config: {
             changeOrigin: true,
             timeout: 10000,
             proxyTimeout: 10000,
+            xfwd: true, // IMPORTANT: sets X-Forwarded-For, X-Forwarded-Proto, Host, etc.
+            preserveHeaderKeyCase: true
         }),
     );
 

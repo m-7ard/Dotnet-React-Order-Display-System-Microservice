@@ -4,7 +4,7 @@ import { getApiUrl } from "../../viteUtils";
 import IUploadDraftImagesRequestDTO from "../contracts/uploadImages/IUploadDraftImagesRequestDTO";
 
 export default class DraftImageDataAccess implements IDraftImageDataAccess {
-    private readonly _apiRoute = `${getApiUrl()}`;
+    private readonly apiRoute = `${getApiUrl()}`;
     
     constructor(private readonly tokenStorage: TokenStorage) {}
 
@@ -12,7 +12,7 @@ export default class DraftImageDataAccess implements IDraftImageDataAccess {
         const formData = new FormData();
         request.files.forEach((file) => formData.append("file", file));
         
-        const response = await fetch(`${this._apiRoute}/upload`, {
+        const response = await fetch(`${this.apiRoute}/upload`, {
             method: "POST",
             headers: {
                 'Authorization': `Bearer ${this.tokenStorage.getAccessToken()}`

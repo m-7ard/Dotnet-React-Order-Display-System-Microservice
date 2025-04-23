@@ -6,6 +6,24 @@ services:
         networks:
             - app-net
 
+    caddy:
+        image: caddy:2.6-alpine
+        container_name: caddy
+        restart: unless-stopped
+        ports:
+          - "127.0.0.1:80:80"  # Bind port 80 on localhost
+          - "127.0.0.1:443:443" # Bind port 443 on localhost
+        volumes:
+            - ./Caddyfile:/etc/caddy/Caddyfile
+            - caddy_data:/data
+            - caddy_config:/config
+        depends_on:
+            - file
+            - proxy
+            - auth
+        networks:
+            - app-net
+
     frontend:
         build:
             context: ./frontend
@@ -23,7 +41,7 @@ services:
         volumes:
             - uploaded-media:/app/media
         depends_on:
-          - frontend
+            - frontend
         ports:
             - "3000:3000"
         networks:
@@ -73,3 +91,5 @@ networks:
 
 volumes:
     uploaded-media:
+    caddy_data:
+    caddy_config:
