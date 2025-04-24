@@ -23,7 +23,7 @@ The documentation for the main application can be found at https://github.com/m-
 NOTE: The dev version will not use the Caddy proxy
 
 ## A High Level View
-![A High Level View](readmeFiles/app-flow.png)
+![A High Level View](readmeFiles/app-flow-1.png)
 
 ## Docker Detials
 The application uses a docker compose to orchestrate all the servers and uses a bridge network.
