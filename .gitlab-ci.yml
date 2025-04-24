@@ -34,6 +34,9 @@ deploy:
         echo "VITE_FILE_SERVER_URL=http://${HETZNER_IPV4}:3000" >> frontend/.env.production;
         echo "VITE_AUTH_URL=http://${HETZNER_IPV4}:8000" >> frontend/.env.production;
 
+        export CADDY_PORT_80=${HETZNER_IPV4}
+        export CADDY_PORT_443=${HETZNER_IPV4}
+
         docker compose down || true;
         echo 'XXXX AFTER DOWN XXXX';
         docker system prune -a -f --volumes
