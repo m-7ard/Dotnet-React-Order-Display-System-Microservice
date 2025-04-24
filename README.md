@@ -20,6 +20,7 @@ The documentation for the main application can be found at https://github.com/m-
 ```bash
     >> dev-start.bat
 ```
+NOTE: The dev version will not use the Caddy proxy
 
 ## A High Level View
 ![A High Level View](readmeFiles/app-flow.png)
@@ -27,7 +28,7 @@ The documentation for the main application can be found at https://github.com/m-
 ## Docker Detials
 The application uses a docker compose to orchestrate all the servers and uses a bridge network.
 The .Net API is private and only accesible through the docker network, preventing the spoofing of the X-User-Id Header.
-There are 2 volumes, both for the fileserver, one of them is for static files, such as the built React app, and media, for uploaded images.
+There is 1 app-related volume, for the fileserver, used to store media such as uploaded images.
 
 ## Node Middle Proxy Details
 The Node proxy will receive all requests to the .Net & Logout requests. (Except when logging out) It will always first try to confirm that the user is authenticated, by first looking through the token cache in Redis, and then look at the remote Auth server and try to obtain the token from there (which includes the user id), and then cache it in the Redis cache with a TTL dicated by the expiry date of the token. If both the lookups fail, a 401 status is returned.

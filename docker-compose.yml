@@ -42,8 +42,6 @@ services:
             - uploaded-media:/app/media
         depends_on:
             - frontend
-        ports:
-            - "3000:3000"
         networks:
             - app-net
         image: order-platform-microservice/file-server:latest
@@ -52,8 +50,6 @@ services:
         build:
             context: ./backend
             dockerfile: Dockerfile
-        ports:
-            - "3100:3100"
         networks:
             - app-net
         depends_on:
@@ -68,16 +64,12 @@ services:
             dockerfile: Dockerfile
         networks:
             - app-net
-        ports:
-            - "8000:8000"
         image: order-platform-microservice/auth-server:latest
 
     web:
         build:
             context: .
             dockerfile: Dockerfile
-        ports:
-            - "5000:5000"
         environment:
             - ASPNETCORE_ENVIRONMENT=Production
             - ASPNETCORE_URLS=http://+:5000
