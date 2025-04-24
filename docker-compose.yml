@@ -11,8 +11,8 @@ services:
         container_name: caddy
         restart: unless-stopped
         ports:
-          - "127.0.0.1:80:80"  # Bind port 80 on localhost
-          - "127.0.0.1:443:443" # Bind port 443 on localhost
+          - "${CADDY_PORT_80:-127.0.0.1}:80:80"
+          - "${CADDY_PORT_443:-127.0.0.1}:443:443"
         volumes:
             - ./Caddyfile:/etc/caddy/Caddyfile
             - caddy_data:/data
