@@ -1,11 +1,12 @@
 import createProxyServer from "api/createProxyServer";
 import responseLogger from "api/middleware/responseLogger";
 import { ProductionDIContainer } from "api/services/DIContainer";
+import { Kafka } from "kafkajs";
 import { createClient } from "redis";
 import { assert, literal, union } from "superstruct";
 
 if (global.crypto == null) {
-    global.crypto = require('crypto');
+    global.crypto = require("crypto");
 }
 
 async function main() {
@@ -39,9 +40,15 @@ async function main() {
     assert(mainApiServerUrl, mainApiServerUrlValidator);
 
     const diContainer = new ProductionDIContainer();
+    const kafka = new Kafka({
+        clientId: "my-producer",
+        brokers: ["localhost:29092"],
+    });
+
+    const producer = kafka.producer();
 
 
-    const redis = createClient({ url: environment === "DOCKER" ? 'redis://redis:6379' : undefined });
+    const redis = createClient({ url: environment === "DOCKER" ? "redis://redis:6379" : undefined });
     await redis.connect();
     await redis.flushDb();
 
@@ -51,7 +58,9 @@ async function main() {
         redis: redis,
         fileServerUrl: fileServerUrl,
         authServerUrl: authServerUrl,
-        mainAppServerUrl: mainApiServerUrl
+        mainAppServerUrl: mainApiServerUrl,
+        kafkaProducer: producer,
+        kafka: kafka
     });
 
     const server = app.listen(port, host, () => {

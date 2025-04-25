@@ -23,6 +23,8 @@ import fetch from "node-fetch";
 import IApiError from "./errors/IApiError";
 import ApiErrorFactory from "./errors/ApiErrorFactory";
 import API_ERROR_CODES from "./errors/API_ERROR_CODES";
+import { Kafka, Producer } from "kafkajs";
+import { WebSocketServer, WebSocket } from "ws";
 
 export type RedisClientConnection = ReturnType<typeof createClient>;
 
@@ -33,11 +35,71 @@ export default function createProxyServer(config: {
     authServerUrl: "http://127.0.0.1:8000" | "http://auth:8000";
     fileServerUrl: "http://127.0.0.1:4300" | "http://127.0.0.1:3000" | "http://file:3000";
     mainAppServerUrl: "http://localhost:5102" | "http://web:5000";
+    kafkaProducer: Producer;
+    kafka: Kafka;
 }) {
-    const { redis, authServerUrl, fileServerUrl, mainAppServerUrl } = config;
+    const { redis, authServerUrl, fileServerUrl, mainAppServerUrl, kafkaProducer, kafka } = config;
     const app = express();
     app.options("*", cors());
     app.use(cors());
+
+    const wss = new WebSocketServer({ port: 8080 });
+
+    async function sendMessage() {
+        await kafkaProducer.connect();
+
+        // Send a message to the 'test-topic' topic
+        await kafkaProducer.send({
+            topic: "test-topic",
+            messages: [{ value: JSON.stringify({ message: "Hello from producer!", timestamp: new Date().toISOString() }) }],
+        });
+
+        console.log("Message sent!");
+        // Keep connection open for continuous messaging or close it
+        // await producer.disconnect();
+    }
+
+    // Send a message every 5 seconds
+    setInterval(sendMessage, 5000);
+
+    wss.on("connection", (ws) => {
+        console.log("Client connected");
+
+        ws.on("message", (message) => {
+            console.log(`Received: ${message}`);
+            ws.send(`Echo: ${message}`);
+        });
+
+        ws.on("close", () => {
+            console.log("Client disconnected");
+        });
+
+        ws.send("Welcome to the WebSocket server!");
+    });
+
+    function broadcast(message: any) {
+        wss.clients.forEach((client) => {
+            if (client.readyState === WebSocket.OPEN) {
+                client.send(message);
+            }
+        });
+    }
+
+    async function consumeMessages() {
+        const consumer = kafka.consumer({ groupId: "websocket-group" });
+
+        await consumer.connect();
+        await consumer.subscribe({ topic: "test-topic", fromBeginning: true });
+
+        await consumer.run({
+            eachMessage: async ({ topic, partition, message }) => {
+                console.log(`Received message: ${message.value!.toString()}`);
+                broadcast(message.value!.toString());
+            },
+        });
+    }
+
+    consumeMessages().catch(console.error);
 
     app.use(express.urlencoded({ extended: false }));
     config.middleware.forEach((middleware) => {
@@ -153,7 +215,7 @@ export default function createProxyServer(config: {
             timeout: 10000,
             proxyTimeout: 10000,
             xfwd: true, // IMPORTANT: sets X-Forwarded-For, X-Forwarded-Proto, Host, etc.
-            preserveHeaderKeyCase: true
+            preserveHeaderKeyCase: true,
         }),
     );
 
