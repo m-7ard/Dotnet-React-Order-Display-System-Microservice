@@ -46,6 +46,9 @@ export interface IRouteConfigMapping {
     UPDATE_PRODUCT_AMOUNT: IRouteConfig<IUpdateProductAmountParams>;
 
     LIST_PRODUCT_HISTORIES: IRouteConfig<TEmptyParams>;
+    
+    REGISTER_USER: IRouteConfig<TEmptyParams>;
+    LOGIN_USER: IRouteConfig<TEmptyParams>;
 
     LOADER_ERROR: IRouteConfig<TEmptyParams>;
     UNKNOWN_ERROR: IRouteConfig<TEmptyParams>;
@@ -72,19 +75,28 @@ export function isLayoutRoute<T extends TAnyGenericRoute>(route: T): route is T 
 }
 
 export interface ICommonRouteMapping {
+    // Base
     FRONTPAGE: ICommonRoute<IRouteConfig<TEmptyParams>, TEmptyLoaderData>;
 
+    // Orders
     LIST_ORDERS: ICommonRoute<IRouteConfig<TEmptyParams>, { orders: Order[] }>;
     CREATE_ORDER: ICommonRoute<IRouteConfig<TEmptyParams>, TEmptyLoaderData>;
     MANAGE_ORDER: ICommonRoute<IRouteConfig<IManageOrderParams>, { order: Order }>;
 
+    // Products
     LIST_PRODUCTS: ICommonRoute<IRouteConfig<TEmptyParams>, { products: IProduct[] }>;
     CREATE_PRODUCT: ICommonRoute<IRouteConfig<TEmptyParams>, TEmptyLoaderData>;
     UPDATE_PRODUCT: ICommonRoute<IRouteConfig<IUpdateProductParams>, { product: IProduct }>;
     UPDATE_PRODUCT_AMOUNT: ICommonRoute<IRouteConfig<IUpdateProductAmountParams>, { product: IProduct }>;
 
+    // Product Histories
     LIST_PRODUCT_HISTORIES: ICommonRoute<IRouteConfig<TEmptyParams>, { productHistories: ProductHistory[] }>;
 
+    // Users
+    REGISTER_USER: ICommonRoute<IRouteConfig<TEmptyParams>, TEmptyLoaderData>;
+    LOGIN_USER: ICommonRoute<IRouteConfig<TEmptyParams>, TEmptyLoaderData>;
+
+    // Errors
     LOADER_ERROR: ICommonRoute<IRouteConfig<TEmptyParams>, TErrorPageLoaderData>;
     UNKNOWN_ERROR: ICommonRoute<IRouteConfig<TEmptyParams>, TErrorPageLoaderData>;
     NOT_FOUND_ERROR: ICommonRoute<IRouteConfig<TEmptyParams>, TErrorPageLoaderData>;

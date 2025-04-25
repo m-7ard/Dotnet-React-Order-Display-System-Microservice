@@ -6,14 +6,21 @@ import IMarkOrderItemFinishedRequestDTO from "../contracts/orderItems/markFinish
 import IMarkOrderFinishedRequestDTO from "../contracts/orders/markFinished/IMarkOrderFinishedRequestDTO";
 import { getApiUrl } from "../../viteUtils";
 import getUrlParams from "../../presentation/utils/getUrlParams";
+import { TokenStorage } from "../../presentation/deps/tokenStorage";
 
 export default class OrderDataAccess implements IOrderDataAccess {
     private readonly _apiRoute = `${getApiUrl()}/api/orders`;
+
+    constructor(private readonly tokenStorage: TokenStorage) {}
 
     async listOrders(request: IListOrdersRequestDTO): Promise<Response> {
         const urlParams = getUrlParams(request);
         const response = await fetch(`${this._apiRoute}/list?${urlParams}`, {
             method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                'Authorization': `Bearer ${this.tokenStorage.getAccessToken()}`
+            },
         });
 
         return response;
@@ -24,6 +31,7 @@ export default class OrderDataAccess implements IOrderDataAccess {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                'Authorization': `Bearer ${this.tokenStorage.getAccessToken()}`
             },
             body: JSON.stringify(request),
         });
@@ -36,6 +44,7 @@ export default class OrderDataAccess implements IOrderDataAccess {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
+                'Authorization': `Bearer ${this.tokenStorage.getAccessToken()}`
             },
         });
 
@@ -47,6 +56,7 @@ export default class OrderDataAccess implements IOrderDataAccess {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
+                'Authorization': `Bearer ${this.tokenStorage.getAccessToken()}`
             },
         });
 
@@ -58,6 +68,7 @@ export default class OrderDataAccess implements IOrderDataAccess {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
+                'Authorization': `Bearer ${this.tokenStorage.getAccessToken()}`
             },
         });
 

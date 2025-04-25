@@ -19,8 +19,7 @@ public class UpdateProductAmountIntegrationTest : ProductsIntegrationTest
         await base.InitializeAsync();
         var mixins = CreateMixins();
         _validImage = await mixins.CreateDraftImage(
-            fileRoute: TestFileRoute.ValidImage,
-            destinationFileName: "saved-valid-image.png"
+            destinationFileName: "valid-image.png"
         );
         _product001 = await mixins.CreateProductAndProductHistory(number: 1, images: [_validImage]);
         DefaultRequest = new UpdateProductAmountRequestDTO(

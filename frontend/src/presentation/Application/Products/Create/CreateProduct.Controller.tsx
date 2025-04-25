@@ -121,17 +121,17 @@ export default function CreateProductController() {
                 onResponseFn: async (response) => {
                     if (response.ok) {
                         navigate({ exp: (routes) => routes.LIST_PRODUCTS, params: {} });
-                        return ok(undefined);
+                        return ok(1);
                     } else if (response.status === 400) {
                         const apiErrors = await response.json();
                         const errors = PresentationErrorFactory.ApiErrorsToPresentationErrors(apiErrors);
-                        console.log(errors)
                         errorManager.setAll(errors);
-                        return ok(undefined);
+                        return ok(2);
                     }
 
-                    return err(undefined);
+                    return err(5);
                 },
+                fallbackValue: 2
             });
         },
     });

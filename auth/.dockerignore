@@ -1,0 +1,60 @@
+# Bytecode and Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Django-specific junk
+*.sqlite3
+db.sqlite3
+*.log
+*.pot
+*.pyc
+*.mo
+
+# Virtual environments
+venv/
+.venv/
+env/
+.envrc
+
+# Migrations (optional — only if you auto-generate them)
+**/migrations/*.py
+!**/migrations/__init__.py
+
+# Static and media (optional — if you collectstatic in Docker)
+# Ignore all contents
+staticfiles/*
+media/*
+static/*
+
+# But keep the folder entries themselves
+!staticfiles/
+!media/
+!static/
+
+# Editor & OS garbage
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Docker-related
+Dockerfile
+docker-compose*
+
+# Testing and coverage
+htmlcov/
+.coverage
+.tox/
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+*.tmp
+.pytest_cache/

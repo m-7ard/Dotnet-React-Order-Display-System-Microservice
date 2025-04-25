@@ -11,6 +11,7 @@ import parseListOrdersCommandParameters from "../../../../../infrastructure/pars
 import { IManageOrderParams, TListOrdersLoaderData, TManageOrderLoaderData } from "../../../routeTypes";
 import { tanstackConfigs } from "../../tanstackConfig";
 import diContainer, { DI_TOKENS } from "../../../../deps/diContainer";
+import AuthRouteGuard from "../../../../components/RouteGuards/AuthRouteGuard";
 
 const listOrdersRoute = createRoute({
     getParentRoute: () => rootRoute,
@@ -31,13 +32,21 @@ const listOrdersRoute = createRoute({
             orders: data.orders.map(orderMapper.apiToDomain),
         };
     },
-    component: OrdersController,
+    component: () => (
+        <AuthRouteGuard>
+            <OrdersController />
+        </AuthRouteGuard>
+    ),
 });
 
 const createOrderRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: tanstackConfigs.CREATE_ORDER.pattern,
-    component: () => <CreateOrderController orderDataAccess={orderDataAccess} />,
+    component: () => (
+        <AuthRouteGuard>
+            <CreateOrderController orderDataAccess={orderDataAccess} />
+        </AuthRouteGuard>
+    ),
 });
 
 const manageOrderRoute = createRoute({
@@ -57,7 +66,11 @@ const manageOrderRoute = createRoute({
             order: orderMapper.apiToDomain(dto.order),
         };
     },
-    component: () => <ManageOrderRoute orderDataAccess={orderDataAccess} />,
+    component: () => (
+        <AuthRouteGuard>
+            <ManageOrderRoute orderDataAccess={orderDataAccess} />
+        </AuthRouteGuard>
+    ),
 });
 
 export default [listOrdersRoute, createOrderRoute, manageOrderRoute];

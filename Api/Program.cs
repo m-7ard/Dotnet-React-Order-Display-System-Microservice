@@ -1,21 +1,18 @@
 using System.Globalization;
 using Api.Interfaces;
+using Api.Middleware;
 using Api.Services;
 using Api.Validators;
-using Application.Common;
 using Application.DomainService;
 using Application.Handlers.Products.Create;
 using Application.Interfaces.Persistence;
 using Application.Interfaces.Services;
 using FluentValidation;
-using Infrastructure;
 using Infrastructure.Files;
 using Infrastructure.Interfaces;
 using Infrastructure.Persistence;
 using Infrastructure.Querying;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.FileProviders;
 
 // dotnet ef migrations add <Name> --project Infrastructure --startup-project Api
 var builder = WebApplication.CreateBuilder(args);
@@ -23,27 +20,26 @@ var builder = WebApplication.CreateBuilder(args);
 var appSettings = BuilderUtils.ReadAppSettings(builder.Configuration);
 var databaseProviderSingleton = new DatabaseProviderSingleton(appSettings.DatabaseProviderValue);
 
+
+// HttpContextAccessor
+builder.Services.AddHttpContextAccessor();
+
 ///
 ///
 /// DB / database / dbcontext
 /// 
 
-builder.Services.AddDbContext<SimpleProductOrderServiceDbContext>(options =>
-    {
-        if (databaseProviderSingleton.IsSQLite)
-        {
-            options.UseSqlite(appSettings.ConnectionString);
-        }
-        else if (databaseProviderSingleton.IsMSSQL)
-        {
-            options.UseSqlServer(appSettings.ConnectionString);
-        }
-        else
-        {
-            throw new InvalidOperationException("Unsupported database provider.");
-        }
-    }
-);
+builder.Services.AddSingleton<TenantDatabaseService>();
+builder.Services.AddScoped<TenantDbContextFactory>(sp =>
+{
+    return new TenantDbContextFactory(
+        sp.GetRequiredService<TenantDatabaseService>(),
+        sp.GetRequiredService<IHttpContextAccessor>(),
+        sp.GetRequiredService<IDatabaseProviderSingleton>(),
+        null // Explicitly pass null for test context in regular operation
+    );
+});
+builder.Services.AddScoped(sp => sp.GetRequiredService<TenantDbContextFactory>().CreateDbContext());
 
 var services = builder.Services;
 
@@ -135,34 +131,18 @@ builder.Services.AddScoped<IProductDomainService, ProductDomainService>();
 
 builder.Services.AddValidatorsFromAssembly(typeof(UpdateProductValidator).Assembly);
 
-///
-///
-/// JWT
-/// 
-
-/*
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
-        };
-    });
-*/
-
 builder.Services.AddAuthorization();
-builder.Services.AddDirectoryBrowser(); // For media
 
 var app = builder.Build();
 
 app.UseRequestLocalization();
+
+///
+///
+/// Middlware
+/// 
+
+app.UseMiddleware<TenantMiddleware>();
 
 ///
 ///
@@ -171,6 +151,7 @@ app.UseRequestLocalization();
 
 using (var scope = app.Services.CreateScope())
 {
+    /*
     var localService = scope.ServiceProvider;
     var context = localService.GetRequiredService<SimpleProductOrderServiceDbContext>();
 
@@ -184,26 +165,13 @@ using (var scope = app.Services.CreateScope())
         var logger = localService.GetRequiredService<ILogger<Program>>();
         logger.LogError(ex, "An error occurred while resetting the database.");
     }
+    */
 }
 
 
 app.UseCors(apiCorsPolicy);
 app.UseAuthentication();
 app.UseAuthorization();
-
-///
-///
-/// Media config
-/// 
-
-var mediaProvider = new PhysicalFileProvider(DirectoryService.GetMediaDirectory());
-
-app.UseFileServer(new FileServerOptions
-{
-    FileProvider = mediaProvider,
-    RequestPath = "/media",
-    EnableDirectoryBrowsing = true
-});
 
 app.UseDefaultFiles();
 app.UseStaticFiles();

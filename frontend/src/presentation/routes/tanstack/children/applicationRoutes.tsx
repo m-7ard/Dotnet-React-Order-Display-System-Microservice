@@ -1,14 +1,12 @@
 import { createRoute } from "@tanstack/react-router";
-import rootRoute from "../rootRoute";
+import { authRootRoute } from "../rootRoute";
 import FrontpagePage from "../../../Application/Frontpage/Frontpage.Page";
 import { tanstackConfigs } from "../tanstackConfig";
 
 const frontPageRoute = createRoute({
-    getParentRoute: () => rootRoute,
+    getParentRoute: () => authRootRoute,
     path: tanstackConfigs.FRONTPAGE.pattern,
-    component: FrontpagePage,
+    component: () => <FrontpagePage />,
 });
 
-export default [
-    frontPageRoute
-]
+export default [frontPageRoute];

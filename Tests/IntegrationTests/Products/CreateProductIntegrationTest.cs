@@ -1,9 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using Api.DTOs.Products.Create;
-using Application.Interfaces.Persistence;
 using Domain.Models;
-using Domain.ValueObjects.Product;
 using Microsoft.EntityFrameworkCore;
 
 namespace Tests.IntegrationTests.Products;
@@ -17,8 +15,7 @@ public class CreateProductIntegrationTest : ProductsIntegrationTest
         await base.InitializeAsync();
         var mixins = CreateMixins();
         _validImage = await mixins.CreateDraftImage(
-            fileRoute: TestFileRoute.ValidImage,
-            destinationFileName: "saved-valid-image.png"
+            destinationFileName: "valid-image.png"
         );
     }
 

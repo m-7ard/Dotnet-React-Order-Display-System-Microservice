@@ -147,6 +147,7 @@ public class ProductsController : ControllerBase
             createdAfter: parameters.CreatedAfter,
             orderBy: parameters.OrderBy
         );
+
         var result = await _mediator.Send(query);
 
         if (result.TryPickT1(out var errors, out var value))

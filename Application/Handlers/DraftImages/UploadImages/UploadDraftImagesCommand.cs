@@ -1,16 +1,16 @@
+using Application.Contracts.Models;
 using Application.Errors;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using OneOf;
 
 namespace Application.Handlers.DraftImages.UploadImages;
 
 public class UploadDraftImagesCommand : IRequest<OneOf<UploadDraftImagesResult, List<ApplicationError>>>
 {
-    public UploadDraftImagesCommand(List<IFormFile> files)
+    public UploadDraftImagesCommand(List<UploadImageData> imageData)
     {
-        Files = files;
+        ImageData = imageData;
     }
 
-    public List<IFormFile> Files { get; set; }
+    public List<UploadImageData> ImageData { get; set; }
 }

@@ -1,5 +1,15 @@
 import React from "react";
 
-export default function Divider(props: Omit<React.HtmlHTMLAttributes<HTMLHRElement>, "className">) {
-    return <hr className="h-0 w-full border-bottom border-gray-300 shadow-lg" {...props}></hr>;
+type DividerProps = Omit<React.HtmlHTMLAttributes<HTMLHRElement>, "className"> & {
+    isVertical?: boolean;
+};
+
+export default function Divider(props: DividerProps) {
+    const { isVertical = false } = props;
+
+    if (isVertical) {
+        return <hr className="w-0 h-full border-r border-gray-300 shadow-lg" {...props}></hr>;
+    }
+
+    return <hr className="h-0 w-full border-t border-gray-300 shadow-lg" {...props}></hr>;
 }

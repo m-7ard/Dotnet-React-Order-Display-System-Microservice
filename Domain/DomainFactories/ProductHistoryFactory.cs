@@ -51,7 +51,7 @@ public class ProductHistoryFactory
         return BuildNewProductHistory(
             id: ProductHistoryId.ExecuteCreate(Guid.NewGuid()),
             name: product.Name,
-            images: product.Images.Select(image => image.FileName.Value).ToList(),
+            images: product.Images.Select(image => image.Url).ToList(),
             price: product.Price,
             productId: product.Id,
             description: product.Description

@@ -1,18 +1,87 @@
 services:
-  web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: dotnet-react-order-display-system-web
-    ports:
-      - "5000:5000"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Production
-      - ASPNETCORE_URLS=http://+:5000
-      - DOCKER_ENVIRONMENT=true
-      - NODE_ENV=production
-    volumes:
-      - uploaded-media:/app/media
+    redis:
+        image: redis
+        ports:
+            - "6379:6379"
+        networks:
+            - app-net
+
+    caddy:
+        image: caddy:2.6-alpine
+        container_name: caddy
+        restart: unless-stopped
+        ports:
+          - "${CADDY_PORT_80:-127.0.0.1}:80:80"
+          - "${CADDY_PORT_443:-127.0.0.1}:443:443"
+        volumes:
+            - ./Caddyfile:/etc/caddy/Caddyfile
+            - caddy_data:/data
+            - caddy_config:/config
+        depends_on:
+            - file
+            - proxy
+            - auth
+        networks:
+            - app-net
+
+    frontend:
+        build:
+            context: ./frontend
+            dockerfile: Dockerfile
+        networks:
+            - app-net
+        environment:
+            - NODE_ENV=production
+        image: order-platform-microservice/frontend:latest
+
+    file:
+        build:
+            context: ./fileServer
+            dockerfile: Dockerfile
+        volumes:
+            - uploaded-media:/app/media
+        depends_on:
+            - frontend
+        networks:
+            - app-net
+        image: order-platform-microservice/file-server:latest
+
+    proxy:
+        build:
+            context: ./backend
+            dockerfile: Dockerfile
+        networks:
+            - app-net
+        depends_on:
+            - redis
+        environment:
+            REDIS_URL: redis://redis:6379
+        image: order-platform-microservice/proxy:latest
+
+    auth:
+        build:
+            context: ./auth
+            dockerfile: Dockerfile
+        networks:
+            - app-net
+        image: order-platform-microservice/auth-server:latest
+
+    web:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        environment:
+            - ASPNETCORE_ENVIRONMENT=Production
+            - ASPNETCORE_URLS=http://+:5000
+        networks:
+            - app-net
+        image: order-platform-microservice/main-api:latest
+
+networks:
+    app-net:
+        driver: bridge
 
 volumes:
-  uploaded-media:
+    uploaded-media:
+    caddy_data:
+    caddy_config:

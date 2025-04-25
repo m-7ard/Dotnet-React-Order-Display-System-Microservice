@@ -5,7 +5,6 @@ import CoverImage from "../Resuables/CoverImage";
 import MixinButton from "../Resuables/MixinButton";
 import StatelessCharField from "../StatelessFields/StatelessCharField";
 import { Value } from "@sinclair/typebox/value";
-import { getApiUrl } from "../../../viteUtils";
 import MixinPrototypeCard, { MixinPrototypeCardSection } from "../Resuables/MixinPrototypeCard";
 import FormField from "../Forms/FormField";
 import FormError from "../Forms/FormError,";
@@ -30,7 +29,7 @@ export type OrderItemDataFormProps = {
 
 export default function OrderItemDataFieldItem(props: OrderItemDataFormProps) {
     const { onUpdate, onDelete, product, value, errors } = props;
-    const productImages = product.images.map((image) => `${getApiUrl()}/Media/${image.fileName}`);
+    const productImages = product.images.map((image) => `${image.url}`);
 
     const updateQuantity = (quantity: number) => {
         const isValid = Value.Check(Type.Integer({ minimum: 1 }), quantity);

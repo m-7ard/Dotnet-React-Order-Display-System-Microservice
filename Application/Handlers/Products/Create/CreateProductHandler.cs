@@ -60,7 +60,6 @@ public class CreateProductHandler : IRequestHandler<CreateProductCommand, OneOf<
         if (canCreate.IsT1) return new CannotCreateInitialProductHistoryError(message: canCreate.AsT1, path: []).AsList();
 
         await _unitOfWork.SaveAsync();
-
         return new CreateProductResult(id: product.Id);
     }
 }

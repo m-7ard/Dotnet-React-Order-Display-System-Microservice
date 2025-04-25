@@ -1,6 +1,5 @@
 import { useCallback } from "react";
 import IPresentationError from "../../interfaces/IPresentationError";
-import { getApiUrl } from "../../../viteUtils";
 import CoverImage from "../Resuables/CoverImage";
 import MixinButton from "../Resuables/MixinButton";
 import MixinPrototypeCard, { MixinPrototypeCardSection } from "../Resuables/MixinPrototypeCard";
@@ -54,6 +53,7 @@ export default function UploadImagesForm(props: {
                         multiple
                         className="opacity-0 absolute inset-0 cursor-pointer file:cursor-pointer h-full w-full"
                         onChange={async (e) => await uploadImages(e)}
+                        tabIndex={-1}
                     ></input>
                 </MixinButton>
             </MixinPrototypeCardSection>
@@ -88,7 +88,7 @@ function Image(props: {
             <div className="flex flex-row gap-3">
                 <CoverImage
                     className="w-16 h-16 min-w-16 min-h-16 border border-gray-900  overflow-hidden"
-                    src={`${getApiUrl()}/${url}`}
+                    src={`${url}`}
                 />
                 <div className="flex flex-col gap-1 overflow-hidden grow">
                     <div className="text-sm text-medium truncate">{originalFileName}</div>

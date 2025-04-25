@@ -1,0 +1,20 @@
+# Ignore build artifacts in all backend projects
+Domain/bin/
+Domain/obj/
+
+Application/bin/
+Application/obj/
+
+Infrastructure/bin/
+Infrastructure/obj/
+
+Api/bin/
+Api/obj/
+
+# Git and version control
+.git/
+.gitignore
+
+# OS and other noise
+.DS_Store
+Thumbs.db

@@ -80,13 +80,9 @@ public class Mixins
         return product;
     }
 
-    public async Task<DraftImage> CreateDraftImage(TestFileRoute fileRoute, string destinationFileName)
+    public async Task<DraftImage> CreateDraftImage(string destinationFileName)
     {
-        // Copy a file from [fileRoute] that is an existing file's path
-        // To a destination, where it includes the fileName in the path at the end
-        File.Copy(fileRoute.Value, Path.Join(DirectoryService.GetMediaDirectory(), destinationFileName), overwrite: true);
-
-        var contract = new CreateNewDraftImageContract(fileName: destinationFileName, originalFileName: "originalFileName.png", url: $"Media/{destinationFileName}");
+        var contract = new CreateNewDraftImageContract(fileName: destinationFileName, originalFileName: "originalFileName.png", url: $"{destinationFileName}");
         var draftImage = DraftImage.ExecuteCreateNew(contract);
 
         await _draftImageRepository.CreateAsync(draftImage);

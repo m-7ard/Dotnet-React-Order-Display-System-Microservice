@@ -12,28 +12,39 @@ deploy:
     
     # SSH command to interact with the server
     - ssh -i ~/.ssh/id_rsa_gitlab root@$HETZNER_IPV4 "
-        mkdir -p /root/Dotnet-React-Order-Display-System;
-        cd /root/Dotnet-React-Order-Display-System;
+        mkdir -p /root/Dotnet-React-Order-Display-System-Microservice;
+        cd /root/Dotnet-React-Order-Display-System-Microservice;
 
         if [ ! -d .git ]; then
           echo 'Cloning repository...';
-          git clone https://gitlab.com/m-7ard/Dotnet-React-Order-Display-System.git .;
+          git clone https://gitlab.com/m-7ard/Dotnet-React-Order-Display-System-Microservice.git .;
         else
           echo 'Repository exists, pulling latest changes...';
           git reset --hard;
           git pull origin master;
         fi;
 
-        echo 'VITE_API_URL=http://${HETZNER_IPV4}:5000' > frontend/.env.production;
-  
+        sed -i \"/^ALLOWED_HOSTS=/ s/\$/, $HETZNER_IPV4/\" auth/.env;
+        sed -i \"/^CORS_ALLOWED_ORIGINS=/ s/\$/, http:\/\/$HETZNER_IPV4:80/\" auth/.env;
+        sed -i \"/^CORS_ALLOWED_ORIGINS=/ s/\$/, http:\/\/$HETZNER_IPV4:80/\" auth/.env;
+
+        sed -i 's|^PUBLIC_URL=.*|PUBLIC_URL=http://'"${HETZNER_IPV4}:80"'|g' fileServer/.env.DOCKER
+
+        echo "VITE_API_URL=http://${HETZNER_IPV4}:80" > frontend/.env.production;
+        echo "VITE_FILE_SERVER_URL=http://${HETZNER_IPV4}:80" >> frontend/.env.production;
+        echo "VITE_AUTH_URL=http://${HETZNER_IPV4}:80/api/auth" >> frontend/.env.production;
+        echo "VITE_LOGOUT_URL=http://${HETZNER_IPV4}:80/api/auth/logout" >> frontend/.env.production;
+
+        echo "CADDY_PORT_80=${HETZNER_IPV4}" > .env;
+        echo "CADDY_PORT_443=${HETZNER_IPV4}" >> .env;
+
         docker compose down || true;
         echo 'XXXX AFTER DOWN XXXX';
-        docker system prune -af;
+        docker system prune -a -f --volumes
         echo 'XXXX AFTER PRUNE XXXX';
 
-        docker compose build;
+        docker compose build --no-cache;
         echo 'XXXX AFTER BUILD XXXX';
-
       "
   only:
     - master
