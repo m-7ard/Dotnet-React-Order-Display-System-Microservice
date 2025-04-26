@@ -45,9 +45,6 @@ async function main() {
         brokers: ["localhost:29092"],
     });
 
-    const producer = kafka.producer();
-
-
     const redis = createClient({ url: environment === "DOCKER" ? "redis://redis:6379" : undefined });
     await redis.connect();
     await redis.flushDb();
@@ -59,7 +56,6 @@ async function main() {
         fileServerUrl: fileServerUrl,
         authServerUrl: authServerUrl,
         mainAppServerUrl: mainApiServerUrl,
-        kafkaProducer: producer,
         kafka: kafka
     });
 

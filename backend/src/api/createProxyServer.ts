@@ -35,32 +35,31 @@ export default function createProxyServer(config: {
     authServerUrl: "http://127.0.0.1:8000" | "http://auth:8000";
     fileServerUrl: "http://127.0.0.1:4300" | "http://127.0.0.1:3000" | "http://file:3000";
     mainAppServerUrl: "http://localhost:5102" | "http://web:5000";
-    kafkaProducer: Producer;
     kafka: Kafka;
 }) {
-    const { redis, authServerUrl, fileServerUrl, mainAppServerUrl, kafkaProducer, kafka } = config;
+    const { redis, authServerUrl, fileServerUrl, mainAppServerUrl, kafka } = config;
     const app = express();
     app.options("*", cors());
     app.use(cors());
 
     const wss = new WebSocketServer({ port: 8080 });
 
-    async function sendMessage() {
-        await kafkaProducer.connect();
-
-        // Send a message to the 'test-topic' topic
-        await kafkaProducer.send({
-            topic: "test-topic",
-            messages: [{ value: JSON.stringify({ message: "Hello from producer!", timestamp: new Date().toISOString() }) }],
-        });
-
-        console.log("Message sent!");
-        // Keep connection open for continuous messaging or close it
-        // await producer.disconnect();
-    }
-
-    // Send a message every 5 seconds
-    setInterval(sendMessage, 5000);
+    // async function sendMessage() {
+    //     await kafkaProducer.connect();
+// 
+    //     // Send a message to the 'orders' topic
+    //     await kafkaProducer.send({
+    //         topic: "orders",
+    //         messages: [{ value: JSON.stringify({ message: "Hello from producer!", timestamp: new Date().toISOString() }) }],
+    //     });
+// 
+    //     console.log("Message sent!");
+    //     // Keep connection open for continuous messaging or close it
+    //     // await producer.disconnect();
+    // }
+// 
+    // // Send a message every 5 seconds
+    // setInterval(sendMessage, 5000);
 
     wss.on("connection", (ws) => {
         console.log("Client connected");
@@ -89,11 +88,12 @@ export default function createProxyServer(config: {
         const consumer = kafka.consumer({ groupId: "websocket-group" });
 
         await consumer.connect();
-        await consumer.subscribe({ topic: "test-topic", fromBeginning: true });
+        await consumer.subscribe({ topic: "orders", fromBeginning: true });
 
         await consumer.run({
             eachMessage: async ({ topic, partition, message }) => {
                 console.log(`Received message: ${message.value!.toString()}`);
+                // this is a Buffer it seems console.log(`VALUE: `, message.value);
                 broadcast(message.value!.toString());
             },
         });

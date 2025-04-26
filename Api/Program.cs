@@ -1,6 +1,7 @@
 using System.Globalization;
 using Api.Interfaces;
 using Api.Middleware;
+using Api.Producers;
 using Api.Services;
 using Api.Validators;
 using Application.DomainService;
@@ -123,6 +124,9 @@ builder.Services.AddScoped<IProductHistoryDomainService, ProductHistoryDomainSer
 builder.Services.AddScoped<IOrderDomainService, OrderDomainService>();
 builder.Services.AddScoped<IDraftImageDomainService, DraftImageDomainService>();
 builder.Services.AddScoped<IProductDomainService, ProductDomainService>();
+
+builder.Services.AddScoped<OrderProducerService>();
+builder.Services.AddSingleton<OrderKafkaProducer>();
 
 ///
 ///

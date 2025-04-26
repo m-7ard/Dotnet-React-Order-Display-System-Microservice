@@ -6,6 +6,7 @@ using Api.DTOs.Orders.MarkFinished;
 using Api.DTOs.Orders.Read;
 using Api.Errors;
 using Api.Interfaces;
+using Api.Producers;
 using Api.Services;
 using Application.Errors;
 using Application.Errors.Objects;
@@ -29,12 +30,14 @@ public class OrdersController : ControllerBase
     private readonly ISender _mediator;
     private readonly IValidator<CreateOrderRequestDTO.OrderItem> _orderItemDataValidator;
     private readonly IApiModelService _apiModelService;
+    private readonly OrderProducerService _orderProducerService;
 
-    public OrdersController(ISender mediator, IValidator<CreateOrderRequestDTO.OrderItem> createProductValidator, IApiModelService apiModelService)
+    public OrdersController(ISender mediator, IValidator<CreateOrderRequestDTO.OrderItem> createProductValidator, IApiModelService apiModelService, OrderProducerService orderProducerService)
     {
         _mediator = mediator;
         _orderItemDataValidator = createProductValidator;
         _apiModelService = apiModelService;
+        _orderProducerService = orderProducerService;
     }
 
     [HttpPost("create")]
@@ -98,6 +101,9 @@ public class OrdersController : ControllerBase
 
             return BadRequest(PlainApiErrorHandlingService.MapApplicationErrors(handlerErrors, pathPrefix: pathPrefix));
         }
+
+        var orderId = result.AsT0.OrderId;
+        await _orderProducerService.PublishNewlyCreatedOrder(orderId: orderId);
 
         var respone = new CreateOrderResponseDTO(orderId: id.ToString());
         return StatusCode(StatusCodes.Status201Created, respone);

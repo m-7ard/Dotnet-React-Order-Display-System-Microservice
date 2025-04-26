@@ -48,6 +48,6 @@ public class CreateOrderHandler : IRequestHandler<CreateOrderCommand, OneOf<Crea
 
         await _unitOfWork.SaveAsync();
 
-        return new CreateOrderResult();
+        return new CreateOrderResult(orderId: order.Id);
     }
 }
