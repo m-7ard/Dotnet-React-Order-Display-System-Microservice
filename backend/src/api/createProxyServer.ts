@@ -46,18 +46,18 @@ export default function createProxyServer(config: {
 
     // async function sendMessage() {
     //     await kafkaProducer.connect();
-// 
+    //
     //     // Send a message to the 'orders' topic
     //     await kafkaProducer.send({
     //         topic: "orders",
     //         messages: [{ value: JSON.stringify({ message: "Hello from producer!", timestamp: new Date().toISOString() }) }],
     //     });
-// 
+    //
     //     console.log("Message sent!");
     //     // Keep connection open for continuous messaging or close it
     //     // await producer.disconnect();
     // }
-// 
+    //
     // // Send a message every 5 seconds
     // setInterval(sendMessage, 5000);
 
@@ -85,7 +85,16 @@ export default function createProxyServer(config: {
     }
 
     async function consumeMessages() {
-        const consumer = kafka.consumer({ groupId: "websocket-group" });
+        const consumer = kafka.consumer({
+            groupId: "websocket-group",
+            retry: {
+                retries: 10,
+                initialRetryTime: 300,
+                maxRetryTime: 30000,
+                factor: 0.2,
+                multiplier: 2,
+            },
+        });
 
         await consumer.connect();
         await consumer.subscribe({ topic: "orders", fromBeginning: true });

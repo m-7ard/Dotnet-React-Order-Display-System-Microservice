@@ -1,7 +1,12 @@
 namespace Api.Producers;
 
-public interface IEvent<T>
+public abstract class AbstractEvent<T>
 {
-    ProducerEventType Type { get; }
-    T Payload { get; }
+    public string Type { get; }
+    public abstract T Payload { get; }
+
+    protected AbstractEvent(ProducerEventType type)
+    {
+        Type = type.Value;
+    }
 }

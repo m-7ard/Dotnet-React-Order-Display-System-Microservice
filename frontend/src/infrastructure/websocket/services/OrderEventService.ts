@@ -12,7 +12,6 @@ class OrderEventService implements IOrderEventService {
     constructor(websocketSingleton: WebsocketSingleton) {
         websocketSingleton.socket.addEventListener("message", (event) => {
             const data: IWebsocketEvent = JSON.parse(event.data);
-            console.log(data);
             this.listeners.map((fn) => fn(data));
         });
     }

@@ -12,12 +12,11 @@ public class CreateOrderEventPayload
     }
 }
 
-public class CreateOrderEvent : IEvent<CreateOrderEventPayload>
+public class CreateOrderEvent : AbstractEvent<CreateOrderEventPayload>
 {
-    public ProducerEventType Type { get; } = ProducerEventType.OrderCreated;
-    public CreateOrderEventPayload Payload { get; }
+    public override CreateOrderEventPayload Payload { get; }
 
-    public CreateOrderEvent(CreateOrderEventPayload payload)
+    public CreateOrderEvent(CreateOrderEventPayload payload) : base(ProducerEventType.OrderCreated)
     {
         Payload = payload;
     }

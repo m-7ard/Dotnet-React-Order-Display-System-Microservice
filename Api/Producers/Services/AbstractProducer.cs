@@ -19,7 +19,7 @@ public abstract class AbstractProducer
         TopicName = topicName;
     }
 
-    protected async Task PublishEvent<T>(IEvent<T> producerEvent)
+    protected async Task PublishEvent<T>(AbstractEvent<T> producerEvent)
     {
         var options = new JsonSerializerOptions
         {
