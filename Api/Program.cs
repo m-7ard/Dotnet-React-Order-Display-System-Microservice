@@ -1,7 +1,7 @@
 using System.Globalization;
 using Api.Interfaces;
 using Api.Middleware;
-using Api.Producers;
+using Api.Producers.Services;
 using Api.Services;
 using Api.Validators;
 using Application.DomainService;

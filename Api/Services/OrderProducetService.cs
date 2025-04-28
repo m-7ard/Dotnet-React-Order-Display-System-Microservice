@@ -1,5 +1,5 @@
 using Api.Interfaces;
-using Api.Producers;
+using Api.Producers.Services;
 using Application.Interfaces.Persistence;
 using Domain.ValueObjects.Order;
 
@@ -31,7 +31,7 @@ public class OrderProducerService
         else
         {
             var apiModel = await _apiModelService.CreateOrderApiModel(order);
-            await _producer.Publish(apiModel);
+            await _producer.PublishOrderCreated(apiModel);
         }
     }
 }

@@ -11,8 +11,9 @@ import contentGridDirective from "../../directives/contentGridDirective";
 import RouterLink from "../../components/Resuables/RouterLink";
 import LinkBoxV2 from "../../components/Resuables/LinkBoxV2";
 
-export default function OrdersPage(props: { orders: Order[] }) {
+export default function OrdersPage(props: { orders: Order[], liveUpdatesEnabled: boolean }) {
     const { orders } = props;
+    // TODO: add a little blinking circle here to show that the websocket it live
 
     return (
         <MixinPage

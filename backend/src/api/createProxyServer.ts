@@ -92,9 +92,7 @@ export default function createProxyServer(config: {
 
         await consumer.run({
             eachMessage: async ({ topic, partition, message }) => {
-                console.log(`Received message: ${message.value!.toString()}`);
-                // this is a Buffer it seems console.log(`VALUE: `, message.value);
-                broadcast(message.value!.toString());
+                broadcast(message.value?.toString());
             },
         });
     }
