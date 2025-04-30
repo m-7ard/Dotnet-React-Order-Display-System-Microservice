@@ -8,7 +8,7 @@ public class OrderKafkaProducer : AbstractProducer
 {
     private readonly ILogger<OrderKafkaProducer> _logger;
 
-    public OrderKafkaProducer(ILogger<OrderKafkaProducer> logger) : base("orders")
+    public OrderKafkaProducer(ILogger<OrderKafkaProducer> logger, IConfiguration configuration) : base("orders", configuration)
     {
         
         _logger = logger;

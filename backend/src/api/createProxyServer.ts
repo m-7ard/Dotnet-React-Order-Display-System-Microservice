@@ -23,7 +23,7 @@ import fetch from "node-fetch";
 import IApiError from "./errors/IApiError";
 import ApiErrorFactory from "./errors/ApiErrorFactory";
 import API_ERROR_CODES from "./errors/API_ERROR_CODES";
-import { Kafka, Producer } from "kafkajs";
+import { Kafka } from "kafkajs";
 import { WebSocketServer, WebSocket } from "ws";
 
 export type RedisClientConnection = ReturnType<typeof createClient>;
@@ -35,31 +35,18 @@ export default function createProxyServer(config: {
     authServerUrl: "http://127.0.0.1:8000" | "http://auth:8000";
     fileServerUrl: "http://127.0.0.1:4300" | "http://127.0.0.1:3000" | "http://file:3000";
     mainAppServerUrl: "http://localhost:5102" | "http://web:5000";
+    websocketServerHost: "0.0.0.0" | "127.0.0.1";
     kafka: Kafka;
 }) {
-    const { redis, authServerUrl, fileServerUrl, mainAppServerUrl, kafka } = config;
+    const { redis, authServerUrl, fileServerUrl, mainAppServerUrl, kafka, websocketServerHost } = config;
     const app = express();
     app.options("*", cors());
     app.use(cors());
 
-    const wss = new WebSocketServer({ port: 8080 });
-
-    // async function sendMessage() {
-    //     await kafkaProducer.connect();
-    //
-    //     // Send a message to the 'orders' topic
-    //     await kafkaProducer.send({
-    //         topic: "orders",
-    //         messages: [{ value: JSON.stringify({ message: "Hello from producer!", timestamp: new Date().toISOString() }) }],
-    //     });
-    //
-    //     console.log("Message sent!");
-    //     // Keep connection open for continuous messaging or close it
-    //     // await producer.disconnect();
-    // }
-    //
-    // // Send a message every 5 seconds
-    // setInterval(sendMessage, 5000);
+    const wss = new WebSocketServer({
+        port: 8080,
+        host: websocketServerHost,
+    });
 
     wss.on("connection", (ws) => {
         console.log("Client connected");
@@ -72,8 +59,6 @@ export default function createProxyServer(config: {
         ws.on("close", () => {
             console.log("Client disconnected");
         });
-
-        ws.send("Welcome to the WebSocket server!");
     });
 
     function broadcast(message: any) {

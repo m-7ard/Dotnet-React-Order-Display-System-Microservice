@@ -6,10 +6,10 @@
 }
 
 :80 {
-	log {
-		output stdout
-		format json
-	}
+	# log {
+	# 	output stdout
+	# 	format json
+	# }
 
     handle /upload {
         reverse_proxy proxy:3100
@@ -34,13 +34,11 @@
 
     handle /api/* {
         reverse_proxy proxy:3100 {
-            header_up X-Forwarded-Proto {scheme}
-            header_up X-Forwarded-For {remote_host}
             header_up Host {host}
         }
     }
 }
 
 :8080 {
-	reverse_proxy file:3000
+	reverse_proxy proxy:8080
 }

@@ -8,11 +8,11 @@ public abstract class AbstractProducer
     protected readonly IProducer<Null, string> _producer;
     protected readonly string TopicName;
 
-    protected AbstractProducer(string topicName)
+    protected AbstractProducer(string topicName, IConfiguration configuration)
     {
         var config = new ProducerConfig
         {
-            BootstrapServers = "localhost:29092"
+            BootstrapServers = configuration["Kafka:BootstrapServers"]
         };
 
         _producer = new ProducerBuilder<Null, string>(config).Build();

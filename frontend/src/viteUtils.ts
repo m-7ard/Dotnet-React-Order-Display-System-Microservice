@@ -9,6 +9,10 @@ export const getApiUrl = () => {
     return import.meta.env.VITE_API_URL;
 };
 
+export const getWebsocketUrl = () => {
+    return import.meta.env.VITE_WEBSOCKET_URL;
+};
+
 export const getFileServerUrl = () => {
     return import.meta.env.VITE_FILE_SERVER_URL;
 };

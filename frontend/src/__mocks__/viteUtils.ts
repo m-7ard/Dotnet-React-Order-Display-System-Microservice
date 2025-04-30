@@ -7,6 +7,10 @@ export const getApiUrl = () => {
     return "some.url";
 };
 
+export const getWebsocketUrl = () => {
+    return "websocket.url";
+};
+
 export const getFileServerUrl = () => {
     return "fileServer.url";
 };
