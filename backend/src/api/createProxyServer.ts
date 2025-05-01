@@ -48,18 +48,9 @@ export default function createProxyServer(config: {
         host: websocketServerHost,
     });
 
-    wss.on("connection", (ws) => {
-        console.log("Client connected");
-
-        ws.on("message", (message) => {
-            console.log(`Received: ${message}`);
-            ws.send(`Echo: ${message}`);
-        });
-
-        ws.on("close", () => {
-            console.log("Client disconnected");
-        });
-    });
+    // wss.on("connection", (ws) => {
+    //     // ws.on("close", () => {});
+    // });
 
     function broadcast(message: any) {
         wss.clients.forEach((client) => {

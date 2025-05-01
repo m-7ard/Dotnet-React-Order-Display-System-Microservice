@@ -5,7 +5,7 @@ namespace Api.Producers;
 public class ProducerEventType : ValueObject
 {
     public static ProducerEventType OrderCreated => new ProducerEventType("orders/create");
-    public static readonly List<ProducerEventType> ValidEventTypes = [OrderCreated];
+    public static ProducerEventType OrderUpdated => new ProducerEventType("orders/update");
     
     public string Value { get; set; }
 

@@ -6,16 +6,14 @@ export default function EventServiceProvider(props: PropsWithChildren) {
     const { children } = props;
     const [open, setOpen] = useState(websocketSingleton.open);
     useEffect(() => {
-        websocketSingleton.socket.onopen = () => {
-            setOpen(true);
-        }
+        websocketSingleton.registerOnToggle((status) => setOpen(status));
     }, []);
 
     return (
         <EventServiceContext.Provider
             value={{
                 open: open,
-                orderEventService: orderEventService
+                orderEventService: orderEventService,
             }}
         >
             {children}

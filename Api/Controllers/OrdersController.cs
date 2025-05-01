@@ -102,8 +102,7 @@ public class OrdersController : ControllerBase
             return BadRequest(PlainApiErrorHandlingService.MapApplicationErrors(handlerErrors, pathPrefix: pathPrefix));
         }
 
-        var orderId = result.AsT0.OrderId;
-        await _orderProducerService.PublishNewlyCreatedOrder(orderId: orderId);
+        await _orderProducerService.PublishNewlyCreatedOrder(orderId: id);
 
         var respone = new CreateOrderResponseDTO(orderId: id.ToString());
         return StatusCode(StatusCodes.Status201Created, respone);
@@ -237,6 +236,8 @@ public class OrdersController : ControllerBase
             return BadRequest(PlainApiErrorHandlingService.MapApplicationErrors(errors));
         };
 
+        await _orderProducerService.PublishUpdatedOrder(value.OrderId);
+
         var response = new MarkOrderItemFinishedResponseDTO(orderId: value.OrderId.ToString(), orderItemId: value.OrderItemId.ToString(), dateFinished: value.DateFinished);
         return Ok(response);
     }
@@ -260,6 +261,8 @@ public class OrdersController : ControllerBase
 
             return BadRequest(PlainApiErrorHandlingService.MapApplicationErrors(errors));
         };
+        
+        await _orderProducerService.PublishUpdatedOrder(value.OrderId);
 
         var response = new MarkOrderFinishedResponseDTO(orderId: value.OrderId.ToString(), dateFinished: TimeZoneService.ConvertUtcToLocalTime(value.DateFinished));
         return Ok(response);

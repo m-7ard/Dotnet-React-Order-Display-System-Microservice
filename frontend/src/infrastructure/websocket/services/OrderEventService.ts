@@ -4,6 +4,7 @@ import orderMapper from "../../mappers/orderMapper";
 import IEventServiceListenerFn from "../IEventServiceListenerFn";
 import IWebsocketEvent from "../IWebsocketEvent";
 import CreateOrderEventPayload from "../payloads/orders/CreateOrderEventPayload";
+import UpdateOrderEventPayload from "../payloads/orders/UpdateOrderEventPayload";
 import WebsocketSingleton from "../WebsocketSingleton";
 
 class OrderEventService implements IOrderEventService {
@@ -20,6 +21,18 @@ class OrderEventService implements IOrderEventService {
         const listener = (event: IWebsocketEvent) => {
             if (event.type === OrderEventServiceEventTypes.CREATED) {
                 const payload = event.payload as CreateOrderEventPayload;
+                const order = orderMapper.apiToDomain(payload.order);
+                fn(order);
+            }
+        };
+        this.listeners.push(listener);
+        return listener;
+    }
+
+    registerUpdateOrder<T extends (order: Order) => void>(fn: T): IEventServiceListenerFn {
+        const listener = (event: IWebsocketEvent) => {
+            if (event.type === OrderEventServiceEventTypes.UPDATED) {
+                const payload = event.payload as UpdateOrderEventPayload;
                 const order = orderMapper.apiToDomain(payload.order);
                 fn(order);
             }

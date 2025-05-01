@@ -20,9 +20,9 @@ public class OrderProducerService
         _apiModelService = apiModelService;
     }
 
-    public async Task PublishNewlyCreatedOrder(OrderId orderId)
+    public async Task PublishNewlyCreatedOrder(Guid orderId)
     {
-        var order = await _orderRepository.GetByIdAsync(orderId);
+        var order = await _orderRepository.GetByIdAsync(OrderId.ExecuteCreate(orderId));
 
         if (order == null)
         {
@@ -32,6 +32,21 @@ public class OrderProducerService
         {
             var apiModel = await _apiModelService.CreateOrderApiModel(order);
             await _producer.PublishOrderCreated(apiModel);
+        }
+    }
+
+    public async Task PublishUpdatedOrder(Guid orderId)
+    {
+        var order = await _orderRepository.GetByIdAsync(OrderId.ExecuteCreate(orderId));
+
+        if (order == null)
+        {
+            _logger.LogError("Failed to send order event: Order of Id \"{ID}\" does not exist.", orderId);
+        }
+        else
+        {
+            var apiModel = await _apiModelService.CreateOrderApiModel(order);
+            await _producer.PublishOrderUpdated(apiModel);
         }
     }
 }

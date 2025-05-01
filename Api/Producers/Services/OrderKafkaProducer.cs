@@ -25,4 +25,16 @@ public class OrderKafkaProducer : AbstractProducer
             _logger.LogError("Failed to send order event: {REASON}", ex.Error.Reason);
         }
     }
+
+    public async Task PublishOrderUpdated(OrderApiModel order)
+    {
+        try {
+            var producerEvent = new UpdateOrderEvent(payload: new UpdateOrderEventPayload(order: order));
+            await PublishEvent(producerEvent);
+        } 
+        catch (ProduceException<Null, string> ex)
+        {
+            _logger.LogError("Failed to send order event: {REASON}", ex.Error.Reason);
+        }
+    }
 }
