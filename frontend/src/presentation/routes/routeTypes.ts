@@ -2,14 +2,14 @@ import IProduct from "../../domain/models/IProduct";
 import ProductHistory from "../../domain/models/IProductHistory";
 import Order from "../../domain/models/Order";
 
+
+/* 
+
+    Defining the Params of each route
+
+*/
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type TRouteParams = Record<string, string>;
-
-export interface IRouteConfig<Params extends TRouteParams> {
-    build: (props: Params) => string;
-    pattern: string;
-}
-
 export interface IManageOrderParams extends TRouteParams {
     id: string;
 }
@@ -21,6 +21,12 @@ export interface IUpdateProductAmountParams extends TRouteParams {
 }
 export type TEmptyParams = TRouteParams;
 
+
+/* 
+
+    Defining the Loader Data of each route
+
+*/
 type TEmptyLoaderData = never;
 export type TErrorPageLoaderData = { error: Error };
 
@@ -32,6 +38,18 @@ export type TUpdateProductLoaderData = { product: IProduct };
 export type TUpdateProductAmountLoaderData = { product: IProduct };
 
 export type TListProductHistoriesLoaderData = { productHistories: ProductHistory[] };
+
+
+/*
+
+    Defining how each route is built and what its pattern will be.
+    The pattern will match the specific router implementation.
+
+*/
+export interface IRouteConfig<Params extends TRouteParams> {
+    build: (props: Params) => string;
+    pattern: string;
+}
 
 export interface IRouteConfigMapping {
     FRONTPAGE: IRouteConfig<TEmptyParams>;
@@ -58,6 +76,12 @@ export interface IRouteConfigMapping {
     CRASH_ERROR: IRouteConfig<TEmptyParams>;
 }
 
+
+/*
+
+    Defines the route hierarchy and data associated with that route
+
+*/
 export type ICommonRoute<Config extends IRouteConfig<any>, LoaderData> = {
     __loaderDataType?: LoaderData;
 
@@ -66,14 +90,33 @@ export type ICommonRoute<Config extends IRouteConfig<any>, LoaderData> = {
     isLayout: boolean;
     config?: Config;
 };
+
+
+/*
+
+    Reusable helper types.
+
+*/
 export type TAnyGenericRoute = ICommonRoute<IRouteConfig<any>, any>;
 export type TExtractGenericRouteParams<T> = T extends ICommonRoute<IRouteConfig<infer Params>, any> ? Params : never;
 export type TExtractGenericRouteLoaderData<T> = T extends ICommonRoute<IRouteConfig<any>, infer LoaderData> ? NonNullable<LoaderData> : never;
 
+
+/*
+
+    Type guard for layout routes. Layout Routes don't have configs.
+
+*/
 export function isLayoutRoute<T extends TAnyGenericRoute>(route: T): route is T & { isLayout: true; config: undefined } {
     return route.isLayout === true && route.config === undefined;
 }
 
+
+/*
+
+    Defines the common route maps that each router needs to define.
+
+*/
 export interface ICommonRouteMapping {
     // Base
     FRONTPAGE: ICommonRoute<IRouteConfig<TEmptyParams>, TEmptyLoaderData>;

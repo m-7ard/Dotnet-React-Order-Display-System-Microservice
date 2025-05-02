@@ -12,15 +12,38 @@ import OrderItemStatus from "../../../../domain/valueObjects/OrderItem/OrderItem
 import IMarkOrderFinishedResponseDTO from "../../../../infrastructure/contracts/orders/markFinished/IMarkOrderFinishedResponseDTO";
 import IMarkOrderItemFinishedResponseDTO from "../../../../infrastructure/contracts/orderItems/markFinished/IMarkOrderItemFinishedResponseDTO";
 import { useRouterLoaderData } from "../../../routes/RouterModule/RouterModule.hooks";
+import { useCallback, useEffect, useState } from "react";
+import Order from "../../../../domain/models/Order";
+import { useEventServiceContext } from "../../Application.EventServiceProvider.Context";
 
-export default function ManageOrderRoute(props: { orderDataAccess: IOrderDataAccess }) {
+export default function ManageOrderController(props: { orderDataAccess: IOrderDataAccess }) {
+    // props
     const { orderDataAccess } = props;
-    const { order } = useRouterLoaderData((keys) => keys.MANAGE_ORDER);
-    const responseHandler = useResponseHandler();
-    const errorsManager = useItemManager<IPresentationError<Record<string | number, unknown>>>({ _: undefined });
 
+    // deps
+    const loaderData = useRouterLoaderData((keys) => keys.MANAGE_ORDER);
+    const responseHandler = useResponseHandler();
+    const { orderEventService } = useEventServiceContext();
+
+    // state
+    const errorsManager = useItemManager<IPresentationError<Record<string | number, unknown>>>({ _: undefined });
+    const [storedOrder, setStoredOrder] = useState(loaderData.order);
+
+    // effect
+    useEffect(() => {
+        const fn = orderEventService.registerUpdateOrder((order) => {
+            setStoredOrder(order);
+        });
+
+        return () => {
+            orderEventService.removeListener(fn);
+        };
+    }, [orderEventService]);
+
+    // fetchers
     const markOrderFinishedMutation = useMutation({
-        mutationFn: async () => {
+        mutationFn: async (variables: { order: Order }) => {
+            const { order } = variables;
             if (!order.canMarkFinished()) {
                 return;
             }
@@ -65,7 +88,7 @@ export default function ManageOrderRoute(props: { orderDataAccess: IOrderDataAcc
             await responseHandler({
                 requestFn: () =>
                     orderDataAccess.markOrderItemFinished({
-                        orderId: order.id,
+                        orderId: storedOrder.id,
                         orderItemId: orderItem.id,
                     }),
                 onResponseFn: async (response) => {
@@ -91,12 +114,8 @@ export default function ManageOrderRoute(props: { orderDataAccess: IOrderDataAcc
         },
     });
 
-    return (
-        <ManageOrderPage
-            order={order}
-            errors={errorsManager.items}
-            onMarkFinished={markOrderFinishedMutation.mutate}
-            onMarkOrderItemFinished={(orderItem) => markOrderItemFinishedMutation.mutate({ orderItem: orderItem })}
-        />
-    );
+    const markOrderFinished = useCallback(() => markOrderFinishedMutation.mutate({ order: storedOrder }), [markOrderFinishedMutation, storedOrder]);
+    const markOrderItemFinished = useCallback((orderItem: OrderItem) => markOrderItemFinishedMutation.mutate({ orderItem: orderItem }), [markOrderItemFinishedMutation]);
+
+    return <ManageOrderPage order={storedOrder} errors={errorsManager.items} onMarkFinished={markOrderFinished} onMarkOrderItemFinished={markOrderItemFinished} />;
 }

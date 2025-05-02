@@ -13,6 +13,7 @@ import PresentationErrorFactory from "../mappers/PresentationErrorFactory";
 import IDjangoErrors from "../../infrastructure/interfaces/IDjangoError";
 import ILoginUserResponseDTO from "../../infrastructure/contracts/auth/login/ILoginUserResponseDTO";
 import IPlainApiError from "../../infrastructure/interfaces/IPlainApiError";
+import IRefreshResponseDTO from "../../infrastructure/contracts/auth/refresh/IRefreshResponseDTO";
 
 export default function AuthServiceProvider(props: React.PropsWithChildren<{ href: string }>) {
     // Props
@@ -146,6 +147,32 @@ export default function AuthServiceProvider(props: React.PropsWithChildren<{ hre
             });
         currentHref.current = href;
     }, [currentUser, dispatchException, href, hasInitialised]);
+
+    useEffect(() => {
+        if (user == null) {
+            return;
+        }
+
+        const fn = setInterval(() => {
+            userDataAccess
+                .refresh()
+                .then((response) => {
+                    if (response.ok) {
+                        return response.json() as Promise<IRefreshResponseDTO>;
+                    }
+
+                    throw response.json();
+                })
+                .then((body) => {
+                    tokenStorage.setAccessToken(body.access);
+                })
+                .catch(() => clearInterval(fn));
+        }, 5000);
+
+        return () => {
+            clearInterval(fn);
+        };
+    }, [user, tokenStorage, userDataAccess]);
 
     // Service
     const authService: IAuthService = {

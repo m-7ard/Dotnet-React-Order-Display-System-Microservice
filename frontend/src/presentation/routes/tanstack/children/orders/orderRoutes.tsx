@@ -1,6 +1,6 @@
 import { createRoute } from "@tanstack/react-router";
 import rootRoute from "../../rootRoute";
-import ManageOrderRoute from "../../../../Application/Orders/Manage/ManageOrder.Controller";
+import ManageOrderController from "../../../../Application/Orders/Manage/ManageOrder.Controller";
 import CreateOrderController from "../../../../Application/Orders/Create/CreateOrder.Controller";
 import { orderDataAccess } from "../../../../deps/dataAccess";
 import IListOrdersResponseDTO from "../../../../../infrastructure/contracts/orders/list/IListOrdersResponseDTO";
@@ -68,7 +68,7 @@ const manageOrderRoute = createRoute({
     },
     component: () => (
         <AuthRouteGuard>
-            <ManageOrderRoute orderDataAccess={orderDataAccess} />
+            <ManageOrderController orderDataAccess={orderDataAccess} />
         </AuthRouteGuard>
     ),
 });
