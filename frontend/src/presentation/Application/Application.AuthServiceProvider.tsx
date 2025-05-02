@@ -167,7 +167,7 @@ export default function AuthServiceProvider(props: React.PropsWithChildren<{ hre
                     tokenStorage.setAccessToken(body.access);
                 })
                 .catch(() => clearInterval(fn));
-        }, 5000);
+        }, 1000 * 60 * 29);
 
         return () => {
             clearInterval(fn);
