@@ -57,6 +57,7 @@ export interface IRouteConfigMapping {
     LIST_ORDERS: IRouteConfig<TEmptyParams>;
     CREATE_ORDER: IRouteConfig<TEmptyParams>;
     MANAGE_ORDERS: IRouteConfig<IManageOrderParams>;
+    SERVING_ORDERS: IRouteConfig<TEmptyParams>;
 
     LIST_PRODUCTS: IRouteConfig<TEmptyParams>;
     CREATE_PRODUCT: IRouteConfig<TEmptyParams>;
@@ -125,6 +126,7 @@ export interface ICommonRouteMapping {
     LIST_ORDERS: ICommonRoute<IRouteConfig<TEmptyParams>, { orders: Order[] }>;
     CREATE_ORDER: ICommonRoute<IRouteConfig<TEmptyParams>, TEmptyLoaderData>;
     MANAGE_ORDER: ICommonRoute<IRouteConfig<IManageOrderParams>, { order: Order }>;
+    SERVING_ORDERS: ICommonRoute<IRouteConfig<TEmptyParams>, { orders: Order[] }>;
 
     // Products
     LIST_PRODUCTS: ICommonRoute<IRouteConfig<TEmptyParams>, { products: IProduct[] }>;

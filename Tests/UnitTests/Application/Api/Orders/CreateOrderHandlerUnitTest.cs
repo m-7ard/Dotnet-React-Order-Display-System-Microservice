@@ -5,7 +5,6 @@ using Application.Interfaces.Persistence;
 using Application.Interfaces.Services;
 using Domain.Models;
 using Moq;
-using Tests.UnitTests.Utils;
 
 namespace Tests.UnitTests.Application.Api.Orders;
 
@@ -47,7 +46,7 @@ public class CreateOrderHandlerUnitTest
 
         var mockOrder = Mixins.CreateNewOrderWithoutItem(1);
 
-        _mockOrderDomainService.Setup(service => service.TryOrchestrateCreateNewOrder(Guid.NewGuid())).ReturnsAsync(mockOrder);
+        _mockOrderDomainService.Setup(service => service.TryOrchestrateCreateNewOrder(command.Id)).ReturnsAsync(mockOrder);
         _mockOrderDomainService.Setup(service => service.TryOrchestrateTransitionOrderItemStatus(It.IsAny<OrchestrateTransitionOrderItemStatusContract>())).ReturnsAsync(true);
 
         // ACT

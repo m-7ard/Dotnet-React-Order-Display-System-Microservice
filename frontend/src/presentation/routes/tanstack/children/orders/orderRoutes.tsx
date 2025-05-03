@@ -12,6 +12,7 @@ import { IManageOrderParams, TListOrdersLoaderData, TManageOrderLoaderData } fro
 import { tanstackConfigs } from "../../tanstackConfig";
 import diContainer, { DI_TOKENS } from "../../../../deps/diContainer";
 import AuthRouteGuard from "../../../../components/RouteGuards/AuthRouteGuard";
+import ServingOrdersController from "../../../../Application/Orders/Serving/ServingOrders.Controller";
 
 const listOrdersRoute = createRoute({
     getParentRoute: () => rootRoute,
@@ -35,6 +36,31 @@ const listOrdersRoute = createRoute({
     component: () => (
         <AuthRouteGuard>
             <OrdersController />
+        </AuthRouteGuard>
+    ),
+});
+
+const servingOrdersRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: tanstackConfigs.SERVING_ORDERS.pattern,
+    loader: async ({ deps }): Promise<TListOrdersLoaderData> => {
+        const parsedParams = parseListOrdersCommandParameters(deps);
+        const { requestHandler } = diContainer.resolve(DI_TOKENS.ROUTER_CONTEXT);
+
+        const response = await requestHandler.handleRequest(orderDataAccess.listOrders(parsedParams));
+        if (!response.ok) {
+            await requestHandler.handleInvalidResponse(response);
+        }
+
+        const data: IListOrdersResponseDTO = await response.json();
+
+        return {
+            orders: data.orders.map(orderMapper.apiToDomain),
+        };
+    },
+    component: () => (
+        <AuthRouteGuard>
+            <ServingOrdersController />
         </AuthRouteGuard>
     ),
 });
@@ -73,4 +99,4 @@ const manageOrderRoute = createRoute({
     ),
 });
 
-export default [listOrdersRoute, createOrderRoute, manageOrderRoute];
+export default [listOrdersRoute, createOrderRoute, manageOrderRoute, servingOrdersRoute];

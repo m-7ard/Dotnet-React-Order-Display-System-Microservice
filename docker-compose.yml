@@ -1,4 +1,16 @@
 services:
+    sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        container_name: sqlserver
+        environment:
+            - ACCEPT_EULA=Y
+            - SA_PASSWORD=Your_password123
+            - MSSQL_PID=Express
+        ports:
+            - "1433:1433"
+        networks:
+            - app-net
+
     redis:
         image: redis
         ports:
@@ -116,6 +128,7 @@ services:
         environment:
             - ASPNETCORE_ENVIRONMENT=Production
             - ASPNETCORE_URLS=http://+:5000
+            - SqlServer_Database=Server=sqlserver;Database=YourDb;User Id=sa;Password=Your_password123;
         depends_on:
             kafka:
                 condition: service_healthy

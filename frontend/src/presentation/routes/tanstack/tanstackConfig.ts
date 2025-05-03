@@ -20,6 +20,10 @@ export const tanstackConfigs: IRouteConfigMapping = {
         pattern: "/orders/$id/manage",
         build: ({ id }) => `/order/${id}/manage`,
     },
+    SERVING_ORDERS: {
+        pattern: "/orders/serving",
+        build: () => "/orders/serving",
+    },
 
     // Products
     LIST_PRODUCTS: {

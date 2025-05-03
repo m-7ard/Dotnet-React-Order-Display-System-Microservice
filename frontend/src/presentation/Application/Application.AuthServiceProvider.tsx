@@ -148,6 +148,7 @@ export default function AuthServiceProvider(props: React.PropsWithChildren<{ hre
         currentHref.current = href;
     }, [currentUser, dispatchException, href, hasInitialised]);
 
+    // Refresh token
     useEffect(() => {
         if (user == null) {
             return;
