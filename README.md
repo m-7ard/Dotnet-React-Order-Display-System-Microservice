@@ -2,10 +2,11 @@
 
 ## Table of Contents
 1. [.Net Backend Documentation](#Net-Backend-Documentation)
-2. [A High Level View](#A-High-Level-View)
-3. [Docker Detials](#Docker-Detials)
-4. [Node Middle Proxy Details](#Node-Middle-Proxy-Details)
-5. [Image Upload Details](#Image-Upload-Details)
+2. [Table overview of hosts and ports](#Table-overview-of-hosts-and-ports)
+3. [A High Level View](#A-High-Level-View)
+4. [Docker Detials](#Docker-Detials)
+5. [Node Middle Proxy Details](#Node-Middle-Proxy-Details)
+6. [Image Upload Details](#Image-Upload-Details)
 
 ## .Net Backend Documentation
 The documentation for the main application can be found at https://github.com/m-7ard/Dotnet-React-Order-Display-System-
@@ -13,14 +14,33 @@ The documentation for the main application can be found at https://github.com/m-
 ## Setup
 ### Using Docker
 ```bash
-    >> docker compose up 
+    >> docker compose up
+    >> Go to localhost:80
 ```
 
 ### Manually (Dev mode)
 ```bash
+    # Install dependencies (this assumes you have NodeJS and Python set up)
+    >> /frontend npm i
+    >> /backend npm i
+    >> /fileserver npm i
+    >> /auth python -m venv env
+    >> /auth env\scripts\activate
+    >> /auth pip install -r requirements.txt
+
     >> dev-start.bat
+    >> Go to localhost:5173
 ```
 NOTE: The dev version will not use the Caddy proxy
+
+## Table overview of hosts and ports
+| Service          | Dev URL                    | Docker URL                    | Production URL                   |
+|------------------|----------------------------|-------------------------------|----------------------------------|
+| **Backend Proxy**| `localhost:4200`           | `localhost:3100` (proxy:3100) | `localhost:3100`                 |
+| **Caddy**        | None                       | `localhost:80`                | None                             |
+| **Auth**         | `localhost:8000`           | `localhost:8000` (auth:8000)  | Same as dev                      |
+| **.NET API**     | `localhost:5102`           | `localhost:5000` (web:5000)   | N/A (not set up for prod)        |
+| **File Server**  | `localhost:4300`           | `localhost:3000` (auth:3000)  | `localhost:3000`                 |
 
 ## A High Level View
 ![A High Level View](readmeFiles/app-flow-1.png)
