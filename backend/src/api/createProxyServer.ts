@@ -23,6 +23,8 @@ import fetch from "node-fetch";
 import IApiError from "./errors/IApiError";
 import ApiErrorFactory from "./errors/ApiErrorFactory";
 import API_ERROR_CODES from "./errors/API_ERROR_CODES";
+import { Kafka } from "kafkajs";
+import { WebSocketServer, WebSocket } from "ws";
 
 export type RedisClientConnection = ReturnType<typeof createClient>;
 
@@ -33,11 +35,54 @@ export default function createProxyServer(config: {
     authServerUrl: "http://127.0.0.1:8000" | "http://auth:8000";
     fileServerUrl: "http://127.0.0.1:4300" | "http://127.0.0.1:3000" | "http://file:3000";
     mainAppServerUrl: "http://localhost:5102" | "http://web:5000";
+    websocketServerHost: "0.0.0.0" | "127.0.0.1";
+    kafka: Kafka;
 }) {
-    const { redis, authServerUrl, fileServerUrl, mainAppServerUrl } = config;
+    const { redis, authServerUrl, fileServerUrl, mainAppServerUrl, kafka, websocketServerHost } = config;
     const app = express();
     app.options("*", cors());
     app.use(cors());
+
+    const wss = new WebSocketServer({
+        port: 8080,
+        host: websocketServerHost,
+    });
+
+    // wss.on("connection", (ws) => {
+    //     // ws.on("close", () => {});
+    // });
+
+    function broadcast(message: any) {
+        wss.clients.forEach((client) => {
+            if (client.readyState === WebSocket.OPEN) {
+                client.send(message);
+            }
+        });
+    }
+
+    async function consumeMessages() {
+        const consumer = kafka.consumer({
+            groupId: "websocket-group",
+            retry: {
+                retries: 10,
+                initialRetryTime: 300,
+                maxRetryTime: 30000,
+                factor: 0.2,
+                multiplier: 2,
+            },
+        });
+
+        await consumer.connect();
+        await consumer.subscribe({ topic: "orders", fromBeginning: true });
+
+        await consumer.run({
+            eachMessage: async ({ topic, partition, message }) => {
+                broadcast(message.value?.toString());
+            },
+        });
+    }
+
+    consumeMessages().catch(console.error);
 
     app.use(express.urlencoded({ extended: false }));
     config.middleware.forEach((middleware) => {
@@ -153,7 +198,7 @@ export default function createProxyServer(config: {
             timeout: 10000,
             proxyTimeout: 10000,
             xfwd: true, // IMPORTANT: sets X-Forwarded-For, X-Forwarded-Proto, Host, etc.
-            preserveHeaderKeyCase: true
+            preserveHeaderKeyCase: true,
         }),
     );
 

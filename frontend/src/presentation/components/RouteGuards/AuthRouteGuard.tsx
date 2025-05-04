@@ -8,7 +8,6 @@ function AuthRouteGuard(props: PropsWithChildren) {
     const { useRouterNavigate } = useRouterModuleContext();
     const navigate = useRouterNavigate();
     const redirected = useRef(false);
-    console.log("user: ", user);
 
     // Effect
     useEffect(() => {

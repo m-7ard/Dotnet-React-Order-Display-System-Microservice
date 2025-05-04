@@ -12,4 +12,5 @@ FROM node:20-alpine
 WORKDIR /app
 COPY --from=builder /app .
 EXPOSE 3100
+EXPOSE 8080
 CMD ["node", "dist/index.mjs"]

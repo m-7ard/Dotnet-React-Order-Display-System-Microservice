@@ -3,6 +3,7 @@ import IUserDataAccess from "../../presentation/interfaces/dataAccess/IUserDataA
 import { getAuthUrl, getLogoutUrl } from "../../viteUtils";
 import ILoginUserRequestDTO from "../contracts/auth/login/ILoginUserRequestDTO";
 import ILogoutUserRequestDTO from "../contracts/auth/logout/ILogoutUserRequestDTO";
+import IRefreshRequestDTO from "../contracts/auth/refresh/IRefreshRequestDTO";
 import IRegisterUserRequestDTO from "../contracts/auth/register/IRegisterUserRequestDTO";
 
 export default class UserDataAccess implements IUserDataAccess {
@@ -10,7 +11,6 @@ export default class UserDataAccess implements IUserDataAccess {
     private readonly logoutUrl = `${getLogoutUrl()}`;
     
     constructor(private readonly tokenStorage: TokenStorage) {
-        console.log(this.authRoute, this.logoutUrl)
     }
 
     async register(request: IRegisterUserRequestDTO): Promise<Response> {
@@ -61,6 +61,23 @@ export default class UserDataAccess implements IUserDataAccess {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(request)
+        });
+
+        return response;
+    }
+
+    async refresh(): Promise<Response> {
+        const body: IRefreshRequestDTO = {
+            refresh: this.tokenStorage.getRefreshToken()
+        }
+
+        const response = await fetch(`${this.authRoute}/token/refresh`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                'Authorization': `Bearer ${this.tokenStorage.getAccessToken()}`
+            },
+            body: JSON.stringify(body)
         });
 
         return response;

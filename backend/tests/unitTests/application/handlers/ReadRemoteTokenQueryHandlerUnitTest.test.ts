@@ -23,14 +23,14 @@ beforeEach(() => {
 describe("ReadRemoteTokenQueryHandlerUnitTest", () => {
     it("ReadRemoteTokenQueryHandlerUnitTest; Token Exists; Success;", async () => {
         // Setup
-        const data: ValidateTokenResponseDTO = { expiration: new Date().toISOString(), user_id: "1"  };
+        const data: ValidateTokenResponseDTO = { expiration: new Date().toISOString(), user_id: 1  };
         mockAuthDataAccess.validateToken.mockImplementationOnce(async () => new Response(JSON.stringify(data), { status: 200 }));
 
         // Act
         const response = await handler.handle(DEFAULT_COMMAND);
 
         // Assert
-        expect(response.isOk() && response.value?.userId === data.user_id);
+        expect(response.isOk() && response.value?.userId === data.user_id.toString());
     });
 
     it("ReadRemoteTokenQueryHandlerUnitTest; Token Does Not Exist; Success;", async () => {

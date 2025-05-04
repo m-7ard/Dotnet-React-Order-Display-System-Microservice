@@ -10,9 +10,10 @@ import AbstractTooltip, { AbstractTooltipTrigger } from "../../components/render
 import contentGridDirective from "../../directives/contentGridDirective";
 import RouterLink from "../../components/Resuables/RouterLink";
 import LinkBoxV2 from "../../components/Resuables/LinkBoxV2";
+import StatusDot from "../../components/Resuables/StatusDot";
 
-export default function OrdersPage(props: { orders: Order[] }) {
-    const { orders } = props;
+export default function OrdersPage(props: { orders: Order[], liveUpdatesEnabled: boolean }) {
+    const { orders, liveUpdatesEnabled } = props;
 
     return (
         <MixinPage
@@ -22,6 +23,7 @@ export default function OrdersPage(props: { orders: Order[] }) {
         >
             <MixinPageSection className="flex flex-row gap-3 items-center overflow-x-auto shrink-0">
                 <LinkBoxV2 exp={(routes) => routes.LIST_ORDERS} params={{}} />
+                <StatusDot title="Live Orders" active={liveUpdatesEnabled} />
                 <div className="flex flex-row gap-3 ml-auto">
                     <RouterLink exp={(routes) => routes.CREATE_ORDER} params={{}}>
                         <MixinButton className="" options={{ size: "mixin-button-sm", theme: "theme-button-generic-white" }} hasShadow>

@@ -7,7 +7,6 @@ using Infrastructure.DbEntities;
 using Infrastructure.Interfaces;
 using Infrastructure.Mappers;
 using Microsoft.EntityFrameworkCore;
-using OneOf.Types;
 
 namespace Infrastructure.Persistence;
 

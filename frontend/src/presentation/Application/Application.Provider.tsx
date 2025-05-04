@@ -4,6 +4,7 @@ import GlobalDialogManager from "../components/Dialog/GlobalDialog.Manager";
 import { useLocation } from "@tanstack/react-router";
 import DataAccessProvider from "./Application.DataAccessProvider";
 import AuthServiceProvider from "./Application.AuthServiceProvider";
+import EventServiceProvider from "./Application.EventServiceProvider";
 
 export default function ApplicationProvider({ children }: PropsWithChildren) {
     const location = useLocation();
@@ -12,9 +13,9 @@ export default function ApplicationProvider({ children }: PropsWithChildren) {
         <ExceptionProvider>
             <DataAccessProvider>
                 <AuthServiceProvider href={location.href}>
-                    <GlobalDialogManager href={location.href}>
-                        {children}
-                    </GlobalDialogManager>
+                    <EventServiceProvider>
+                        <GlobalDialogManager href={location.href}>{children}</GlobalDialogManager>
+                    </EventServiceProvider>
                 </AuthServiceProvider>
             </DataAccessProvider>
         </ExceptionProvider>

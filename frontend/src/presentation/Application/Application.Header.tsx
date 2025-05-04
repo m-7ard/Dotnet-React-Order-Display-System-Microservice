@@ -86,6 +86,18 @@ export default function ApplicationHeader() {
                                     Orders
                                 </MixinButton>
                             </RouterLink>
+                            <RouterLink exp={(routes) => routes.SERVING_ORDERS} params={{}}>
+                                <MixinButton
+                                    options={{
+                                        size: "mixin-button-sm",
+                                        theme: "theme-button-generic-white",
+                                    }}
+                                    type="button"
+                                    active={locationEq((routes) => routes.SERVING_ORDERS)}
+                                >
+                                    Serving
+                                </MixinButton>
+                            </RouterLink>
                         </>
                     )}
                     {user == null ? (

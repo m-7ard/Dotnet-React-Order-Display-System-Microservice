@@ -1,4 +1,3 @@
-import { Knex } from "knex";
 import { AsyncLocalStorage } from "async_hooks";
 
 type TokenType<T> = T extends { __service: infer S } ? S : never;
@@ -17,7 +16,6 @@ type Registration<T = unknown> = { type: "instance"; value: T } | { type: "facto
 const makeToken = <Service>(literal: string) => literal as string & { __service: Service };
 
 export const DI_TOKENS = {
-    KNEX_CLIENT: makeToken<Knex>("KNEX_CLIENT"),
 } as const;
 
 const scopeContext = new AsyncLocalStorage<Map<string, unknown>>();

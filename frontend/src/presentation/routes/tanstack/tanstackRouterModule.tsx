@@ -37,6 +37,13 @@ const createOrder: ICommonRoute<IRouteConfig<TEmptyParams>, never> = {
     isLayout: false,
 };
 
+const servingOrders: ICommonRoute<IRouteConfig<TEmptyParams>, never> = {
+    parent: listOrders,
+    config: tanstackConfigs.SERVING_ORDERS,
+    label: "Serving",
+    isLayout: false,
+};
+
 const __orderIdLayout__: ICommonRoute<IRouteConfig<TEmptyParams>, never> = {
     parent: listOrders,
     label: ":id",
@@ -154,6 +161,7 @@ const genericRoutes: ICommonRouteMapping = {
     LIST_ORDERS: listOrders,
     CREATE_ORDER: createOrder,
     MANAGE_ORDER: manageOrder,
+    SERVING_ORDERS: servingOrders,
 
     // Products
     LIST_PRODUCTS: listProducts,

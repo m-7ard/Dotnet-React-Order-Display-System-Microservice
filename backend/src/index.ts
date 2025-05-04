@@ -1,11 +1,12 @@
 import createProxyServer from "api/createProxyServer";
 import responseLogger from "api/middleware/responseLogger";
 import { ProductionDIContainer } from "api/services/DIContainer";
+import { Kafka } from "kafkajs";
 import { createClient } from "redis";
 import { assert, literal, union } from "superstruct";
 
 if (global.crypto == null) {
-    global.crypto = require('crypto');
+    global.crypto = require("crypto");
 }
 
 async function main() {
@@ -38,10 +39,17 @@ async function main() {
     const mainApiServerUrlValidator = union([literal("http://localhost:5102"), literal("http://web:5000")]);
     assert(mainApiServerUrl, mainApiServerUrlValidator);
 
+    const kafkaAddress = process.env.KAFKA_ADDRESS;
+    const kafkaAddressValidator = union([literal("localhost:29092"), literal("kafka:29092")]);
+    assert(kafkaAddress, kafkaAddressValidator);
+
     const diContainer = new ProductionDIContainer();
+    const kafka = new Kafka({
+        clientId: "my-producer",
+        brokers: [kafkaAddress],
+    });
 
-
-    const redis = createClient({ url: environment === "DOCKER" ? 'redis://redis:6379' : undefined });
+    const redis = createClient({ url: environment === "DOCKER" ? "redis://redis:6379" : undefined });
     await redis.connect();
     await redis.flushDb();
 
@@ -51,7 +59,9 @@ async function main() {
         redis: redis,
         fileServerUrl: fileServerUrl,
         authServerUrl: authServerUrl,
-        mainAppServerUrl: mainApiServerUrl
+        mainAppServerUrl: mainApiServerUrl,
+        kafka: kafka,
+        websocketServerHost: host
     });
 
     const server = app.listen(port, host, () => {

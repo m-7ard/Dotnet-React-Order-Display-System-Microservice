@@ -7,6 +7,7 @@ interface IUserDataAccess {
     login(request: ILoginUserRequestDTO): Promise<Response>
     currentUser(request: ICurrentUserRequestDTO): Promise<Response>;
     logout(): Promise<Response>
+    refresh(): Promise<Response>;
 }
 
 export default IUserDataAccess;

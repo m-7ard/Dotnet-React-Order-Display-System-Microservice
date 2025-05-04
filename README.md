@@ -2,21 +2,27 @@
 
 ## Table of Contents
 1. [.Net Backend Documentation](#Net-Backend-Documentation)
-2. [Table overview of hosts and ports](#Table-overview-of-hosts-and-ports)
-3. [A High Level View](#A-High-Level-View)
-4. [Docker Detials](#Docker-Detials)
-5. [Node Middle Proxy Details](#Node-Middle-Proxy-Details)
-6. [Image Upload Details](#Image-Upload-Details)
+2. [Setup](#setup)
+3. [Table overview of hosts and ports](#Table-overview-of-hosts-and-ports)
+4. [A High Level View](#A-High-Level-View)
+5. [Docker Detials](#Docker-Detials)
+6. [Node Middle Proxy Details](#Node-Middle-Proxy-Details)
+7. [Image Upload Details](#Image-Upload-Details)
 
 ## .Net Backend Documentation
 The documentation for the main application can be found at https://github.com/m-7ard/Dotnet-React-Order-Display-System-
 
 ## Setup
+
 ### Using Docker
 ```bash
     >> docker compose up
     >> Go to localhost:80
 ```
+
+> [!WARNING]
+> You need to manually run Kafka for this to work. This project comes included with a kafka-dev-docker-compose.yml for convenience's sake. 
+> To run it, type >> docker compose -f kafka-dev-docker-compose.yml up 
 
 ### Manually (Dev mode)
 ```bash
@@ -44,6 +50,7 @@ NOTE: The dev version will not use the Caddy proxy
 
 ## A High Level View
 ![A High Level View](readmeFiles/app-flow-1.png)
+![Websocket Flow](readmeFiles/websocket-flow.png)
 
 ## Docker Detials
 The application uses a docker compose to orchestrate all the servers and uses a bridge network.
