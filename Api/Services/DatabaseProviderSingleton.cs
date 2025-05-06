@@ -9,8 +9,9 @@ public class DatabaseProviderSingleton : IDatabaseProviderSingleton
     public bool IsSQLite { get; }
     public bool IsMSSQL { get; }
     public bool IsTesting { get; }
+    public string ConnectionString { get; }
 
-    public DatabaseProviderSingleton(DatabaseProviderSingletonValue value, bool isTesting = false)
+    public DatabaseProviderSingleton(DatabaseProviderSingletonValue value, string connectionString, bool isTesting = false)
     {
         Value = value;
         IsSQLite = value == DatabaseProviderSingletonValue.Sqlite;
@@ -22,5 +23,6 @@ public class DatabaseProviderSingleton : IDatabaseProviderSingleton
         }
 
         IsTesting = isTesting;
+        ConnectionString = connectionString;
     }
 }

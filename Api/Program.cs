@@ -19,7 +19,7 @@ using Microsoft.AspNetCore.Localization;
 var builder = WebApplication.CreateBuilder(args);
 
 var appSettings = BuilderUtils.ReadAppSettings(builder.Configuration);
-var databaseProviderSingleton = new DatabaseProviderSingleton(appSettings.DatabaseProviderValue);
+var databaseProviderSingleton = new DatabaseProviderSingleton(value: appSettings.DatabaseProviderValue, connectionString: appSettings.ConnectionString);
 
 
 // HttpContextAccessor

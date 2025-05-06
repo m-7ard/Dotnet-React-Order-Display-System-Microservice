@@ -8,8 +8,12 @@ export default function OrdersController() {
     const { orders } = useRouterLoaderData((keys) => keys.LIST_ORDERS);
     const { orderEventService, open } = useEventServiceContext();
 
-    const [storedOrder, setStoredOrders] = useState<Order[]>(orders);
-    const storedOrderIds = useRef<Set<string>>(new Set(storedOrder.map(({ id }) => id)));
+    const [storedOrders, setStoredOrders] = useState<Order[]>(orders);
+    const storedOrderIds = useRef<Set<string>>(new Set(storedOrders.map(({ id }) => id)));
+
+    useEffect(() => {
+        setStoredOrders(orders);
+    }, [orders]);
 
     useEffect(() => {
         const createdListener = orderEventService.registerCreateOrder((order) => {
@@ -34,5 +38,5 @@ export default function OrdersController() {
         };
     }, [orderEventService]);
 
-    return <OrdersPage orders={storedOrder} liveUpdatesEnabled={open} />;
+    return <OrdersPage orders={storedOrders} liveUpdatesEnabled={open} />;
 }

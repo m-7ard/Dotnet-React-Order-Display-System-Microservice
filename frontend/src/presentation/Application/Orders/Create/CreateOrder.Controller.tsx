@@ -4,15 +4,11 @@ import useItemManager from "../../../hooks/useItemManager";
 import { Type } from "@sinclair/typebox";
 import typeboxToDomainCompatibleFormError from "../../../mappers/typeboxToDomainCompatibleFormError";
 import validateTypeboxSchema from "../../../utils/validateTypeboxSchema";
-import IOrderDataAccess from "../../../interfaces/dataAccess/IOrderDataAccess";
 import CreateOrderPage from "./CreateOrder.Page";
 import IProduct from "../../../../domain/models/IProduct";
 import ICreateOrderRequestDTO from "../../../../infrastructure/contracts/orders/create/ICreateOrderRequestDTO";
-import useResponseHandler from "../../../hooks/useResponseHandler";
-import { err, ok } from "neverthrow";
-import IPlainApiError from "../../../../infrastructure/interfaces/IPlainApiError";
-import PresentationErrorFactory from "../../../mappers/PresentationErrorFactory";
 import { useRouterNavigate } from "../../../routes/RouterModule/RouterModule.hooks";
+import { useOrderDataAccessBridgeContext } from "../../../components/DataAccess/OrderDataAccessBridge/OrderDataAccessBridge";
 
 const validatorSchema = Type.Object({
     orderItemData: Type.Record(
@@ -46,14 +42,16 @@ const initialValues: ValueSchema = {
 
 const initialErrors: ErrorState = {};
 
-export default function CreateOrderController(props: { orderDataAccess: IOrderDataAccess }) {
-    const { orderDataAccess } = props;
-    const responseHandler = useResponseHandler();
-
+export default function CreateOrderController() {
+    // Data
     const itemManager = useItemManager<ValueSchema>(initialValues);
     const errorManager = useItemManager<ErrorState>(initialErrors);
 
+    // Deps
     const navigate = useRouterNavigate();
+    const orderDataAccessBridge = useOrderDataAccessBridgeContext();
+
+    // Callbacks
     const createOrderMutation = useMutation({
         mutationFn: async () => {
             const request: ICreateOrderRequestDTO = {
@@ -76,24 +74,10 @@ export default function CreateOrderController(props: { orderDataAccess: IOrderDa
                 return;
             }
 
-            responseHandler({
-                requestFn: () => orderDataAccess.createOrder(request),
-                onResponseFn: async (response) => {
-                    if (response.ok) {
-                        navigate({ exp: (routes) => routes.LIST_ORDERS, params: {} });
-                        return ok(undefined);
-                    }
-                    
-                    if (response.status === 400) {
-                        const errors: IPlainApiError[] = await response.json();
-                        errorManager.setAll(PresentationErrorFactory.ApiErrorsToPresentationErrors(errors));
-                        return ok(undefined);
-                    }
-
-                    return err(undefined);
-                }
+            await orderDataAccessBridge.create(request, {
+                onSuccess: () => navigate({ exp: (routes) => routes.LIST_ORDERS, params: {} }),
+                onError: errorManager.setAll
             })
-
         },
     });
 

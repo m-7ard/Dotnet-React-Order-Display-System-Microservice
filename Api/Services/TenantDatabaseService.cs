@@ -1,17 +1,18 @@
 using Infrastructure;
+using Infrastructure.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Api.Services;
 
 public class TenantDatabaseService
 {
-    private readonly string _baseConnectionString;
-    
-    public TenantDatabaseService()
+    private readonly IDatabaseProviderSingleton _databaseProviderSingleton;
+
+    public TenantDatabaseService(IDatabaseProviderSingleton databaseProviderSingleton)
     {
-        _baseConnectionString = "Data Source=client_{clientId}.db";
+        _databaseProviderSingleton = databaseProviderSingleton;
     }
-    
+
     public string GetConnectionStringForTenant(string clientId)
     {
         if (string.IsNullOrEmpty(clientId))
@@ -19,24 +20,33 @@ public class TenantDatabaseService
             throw new ArgumentException("Client ID cannot be null or empty", nameof(clientId));        
         }
             
-        return _baseConnectionString.Replace("{clientId}", clientId);
+        return _databaseProviderSingleton.ConnectionString.Replace("{clientId}", clientId);
     }
     
     public async Task EnsureDatabaseCreatedAsync(string clientId)
     {
         var connectionString = GetConnectionStringForTenant(clientId);
-        
-        var filePath = $"client_{clientId}.db";
+        DbContextOptions<SimpleProductOrderServiceDbContext>? options = null;
 
-        if (!File.Exists(filePath))
+        if (_databaseProviderSingleton.IsSQLite)
         {
-            var options = new DbContextOptionsBuilder<SimpleProductOrderServiceDbContext>()
+            options = new DbContextOptionsBuilder<SimpleProductOrderServiceDbContext>()
                 .UseSqlite(connectionString)
                 .Options;
-
-            using var context = new SimpleProductOrderServiceDbContext(options);
-            await context.Database.EnsureCreatedAsync();
-            Console.WriteLine($"Database created for client {clientId}");
         }
+        else if (_databaseProviderSingleton.IsMSSQL)
+        {
+            options = new DbContextOptionsBuilder<SimpleProductOrderServiceDbContext>()
+                .UseSqlServer(connectionString)
+                .Options;
+        }
+        else
+        {
+            throw new Exception($"TenantDatabaseService has not been configured for DB type {_databaseProviderSingleton.Value}");
+        }
+        
+        using var context = new SimpleProductOrderServiceDbContext(options);
+        var created = await context.Database.EnsureCreatedAsync();
+        Console.WriteLine($"Database created for client {clientId}");
     }
 }

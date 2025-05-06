@@ -6,12 +6,9 @@ import useItemManager from "../../../hooks/useItemManager";
 import { useMutation } from "@tanstack/react-query";
 import typeboxToDomainCompatibleFormError from "../../../mappers/typeboxToDomainCompatibleFormError";
 import validateTypeboxSchema from "../../../utils/validateTypeboxSchema";
-import useResponseHandler from "../../../hooks/useResponseHandler";
-import { productDataAccess } from "../../../deps/dataAccess";
-import { err, ok } from "neverthrow";
 import useUploadProductImages from "../../../hooks/useUploadProductImages";
-import PresentationErrorFactory from "../../../mappers/PresentationErrorFactory";
 import { useRouterLoaderData, useRouterNavigate } from "../../../routes/RouterModule/RouterModule.hooks";
+import { useProductDataAccessBridgeContext } from "../../../components/DataAccess/ProductDataAccessBridge/ProductDataAccessBridgeProvider.Context";
 
 const validatorSchema = Type.Object({
     name: Type.String({
@@ -45,9 +42,8 @@ export type ErrorSchema = IPresentationError<{
 const initialErrorState: ErrorSchema = {};
 
 export default function UpdateProductController() {
+    // Data
     const { product } = useRouterLoaderData((keys) => keys.UPDATE_PRODUCT);
-
-    const responseHandler = useResponseHandler();
     const initialValueState: ValueSchema = {
         name: product.name,
         description: product.description,
@@ -64,11 +60,15 @@ export default function UpdateProductController() {
             };
         }, {}),
     };
+    // Deps
+    const productDataAccessBridge = useProductDataAccessBridgeContext();
+    const navigate = useRouterNavigate();
 
+    // State
     const itemManager = useItemManager<ValueSchema>(initialValueState);
     const errorManager = useItemManager<ErrorSchema>(initialErrorState);
 
-    const navigate = useRouterNavigate();
+    // Callbacks
     const updateProductMutation = useMutation({
         mutationFn: async () => {
             const images = Object.keys(itemManager.items.images);
@@ -85,28 +85,19 @@ export default function UpdateProductController() {
                 return;
             }
 
-            await responseHandler({
-                requestFn: () =>
-                    productDataAccess.updateProduct({
-                        id: product.id,
-                        name: itemManager.items.name,
-                        description: itemManager.items.description,
-                        price: parseFloat(itemManager.items.price),
-                        images: images,
-                    }),
-                onResponseFn: async (response) => {
-                    if (response.ok) {
-                        navigate({ exp: (routes) => routes.LIST_PRODUCTS, params: {}, search: { productId: product.id } });
-                        return ok(undefined);
-                    } else if (response.status === 400) {
-                        const errors = PresentationErrorFactory.ApiErrorsToPresentationErrors(await response.json());
-                        errorManager.setAll(errors);
-                        return ok(undefined);
-                    }
-
-                    return err(undefined);
+            await productDataAccessBridge.update(
+                {
+                    id: product.id,
+                    name: itemManager.items.name,
+                    description: itemManager.items.description,
+                    price: parseFloat(itemManager.items.price),
+                    images: images,
                 },
-            });
+                {
+                    onSuccess: () => navigate({ exp: (routes) => routes.LIST_PRODUCTS, params: {}, search: { productId: product.id } }),
+                    onError: errorManager.setAll,
+                },
+            );
         },
     });
 

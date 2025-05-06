@@ -8,4 +8,5 @@ public interface IDatabaseProviderSingleton
     bool IsSQLite { get; }
     bool IsMSSQL { get; }
     bool IsTesting { get; }
+    string ConnectionString { get; }
 } 

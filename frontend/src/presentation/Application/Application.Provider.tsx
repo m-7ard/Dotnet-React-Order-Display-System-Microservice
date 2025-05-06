@@ -5,6 +5,10 @@ import { useLocation } from "@tanstack/react-router";
 import DataAccessProvider from "./Application.DataAccessProvider";
 import AuthServiceProvider from "./Application.AuthServiceProvider";
 import EventServiceProvider from "./Application.EventServiceProvider";
+import ProductDataAccessBridgeProvider from "../components/DataAccess/ProductDataAccessBridge/ProductDataAccessBridgeProvider";
+import { orderDataAccess, productDataAccess, userDataAccess } from "../deps/dataAccess";
+import OrderDataAccessBridgeProvider from "../components/DataAccess/OrderDataAccessBridge/OrderDataAccessBridgeProvider";
+import tokenStorage from "../deps/tokenStorage";
 
 export default function ApplicationProvider({ children }: PropsWithChildren) {
     const location = useLocation();
@@ -12,11 +16,15 @@ export default function ApplicationProvider({ children }: PropsWithChildren) {
     return (
         <ExceptionProvider>
             <DataAccessProvider>
-                <AuthServiceProvider href={location.href}>
-                    <EventServiceProvider>
-                        <GlobalDialogManager href={location.href}>{children}</GlobalDialogManager>
-                    </EventServiceProvider>
-                </AuthServiceProvider>
+                <ProductDataAccessBridgeProvider productDataAcess={productDataAccess}>
+                    <OrderDataAccessBridgeProvider orderDataAccess={orderDataAccess}>
+                        <AuthServiceProvider href={location.href} userDataAccess={userDataAccess} tokenStorage={tokenStorage}>
+                            <EventServiceProvider>
+                                <GlobalDialogManager href={location.href}>{children}</GlobalDialogManager>
+                            </EventServiceProvider>
+                        </AuthServiceProvider>
+                    </OrderDataAccessBridgeProvider>
+                </ProductDataAccessBridgeProvider>
             </DataAccessProvider>
         </ExceptionProvider>
     );
