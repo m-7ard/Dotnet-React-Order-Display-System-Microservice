@@ -128,7 +128,7 @@ services:
         environment:
             - ASPNETCORE_ENVIRONMENT=Production
             - ASPNETCORE_URLS=http://+:5000
-            - SqlServer_Database=Server=sqlserver;Database=YourDb;User Id=sa;Password=Your_password123;
+            - SqlServer_Database=Server=sqlserver;Database=SPOSM_client_{clientId};User Id=sa;Password=Your_password123;TrustServerCertificate=True;
         depends_on:
             kafka:
                 condition: service_healthy

@@ -7,6 +7,8 @@ namespace Api.Services;
 public class TenantDatabaseService
 {
     private readonly IDatabaseProviderSingleton _databaseProviderSingleton;
+    private static readonly Dictionary<string, SemaphoreSlim> _locks = new();
+    private static readonly object _lockObj = new();
 
     public TenantDatabaseService(IDatabaseProviderSingleton databaseProviderSingleton)
     {
@@ -26,27 +28,49 @@ public class TenantDatabaseService
     public async Task EnsureDatabaseCreatedAsync(string clientId)
     {
         var connectionString = GetConnectionStringForTenant(clientId);
-        DbContextOptions<SimpleProductOrderServiceDbContext>? options = null;
 
-        if (_databaseProviderSingleton.IsSQLite)
+        SemaphoreSlim semaphore;
+        lock (_lockObj)
         {
-            options = new DbContextOptionsBuilder<SimpleProductOrderServiceDbContext>()
-                .UseSqlite(connectionString)
-                .Options;
+            if (!_locks.ContainsKey(clientId))
+                _locks[clientId] = new SemaphoreSlim(1, 1);
+
+            semaphore = _locks[clientId];
         }
-        else if (_databaseProviderSingleton.IsMSSQL)
+
+        await semaphore.WaitAsync();
+        try
         {
-            options = new DbContextOptionsBuilder<SimpleProductOrderServiceDbContext>()
-                .UseSqlServer(connectionString)
-                .Options;
+            DbContextOptions<SimpleProductOrderServiceDbContext>? options = null;
+
+            if (_databaseProviderSingleton.IsSQLite)
+            {
+                options = new DbContextOptionsBuilder<SimpleProductOrderServiceDbContext>()
+                    .UseSqlite(connectionString)
+                    .Options;
+            }
+            else if (_databaseProviderSingleton.IsMSSQL)
+            {
+                options = new DbContextOptionsBuilder<SimpleProductOrderServiceDbContext>()
+                    .UseSqlServer(connectionString)
+                    .Options;
+            }
+            else
+            {
+                throw new Exception($"TenantDatabaseService has not been configured for DB type {_databaseProviderSingleton.Value}");
+            }
+
+            using var context = new SimpleProductOrderServiceDbContext(options);
+            var created = await context.Database.EnsureCreatedAsync();
+
+            if (created)
+            {
+                Console.WriteLine($"Database created for client {clientId}");
+            }
         }
-        else
+        finally
         {
-            throw new Exception($"TenantDatabaseService has not been configured for DB type {_databaseProviderSingleton.Value}");
+            semaphore.Release();
         }
-        
-        using var context = new SimpleProductOrderServiceDbContext(options);
-        var created = await context.Database.EnsureCreatedAsync();
-        Console.WriteLine($"Database created for client {clientId}");
     }
 }
