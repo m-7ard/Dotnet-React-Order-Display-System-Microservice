@@ -45,6 +45,7 @@ public class IntegrationWebApplicationFactory<TProgram> : WebApplicationFactory<
             var appSettings = BuilderUtils.ReadTestAppSettings(configuration);
             var databaseProviderSingleton = new DatabaseProviderSingleton(
                 value: appSettings.DatabaseProviderValue, 
+                connectionString: appSettings.ConnectionString,
                 isTesting: true);
 
             // Register singleton provider

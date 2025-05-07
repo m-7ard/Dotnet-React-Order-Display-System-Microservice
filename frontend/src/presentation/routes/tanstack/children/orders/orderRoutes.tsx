@@ -70,7 +70,7 @@ const createOrderRoute = createRoute({
     path: tanstackConfigs.CREATE_ORDER.pattern,
     component: () => (
         <AuthRouteGuard>
-            <CreateOrderController orderDataAccess={orderDataAccess} />
+            <CreateOrderController />
         </AuthRouteGuard>
     ),
 });
@@ -94,7 +94,7 @@ const manageOrderRoute = createRoute({
     },
     component: () => (
         <AuthRouteGuard>
-            <ManageOrderController orderDataAccess={orderDataAccess} />
+            <ManageOrderController />
         </AuthRouteGuard>
     ),
 });

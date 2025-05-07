@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AuthServiceContext } from "./Application.AuthServiceProvider.Context";
-import { useDataAccessContext } from "./Application.DataAccessProvider.Context";
 import User from "../../domain/models/User";
 import IAuthService from "../interfaces/services/IAuthService";
 import ICurrentUserResponseDTO from "../../infrastructure/contracts/auth/currentUser/ICurrentUserResponseDTO";
@@ -14,13 +13,14 @@ import IDjangoErrors from "../../infrastructure/interfaces/IDjangoError";
 import ILoginUserResponseDTO from "../../infrastructure/contracts/auth/login/ILoginUserResponseDTO";
 import IPlainApiError from "../../infrastructure/interfaces/IPlainApiError";
 import IRefreshResponseDTO from "../../infrastructure/contracts/auth/refresh/IRefreshResponseDTO";
+import IUserDataAccess from "../interfaces/dataAccess/IUserDataAccess";
+import { TokenStorage } from "../deps/tokenStorage";
 
-export default function AuthServiceProvider(props: React.PropsWithChildren<{ href: string }>) {
+export default function AuthServiceProvider(props: React.PropsWithChildren<{ href: string; userDataAccess: IUserDataAccess; tokenStorage: TokenStorage; }>) {
     // Props
-    const { children, href } = props;
+    const { children, href, userDataAccess, tokenStorage } = props;
 
     // Deps
-    const { userDataAccess, tokenStorage } = useDataAccessContext();
     const fluentResponseHandler = useFluentResponseHandler();
     const { dispatchException } = useApplicationExceptionContext();
 
@@ -110,6 +110,8 @@ export default function AuthServiceProvider(props: React.PropsWithChildren<{ hre
 
     const logout = useCallback<IAuthService["logout"]>(async () => {
         try {
+            tokenStorage.setAccessToken(null);
+            tokenStorage.setRefreshToken(null);
             const result = await tryHandleRequest(userDataAccess.logout());
 
             if (result.isErr()) {
@@ -118,9 +120,7 @@ export default function AuthServiceProvider(props: React.PropsWithChildren<{ hre
             }
 
             const response = result.value;
-            if (response.ok || response.status === 401) {
-                tokenStorage.setAccessToken(null);
-                tokenStorage.setRefreshToken(null);
+            if (response.ok || response.status === 401 || response.status === 400) {
                 await currentUser({});
                 return;
             }

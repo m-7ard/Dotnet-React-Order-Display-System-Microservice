@@ -54,10 +54,20 @@ public class TenantDbContextFactory
     
         var connectionString = _dbService.GetConnectionStringForTenant(clientId);
         
-        var options = new DbContextOptionsBuilder<SimpleProductOrderServiceDbContext>()
-            .UseSqlite(connectionString)
-            .Options;
-            
-        return new SimpleProductOrderServiceDbContext(options);
+        var optionsBuilder = new DbContextOptionsBuilder<SimpleProductOrderServiceDbContext>();
+        if (_databaseProviderSingleton.IsMSSQL)
+        {
+            optionsBuilder.UseSqlServer(connectionString);
+        }
+        else if (_databaseProviderSingleton.IsSQLite)
+        {
+            optionsBuilder.UseSqlite(connectionString);
+        }
+        else
+        {
+            throw new InvalidOperationException("Unsupported database provider.");
+        }
+
+        return new SimpleProductOrderServiceDbContext(optionsBuilder.Options);
     }
 }

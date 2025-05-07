@@ -1,29 +1,21 @@
 import { useMutation } from "@tanstack/react-query";
 import ManageOrderPage from "./ManageOrder.Page";
-import useResponseHandler from "../../../hooks/useResponseHandler";
 import IPresentationError from "../../../interfaces/IPresentationError";
 import useItemManager from "../../../hooks/useItemManager";
-import { err, ok } from "neverthrow";
-import IPlainApiError from "../../../../infrastructure/interfaces/IPlainApiError";
 import OrderItem from "../../../../domain/models/OrderItem";
-import IOrderDataAccess from "../../../interfaces/dataAccess/IOrderDataAccess";
 import OrderStatus from "../../../../domain/valueObjects/Order/OrderStatus";
 import OrderItemStatus from "../../../../domain/valueObjects/OrderItem/OrderItemStatus";
-import IMarkOrderFinishedResponseDTO from "../../../../infrastructure/contracts/orders/markFinished/IMarkOrderFinishedResponseDTO";
-import IMarkOrderItemFinishedResponseDTO from "../../../../infrastructure/contracts/orderItems/markFinished/IMarkOrderItemFinishedResponseDTO";
 import { useRouterLoaderData } from "../../../routes/RouterModule/RouterModule.hooks";
 import { useCallback, useEffect, useState } from "react";
 import Order from "../../../../domain/models/Order";
 import { useEventServiceContext } from "../../Application.EventServiceProvider.Context";
+import { useOrderDataAccessBridgeContext } from "../../../components/DataAccess/OrderDataAccessBridge/OrderDataAccessBridge";
 
-export default function ManageOrderController(props: { orderDataAccess: IOrderDataAccess }) {
-    // props
-    const { orderDataAccess } = props;
-
+export default function ManageOrderController() {
     // deps
     const loaderData = useRouterLoaderData((keys) => keys.MANAGE_ORDER);
-    const responseHandler = useResponseHandler();
     const { orderEventService } = useEventServiceContext();
+    const orderDataAccessBridge = useOrderDataAccessBridgeContext();
 
     // state
     const errorsManager = useItemManager<IPresentationError<Record<string | number, unknown>>>({ _: undefined });
@@ -49,31 +41,23 @@ export default function ManageOrderController(props: { orderDataAccess: IOrderDa
             }
 
             errorsManager.setAll({});
-            await responseHandler({
-                requestFn: () =>
-                    orderDataAccess.markOrderFinished({
-                        orderId: order.id,
-                    }),
-                onResponseFn: async (response) => {
-                    if (response.ok) {
-                        const body: IMarkOrderFinishedResponseDTO = await response.json();
+            await orderDataAccessBridge.markOrderFinished(
+                {
+                    orderId: order.id,
+                },
+                {
+                    onSuccess: (res) => {
                         order.status = OrderStatus.FINISHED;
-                        order.dateFinished = new Date(body.dateFinished);
-                        return ok(undefined);
-                    }
-
-                    if (response.status === 400) {
-                        const errors: IPlainApiError[] = await response.json();
+                        order.dateFinished = new Date(res.dateFinished);
+                    },
+                    onError: (errors) => {
                         errorsManager.updateItem(
                             "_",
-                            errors.map(({ message }) => message),
+                            Object.values(errors).flatMap((messages) => messages),
                         );
-                        return ok(undefined);
-                    }
-
-                    return err(undefined);
+                    },
                 },
-            });
+            );
         },
     });
 
@@ -85,32 +69,24 @@ export default function ManageOrderController(props: { orderDataAccess: IOrderDa
             }
 
             errorsManager.setAll({});
-            await responseHandler({
-                requestFn: () =>
-                    orderDataAccess.markOrderItemFinished({
-                        orderId: storedOrder.id,
-                        orderItemId: orderItem.id,
-                    }),
-                onResponseFn: async (response) => {
-                    if (response.ok) {
-                        const body: IMarkOrderItemFinishedResponseDTO = await response.json();
+            await orderDataAccessBridge.markOrderItemFinished(
+                {
+                    orderId: storedOrder.id,
+                    orderItemId: orderItem.id,
+                },
+                {
+                    onSuccess: (res) => {
                         orderItem.status = OrderItemStatus.FINISHED;
-                        orderItem.dateFinished = new Date(body.dateFinished);
-                        return ok(undefined);
-                    }
-
-                    if (response.status === 400) {
-                        const errors: IPlainApiError[] = await response.json();
+                        orderItem.dateFinished = new Date(res.dateFinished);
+                    },
+                    onError: (errors) => {
                         errorsManager.updateItem(
                             orderItem.id,
-                            errors.map(({ message }) => message),
+                            Object.values(errors).flatMap((messages) => messages),
                         );
-                        return ok(undefined);
-                    }
-
-                    return err(undefined);
+                    },
                 },
-            });
+            );
         },
     });
 
