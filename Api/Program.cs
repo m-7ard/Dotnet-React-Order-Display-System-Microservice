@@ -14,6 +14,7 @@ using Infrastructure.Interfaces;
 using Infrastructure.Persistence;
 using Infrastructure.Querying;
 using Microsoft.AspNetCore.Localization;
+using RabbitMQ.Client;
 
 // dotnet ef migrations add <Name> --project Infrastructure --startup-project Api
 var builder = WebApplication.CreateBuilder(args);
@@ -127,6 +128,14 @@ builder.Services.AddScoped<IProductDomainService, ProductDomainService>();
 
 builder.Services.AddScoped<OrderProducerService>();
 builder.Services.AddSingleton<OrderKafkaProducer>();
+
+
+///
+///
+/// Queue
+/// 
+
+builder.Services.AddHostedService<RabbitMqConsumerService>();
 
 ///
 ///

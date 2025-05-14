@@ -25,6 +25,10 @@ import ApiErrorFactory from "./errors/ApiErrorFactory";
 import API_ERROR_CODES from "./errors/API_ERROR_CODES";
 import { Kafka } from "kafkajs";
 import { WebSocketServer, WebSocket } from "ws";
+import { Channel, ChannelModel } from "amqplib";
+import QueueService from "infrastructure/services/QueueService";
+import RegisterUserCommandHandler from "application/handlers/auth/RegisterUserCommandHandler";
+import RegisterAction from "./actions/auth/RegisterAction";
 
 export type RedisClientConnection = ReturnType<typeof createClient>;
 
@@ -37,8 +41,9 @@ export default function createProxyServer(config: {
     mainAppServerUrl: "http://localhost:5102" | "http://web:5000";
     websocketServerHost: "0.0.0.0" | "127.0.0.1";
     kafka: Kafka;
+    channel: Channel;
 }) {
-    const { redis, authServerUrl, fileServerUrl, mainAppServerUrl, kafka, websocketServerHost } = config;
+    const { redis, authServerUrl, fileServerUrl, mainAppServerUrl, kafka, websocketServerHost, channel } = config;
     const app = express();
     app.options("*", cors());
     app.use(cors());
@@ -92,6 +97,7 @@ export default function createProxyServer(config: {
     const authDataAccess = new AuthDataAccess(authServerUrl);
     const draftImageDataAccess = new DraftImageDataAccess(mainAppServerUrl);
     const tokenRepository = new RedisTokenRepository(redis);
+    const queueService = new QueueService(channel);
 
     const authRouter = Router();
 
@@ -103,6 +109,17 @@ export default function createProxyServer(config: {
         },
         method: "POST",
         path: "/logout",
+        guards: [express.json({ limit: "1mb" })],
+    });
+
+    registerAction({
+        router: authRouter,
+        initialiseAction: () => {
+            const registerUserCommandHandler = new RegisterUserCommandHandler(authDataAccess, queueService);
+            return new RegisterAction(registerUserCommandHandler);
+        },
+        method: "POST",
+        path: "/register",
         guards: [express.json({ limit: "1mb" })],
     });
 
@@ -197,7 +214,7 @@ export default function createProxyServer(config: {
             changeOrigin: true,
             timeout: 10000,
             proxyTimeout: 10000,
-            xfwd: true, // IMPORTANT: sets X-Forwarded-For, X-Forwarded-Proto, Host, etc.
+            xfwd: true,
             preserveHeaderKeyCase: true,
         }),
     );

@@ -1,6 +1,6 @@
 import { TokenStorage } from "../../presentation/deps/tokenStorage";
 import IUserDataAccess from "../../presentation/interfaces/dataAccess/IUserDataAccess";
-import { getAuthUrl, getLogoutUrl } from "../../viteUtils";
+import { getAuthUrl, getLogoutUrl, getRegisterUrl } from "../../viteUtils";
 import ILoginUserRequestDTO from "../contracts/auth/login/ILoginUserRequestDTO";
 import ILogoutUserRequestDTO from "../contracts/auth/logout/ILogoutUserRequestDTO";
 import IRefreshRequestDTO from "../contracts/auth/refresh/IRefreshRequestDTO";
@@ -9,12 +9,13 @@ import IRegisterUserRequestDTO from "../contracts/auth/register/IRegisterUserReq
 export default class UserDataAccess implements IUserDataAccess {
     private readonly authRoute = `${getAuthUrl()}`;
     private readonly logoutUrl = `${getLogoutUrl()}`;
+    private readonly registerUrl = `${getRegisterUrl()}`;
     
     constructor(private readonly tokenStorage: TokenStorage) {
     }
 
     async register(request: IRegisterUserRequestDTO): Promise<Response> {
-        const response = await fetch(`${this.authRoute}/register`, {
+        const response = await fetch(`${this.registerUrl}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

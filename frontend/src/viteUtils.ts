@@ -1,9 +1,6 @@
 export const getLocalUrl = (path: string) => {
-    return new URL(
-        path,
-        import.meta.url,
-    ).href
-}
+    return new URL(path, import.meta.url).href;
+};
 
 export const getApiUrl = () => {
     return import.meta.env.VITE_API_URL;
@@ -23,4 +20,8 @@ export const getAuthUrl = () => {
 
 export const getLogoutUrl = () => {
     return import.meta.env.VITE_LOGOUT_URL;
+};
+
+export const getRegisterUrl = () => {
+    return import.meta.env.VITE_REGISTER_URL;
 };

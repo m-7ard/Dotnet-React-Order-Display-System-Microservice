@@ -17,8 +17,12 @@ export const getFileServerUrl = () => {
 
 export const getAuthUrl = () => {
     return "auth.url";
-}
+};
 
 export const getLogoutUrl = () => {
     return "logout.url";
-}
+};
+
+export const getRegisterUrl = () => {
+    return "register.url";
+};

@@ -1,0 +1,3 @@
+interface IEnsureApplicationReady {
+    userId: string;
+}

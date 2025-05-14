@@ -69,8 +69,8 @@ export default function AuthServiceProvider(props: React.PropsWithChildren<{ hre
                     return ok(true);
                 }
 
-                const errors: IDjangoErrors = await response.json();
-                return err(PresentationErrorFactory.DjangoErrorsToPresentationErrors(errors));
+                const errors: IPlainApiError[] = await response.json();
+                return err(PresentationErrorFactory.ApiErrorsToPresentationErrors(errors));
             } catch (error: unknown) {
                 dispatchException(error);
                 return err({ _: [JSON.stringify(error)] });
