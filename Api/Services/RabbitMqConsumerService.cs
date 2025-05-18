@@ -1,4 +1,7 @@
 using System.Text;
+using System.Text.Json;
+using Api.Producers;
+using Api.Producers.Events;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
@@ -10,8 +13,9 @@ public class RabbitMqConsumerService : BackgroundService
     private IConnection? _connection;
     private IChannel? _channel;
     private readonly ConnectionFactory _factory;
+    private readonly TenantDatabaseService _tenantDatabaseService;
 
-    public RabbitMqConsumerService(ILogger<RabbitMqConsumerService> logger)
+    public RabbitMqConsumerService(ILogger<RabbitMqConsumerService> logger, TenantDatabaseService tenantDatabaseService)
     {
         _logger = logger;
 
@@ -19,6 +23,23 @@ public class RabbitMqConsumerService : BackgroundService
         {
             Uri = new Uri("amqp://guest:guest@localhost:5672/")
         };
+        _tenantDatabaseService = tenantDatabaseService;
+    }
+
+    private T AssertEventPayload<T>(RawEvent rawEvent)
+    {
+        var ev = rawEvent.Payload.Deserialize<T>(new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            PropertyNameCaseInsensitive = true
+        });
+
+        if (ev is null)
+        {
+            throw new CannotDeserializeEventPayloadException(message: QueueEventTypeName.EnsureApplicationReady.Value, innerException: null);
+        }
+
+        return ev;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -31,14 +52,58 @@ public class RabbitMqConsumerService : BackgroundService
         var consumer = new AsyncEventingBasicConsumer(_channel);
         consumer.ReceivedAsync += async (model, ea) =>
         {
-            var body = ea.Body.ToArray();
-            var message = Encoding.UTF8.GetString(body);
-            _logger.LogInformation("Received: {Message}", message);
+            RawEvent? rawEvent = null;
+            string? message = null;
 
-            // Process the message
-            await Task.Yield();
+            try
+            {
+                var body = ea.Body.ToArray();
+                message = Encoding.UTF8.GetString(body);
+                rawEvent = JsonSerializer.Deserialize<RawEvent>(message, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+            }
+            catch (Exception ex)
+            {
+                await _channel.BasicAckAsync(ea.DeliveryTag, false);
+                _logger.LogError(ex, "Failed to deserialize message: {Message}", message);
+                return;
+            }
 
-            await _channel.BasicAckAsync(ea.DeliveryTag, false);
+
+            if (rawEvent is null)
+            {
+                await _channel.BasicAckAsync(ea.DeliveryTag, false);
+                return;
+            }
+
+            try
+            {
+                if (rawEvent.Type == QueueEventTypeName.EnsureApplicationReady.Value)
+                {
+                    var ev = AssertEventPayload<EnsureApplicationCreatedEventPayload>(rawEvent);
+                    await _tenantDatabaseService.EnsureDatabaseCreatedAsync(ev.UserId);
+                }
+                else
+                {
+                    throw new Exception($"No handler exists for Event of Type {rawEvent.Type}");
+                }
+            }
+            catch (Exception ex)
+            {
+                if (ex is CannotDeserializeEventPayloadException)
+                {
+                    _logger.LogError(ex, "Failed to deserialize event payload: {Message}", message);
+                    return;
+                }
+
+                _logger.LogError(ex, "Unexpected error occured while processing event: {Message}", ex.Message);
+            }
+            finally
+            {
+                await _channel.BasicAckAsync(ea.DeliveryTag, false);
+            }
         };
 
         await _channel.BasicConsumeAsync(queue: "apiQueue", autoAck: false, consumer: consumer, cancellationToken: stoppingToken);

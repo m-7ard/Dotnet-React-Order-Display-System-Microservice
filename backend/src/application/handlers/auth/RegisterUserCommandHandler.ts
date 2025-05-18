@@ -47,7 +47,6 @@ export default class RegisterUserCommandHandler implements IRequestHandler<Regis
         }
 
         const data: IRegisterUserResponseDTO = await response.json();
-        console.log(data)
         this.queueService.ensureApplicationReady(data.pk.toString());
 
         return ok(undefined);

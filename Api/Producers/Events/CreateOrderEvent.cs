@@ -16,7 +16,7 @@ public class CreateOrderEvent : AbstractEvent<CreateOrderEventPayload>
 {
     public override CreateOrderEventPayload Payload { get; }
 
-    public CreateOrderEvent(CreateOrderEventPayload payload) : base(ProducerEventType.OrderCreated)
+    public CreateOrderEvent(CreateOrderEventPayload payload) : base(ProductEventTypeName.OrderCreated)
     {
         Payload = payload;
     }

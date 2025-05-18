@@ -16,7 +16,7 @@ public class UpdateOrderEvent : AbstractEvent<UpdateOrderEventPayload>
 {
     public override UpdateOrderEventPayload Payload { get; }
 
-    public UpdateOrderEvent(UpdateOrderEventPayload payload) : base(ProducerEventType.OrderUpdated)
+    public UpdateOrderEvent(UpdateOrderEventPayload payload) : base(ProductEventTypeName.OrderUpdated)
     {
         Payload = payload;
     }
