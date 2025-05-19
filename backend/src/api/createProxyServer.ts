@@ -29,6 +29,9 @@ import { Channel, ChannelModel } from "amqplib";
 import QueueService from "infrastructure/services/QueueService";
 import RegisterUserCommandHandler from "application/handlers/auth/RegisterUserCommandHandler";
 import RegisterAction from "./actions/auth/RegisterAction";
+import RawEvent from "./events/RawEvent";
+import EVENT_TYPES from "./events/EVENT_TYPES";
+import AuthenticateUserEvent, { AuthenticateUserPayload } from "./events/websockets/AuthenticateUserEvent";
 
 export type RedisClientConnection = ReturnType<typeof createClient>;
 
@@ -53,9 +56,68 @@ export default function createProxyServer(config: {
         host: websocketServerHost,
     });
 
-    // wss.on("connection", (ws) => {
-    //     // ws.on("close", () => {});
-    // });
+    // User Id Key
+    const socketRegistry = new Map<WebSocket, { timeoutFn: NodeJS.Timeout }>();
+    const userSocketRegistry = new Map<string, Set<WebSocket>>();
+
+    wss.on("connection", (ws) => {
+        ws.on("message", async (rawData) => {
+            const data: object = JSON.parse(rawData.toString());
+            if (!(data.hasOwnProperty("payload") && data.hasOwnProperty("type"))) {
+                console.error("Received event of invalid format: ", data);
+                return;
+            }
+
+            const typedEvent = data as RawEvent;
+            if (typedEvent.type === EVENT_TYPES.AUTHENTICATE_USER) {
+                const ev = new AuthenticateUserEvent(typedEvent.payload as AuthenticateUserPayload);
+                const validation = await tokenValidationService.validateToken(ev.payload.token);
+                if (validation.isErr()) {
+                    return;
+                }
+                
+                // Token & date until expiry
+                const token = validation.value;
+                const timeSpan = token.expiryDate.getSeconds() - new Date().getSeconds();
+                
+                // This socket's data
+                const socketData = socketRegistry.get(ws);
+
+                // All sockets belonging to this authenticated user
+                const nullishUserSockets = userSocketRegistry.get(token.userId);
+                if (nullishUserSockets == null) {
+                    userSocketRegistry.set(token.userId, new Set());
+                }
+                const userSockets = nullishUserSockets!;
+                userSockets.add(ws);
+
+                // Closes websocket, deletes socket from registry, removes socket from user sockets 
+                // and deletes the user entry if there are no more sockets related to user
+                const newTimeoutFn = () => {
+                    ws.close();
+                    socketRegistry.delete(ws);
+                    userSockets.delete(ws);
+                    if (userSockets.size === 0) {
+                        userSocketRegistry.delete(token.userId);
+                    }
+                }
+
+                const fn = setTimeout(newTimeoutFn, timeSpan * 1000);
+                
+                if (socketData == null) {
+                    socketRegistry.set(ws, { timeoutFn: fn });
+                } else {
+                    clearTimeout(socketData.timeoutFn);
+                    socketData.timeoutFn = fn;
+                }
+            } else {
+                console.error("No handler for event of type: ", typedEvent.type);
+            }
+        });
+
+        ws.on("close", () => {
+        });
+    });
 
     function broadcast(message: any) {
         wss.clients.forEach((client) => {
@@ -98,6 +160,8 @@ export default function createProxyServer(config: {
     const draftImageDataAccess = new DraftImageDataAccess(mainAppServerUrl);
     const tokenRepository = new RedisTokenRepository(redis);
     const queueService = new QueueService(channel);
+    const jwtTokenGateway = new JwtTokenGateway(tokenRepository, authDataAccess);
+    const tokenValidationService = new TokenValidationService(jwtTokenGateway);
 
     const authRouter = Router();
 

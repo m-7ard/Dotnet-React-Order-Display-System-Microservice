@@ -20,16 +20,7 @@ export class TokenValidationService {
         private gateway: IJwtTokenGateway
     ) {}
 
-    async validate(authHeader: string | undefined): Promise<TokenValidationResult> {
-        if (authHeader == null) {
-            return err(TokenValidationErrorCode.MISSING_AUTH_HEADER);
-        }
-
-        const [_, token] = authHeader.split(" ");
-        if (token == null) {
-            return err(TokenValidationErrorCode.INVALID_AUTH_HEADER);
-        }
-
+    async validateToken(token: string): Promise<TokenValidationResult> {
         // Find cached token
         const queryResult = await this.gateway.readCached(new ReadCachedTokenQuery({ bearerToken: token }));
         if (queryResult.isErr()) {
@@ -59,5 +50,18 @@ export class TokenValidationService {
         }
 
         return ok(jwtToken);
+    }
+
+    async validateHeader(authHeader: string | undefined): Promise<TokenValidationResult> {
+        if (authHeader == null) {
+            return err(TokenValidationErrorCode.MISSING_AUTH_HEADER);
+        }
+
+        const [_, token] = authHeader.split(" ");
+        if (token == null) {
+            return err(TokenValidationErrorCode.INVALID_AUTH_HEADER);
+        }
+
+       return await this.validateToken(token);
     }
 }

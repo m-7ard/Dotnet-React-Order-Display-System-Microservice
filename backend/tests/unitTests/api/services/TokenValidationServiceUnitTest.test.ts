@@ -37,7 +37,7 @@ describe("TokenValidationService", () => {
         mockGateway.readCached.mockImplementationOnce(async () => ok(MOCK_TOKEN));
 
         // Act
-        const response = await service.validate(VALID_HEADER);
+        const response = await service.validateHeader(VALID_HEADER);
 
         // Assert
         expect(response.isOk() && response.value === MOCK_TOKEN);
@@ -50,7 +50,7 @@ describe("TokenValidationService", () => {
         mockGateway.create.mockImplementationOnce(async () => ok(undefined));
 
         // Act
-        const response = await service.validate(VALID_HEADER);
+        const response = await service.validateHeader(VALID_HEADER);
 
         // Assert
         expect(response.isOk() && response.value === MOCK_TOKEN);
@@ -62,7 +62,7 @@ describe("TokenValidationService", () => {
         // Setup
 
         // Act
-        const response = await service.validate(undefined);
+        const response = await service.validateHeader(undefined);
 
         // Assert
         expect(response.isErr() && response.error === TokenValidationErrorCode.MISSING_AUTH_HEADER);
@@ -72,7 +72,7 @@ describe("TokenValidationService", () => {
         // Setup
 
         // Act
-        const response = await service.validate("invalidHeader");
+        const response = await service.validateHeader("invalidHeader");
 
         // Assert
         expect(response.isErr() && response.error === TokenValidationErrorCode.INVALID_AUTH_HEADER);
@@ -83,7 +83,7 @@ describe("TokenValidationService", () => {
         mockGateway.readCached.mockImplementationOnce(async () => err([]));
 
         // Act
-        const response = await service.validate(VALID_HEADER);
+        const response = await service.validateHeader(VALID_HEADER);
 
         // Assert
         expect(response.isErr() && response.error === TokenValidationErrorCode.TOKEN_LOOKUP_FAILED);
@@ -95,7 +95,7 @@ describe("TokenValidationService", () => {
         mockGateway.readRemote.mockImplementationOnce(async () => err([]));
 
         // Act
-        const response = await service.validate(VALID_HEADER);
+        const response = await service.validateHeader(VALID_HEADER);
 
         // Assert
         expect(response.isErr() && response.error === TokenValidationErrorCode.TOKEN_LOOKUP_FAILED);
@@ -108,7 +108,7 @@ describe("TokenValidationService", () => {
         mockGateway.readRemote.mockImplementationOnce(async () => ok(null));
 
         // Act
-        const response = await service.validate(VALID_HEADER);
+        const response = await service.validateHeader(VALID_HEADER);
 
         // Assert
         expect(response.isErr() && response.error === TokenValidationErrorCode.INVALID_TOKEN);
@@ -121,7 +121,7 @@ describe("TokenValidationService", () => {
         mockGateway.create.mockImplementationOnce(async () => err([]));
 
         // Act
-        const response = await service.validate(VALID_HEADER);
+        const response = await service.validateHeader(VALID_HEADER);
 
         // Assert
         expect(response.isErr() && response.error === TokenValidationErrorCode.TOKEN_CREATION_FAILED);

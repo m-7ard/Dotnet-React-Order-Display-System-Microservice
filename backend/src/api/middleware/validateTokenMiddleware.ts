@@ -5,7 +5,7 @@ export const CLIENT_ID_HEADER_KEY = "X-Client-Id";
 
 export function validateTokenMiddlewareFactory(props: { tokenValidationService: TokenValidationService }) {
     async function validateTokenMiddleware(req: Request, res: Response, next: NextFunction) {
-        const result = await tokenValidationService.validate(req.headers["authorization"]);
+        const result = await tokenValidationService.validateHeader(req.headers["authorization"]);
         if (result.isErr()) {
             if (
                 result.error === TokenValidationErrorCode.MISSING_AUTH_HEADER ||

@@ -1,6 +1,5 @@
 import { Channel } from "amqplib";
-import EnsureApplicationReadyEvent from "infrastructure/events/payloads/EnsureApplicationReady";
-import EnsureApplicationReadyPayload from "infrastructure/events/payloads/EnsureApplicationReady";
+import EnsureApplicationReadyEvent from "infrastructure/events/payloads/EnsureApplicationReadyEvent";
 
 class QueueService {
     constructor(private readonly channel: Channel) {}
