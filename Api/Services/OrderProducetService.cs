@@ -10,14 +10,16 @@ public class OrderProducerService
     private readonly OrderKafkaProducer _producer;
     private readonly ILogger<OrderProducerService> _logger;
     private readonly IOrderRepository _orderRepository;
-    public readonly IApiModelService _apiModelService;
+    private readonly IApiModelService _apiModelService;
+    private readonly TenantUserService _tenantUserService;
 
-    public OrderProducerService(OrderKafkaProducer producer, ILogger<OrderProducerService> logger, IOrderRepository orderRepository, IApiModelService apiModelService)
+    public OrderProducerService(OrderKafkaProducer producer, ILogger<OrderProducerService> logger, IOrderRepository orderRepository, IApiModelService apiModelService, TenantUserService tenantUserService)
     {
         _producer = producer;
         _logger = logger;
         _orderRepository = orderRepository;
         _apiModelService = apiModelService;
+        _tenantUserService = tenantUserService;
     }
 
     public async Task PublishNewlyCreatedOrder(Guid orderId)
@@ -31,7 +33,7 @@ public class OrderProducerService
         else
         {
             var apiModel = await _apiModelService.CreateOrderApiModel(order);
-            await _producer.PublishOrderCreated(apiModel);
+            await _producer.PublishOrderCreated(order: apiModel, userId: _tenantUserService.GetUserId());
         }
     }
 
@@ -46,7 +48,7 @@ public class OrderProducerService
         else
         {
             var apiModel = await _apiModelService.CreateOrderApiModel(order);
-            await _producer.PublishOrderUpdated(apiModel);
+            await _producer.PublishOrderUpdated(order: apiModel, userId: _tenantUserService.GetUserId());
         }
     }
 }

@@ -23,7 +23,7 @@ import fetch from "node-fetch";
 import IApiError from "./errors/IApiError";
 import ApiErrorFactory from "./errors/ApiErrorFactory";
 import API_ERROR_CODES from "./errors/API_ERROR_CODES";
-import { Kafka } from "kafkajs";
+import { Kafka, KafkaMessage } from "kafkajs";
 import { WebSocketServer, WebSocket } from "ws";
 import { Channel, ChannelModel } from "amqplib";
 import QueueService from "infrastructure/services/QueueService";
@@ -32,6 +32,9 @@ import RegisterAction from "./actions/auth/RegisterAction";
 import RawEvent from "./events/RawEvent";
 import EVENT_TYPES from "./events/EVENT_TYPES";
 import AuthenticateUserEvent, { AuthenticateUserPayload } from "./events/websockets/AuthenticateUserEvent";
+import AbstractEvent from "infrastructure/events/AbstractEvent";
+import CreateOrderEventPayload from "./events/orders/CreateOrderEventPayload";
+import OrderEventPayload from "./events/orders/OrderEventPayload";
 
 export type RedisClientConnection = ReturnType<typeof createClient>;
 
@@ -75,23 +78,25 @@ export default function createProxyServer(config: {
                 if (validation.isErr()) {
                     return;
                 }
-                
+
                 // Token & date until expiry
                 const token = validation.value;
-                const timeSpan = token.expiryDate.getSeconds() - new Date().getSeconds();
-                
+                const timeSpan = token.expiryDate.getTime() - new Date().getTime();
+
                 // This socket's data
                 const socketData = socketRegistry.get(ws);
 
                 // All sockets belonging to this authenticated user
-                const nullishUserSockets = userSocketRegistry.get(token.userId);
+                let nullishUserSockets = userSocketRegistry.get(token.userId);
                 if (nullishUserSockets == null) {
-                    userSocketRegistry.set(token.userId, new Set());
+                    const userSockets = new Set<WebSocket>();
+                    userSocketRegistry.set(token.userId, userSockets);
+                    nullishUserSockets = userSockets;
                 }
                 const userSockets = nullishUserSockets!;
                 userSockets.add(ws);
 
-                // Closes websocket, deletes socket from registry, removes socket from user sockets 
+                // Closes websocket, deletes socket from registry, removes socket from user sockets
                 // and deletes the user entry if there are no more sockets related to user
                 const newTimeoutFn = () => {
                     ws.close();
@@ -100,10 +105,10 @@ export default function createProxyServer(config: {
                     if (userSockets.size === 0) {
                         userSocketRegistry.delete(token.userId);
                     }
-                }
+                };
 
-                const fn = setTimeout(newTimeoutFn, timeSpan * 1000);
-                
+                const fn = setTimeout(newTimeoutFn, timeSpan);
+
                 if (socketData == null) {
                     socketRegistry.set(ws, { timeoutFn: fn });
                 } else {
@@ -115,11 +120,18 @@ export default function createProxyServer(config: {
             }
         });
 
-        ws.on("close", () => {
-        });
+        ws.on("close", () => {});
     });
 
-    function broadcast(message: any) {
+    function broadcast(params: { event: AbstractEvent<object>; message: string }) {
+        const { event, message } = params;
+        if (event.type.startsWith("orders")) {
+            const payload = event.payload as OrderEventPayload;
+            const nullishUserSockets = userSocketRegistry.get(payload.userId);
+            nullishUserSockets?.forEach((ws) => ws.send(message));
+            return;
+        }
+
         wss.clients.forEach((client) => {
             if (client.readyState === WebSocket.OPEN) {
                 client.send(message);
@@ -144,7 +156,18 @@ export default function createProxyServer(config: {
 
         await consumer.run({
             eachMessage: async ({ topic, partition, message }) => {
-                broadcast(message.value?.toString());
+                const rawData = message.value?.toString();
+                if (rawData == null) {
+                    return;
+                }
+
+                try {
+                    const event: AbstractEvent<object> = JSON.parse(rawData);
+                    broadcast({ event: event, message: rawData });
+                } catch (e: unknown) {
+                    const timeStamp = `\x1b[33m${new Date().toLocaleTimeString()}\x1b[0m`;
+                    console.error(`[${timeStamp}] Consumer failed to parse message: `, rawData);
+                }
             },
         });
     }

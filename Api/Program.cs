@@ -128,6 +128,8 @@ builder.Services.AddScoped<IProductDomainService, ProductDomainService>();
 
 builder.Services.AddScoped<OrderProducerService>();
 builder.Services.AddSingleton<OrderKafkaProducer>();
+builder.Services.AddScoped<TenantMiddleware>();
+builder.Services.AddScoped<TenantUserService>();
 
 
 ///

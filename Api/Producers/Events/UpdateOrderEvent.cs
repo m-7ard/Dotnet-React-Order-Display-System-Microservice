@@ -5,10 +5,12 @@ namespace Api.Producers.Events;
 public class UpdateOrderEventPayload
 {
     public OrderApiModel Order { get; set; }
+    public string UserId { get; set; }
 
-    public UpdateOrderEventPayload(OrderApiModel order)
+    public UpdateOrderEventPayload(OrderApiModel order, string userId)
     {
         Order = order;
+        UserId = userId;
     }
 }
 

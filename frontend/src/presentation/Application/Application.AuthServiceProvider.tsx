@@ -15,10 +15,11 @@ import IPlainApiError from "../../infrastructure/interfaces/IPlainApiError";
 import IRefreshResponseDTO from "../../infrastructure/contracts/auth/refresh/IRefreshResponseDTO";
 import IUserDataAccess from "../interfaces/dataAccess/IUserDataAccess";
 import { TokenStorage } from "../deps/tokenStorage";
+import WebsocketProducerService from "../../infrastructure/websocket/services/WebsocketProducerService";
 
-export default function AuthServiceProvider(props: React.PropsWithChildren<{ href: string; userDataAccess: IUserDataAccess; tokenStorage: TokenStorage; }>) {
+export default function AuthServiceProvider(props: React.PropsWithChildren<{ href: string; userDataAccess: IUserDataAccess; tokenStorage: TokenStorage; websocketProducerService: WebsocketProducerService }>) {
     // Props
-    const { children, href, userDataAccess, tokenStorage } = props;
+    const { children, href, userDataAccess, tokenStorage, websocketProducerService } = props;
 
     // Deps
     const fluentResponseHandler = useFluentResponseHandler();
@@ -95,6 +96,7 @@ export default function AuthServiceProvider(props: React.PropsWithChildren<{ hre
                     tokenStorage.setAccessToken(data.access);
                     tokenStorage.setRefreshToken(data.refresh);
                     await currentUser({});
+                    websocketProducerService.authenticateUser(tokenStorage.getAccessToken());
                     return ok(true);
                 }
 
@@ -105,7 +107,7 @@ export default function AuthServiceProvider(props: React.PropsWithChildren<{ hre
                 return err({ _: [JSON.stringify(error)] });
             }
         },
-        [dispatchException, userDataAccess, currentUser, tokenStorage],
+        [dispatchException, userDataAccess, currentUser, tokenStorage, websocketProducerService],
     );
 
     const logout = useCallback<IAuthService["logout"]>(async () => {
@@ -146,7 +148,9 @@ export default function AuthServiceProvider(props: React.PropsWithChildren<{ hre
                 setHasInitialised(true);
             });
         currentHref.current = href;
-    }, [currentUser, dispatchException, href, hasInitialised]);
+
+        websocketProducerService.authenticateUser(tokenStorage.getAccessToken());
+    }, [currentUser, dispatchException, href, hasInitialised, websocketProducerService, tokenStorage]);
 
     // Refresh token
     useEffect(() => {
@@ -166,6 +170,7 @@ export default function AuthServiceProvider(props: React.PropsWithChildren<{ hre
                 })
                 .then((body) => {
                     tokenStorage.setAccessToken(body.access);
+                    websocketProducerService.authenticateUser(tokenStorage.getAccessToken());
                 })
                 .catch(() => clearInterval(fn));
         }, 1000 * 60 * 29);
@@ -173,7 +178,7 @@ export default function AuthServiceProvider(props: React.PropsWithChildren<{ hre
         return () => {
             clearInterval(fn);
         };
-    }, [user, tokenStorage, userDataAccess]);
+    }, [user, tokenStorage, userDataAccess, websocketProducerService]);
 
     // Service
     const authService: IAuthService = {

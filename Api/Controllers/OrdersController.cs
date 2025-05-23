@@ -6,7 +6,6 @@ using Api.DTOs.Orders.MarkFinished;
 using Api.DTOs.Orders.Read;
 using Api.Errors;
 using Api.Interfaces;
-using Api.Producers;
 using Api.Services;
 using Application.Errors;
 using Application.Errors.Objects;

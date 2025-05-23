@@ -10,14 +10,14 @@ public class OrderKafkaProducer : AbstractProducer
 
     public OrderKafkaProducer(ILogger<OrderKafkaProducer> logger, IConfiguration configuration) : base("orders", configuration)
     {
-        
+
         _logger = logger;
     }
 
-    public async Task PublishOrderCreated(OrderApiModel order)
+    public async Task PublishOrderCreated(OrderApiModel order, string userId)
     {
         try {
-            var producerEvent = new CreateOrderEvent(payload: new CreateOrderEventPayload(order: order));
+            var producerEvent = new CreateOrderEvent(payload: new CreateOrderEventPayload(order: order, userId: userId));
             await PublishEvent(producerEvent);
         } 
         catch (ProduceException<Null, string> ex)
@@ -26,10 +26,10 @@ public class OrderKafkaProducer : AbstractProducer
         }
     }
 
-    public async Task PublishOrderUpdated(OrderApiModel order)
+    public async Task PublishOrderUpdated(OrderApiModel order, string userId)
     {
         try {
-            var producerEvent = new UpdateOrderEvent(payload: new UpdateOrderEventPayload(order: order));
+            var producerEvent = new UpdateOrderEvent(payload: new UpdateOrderEventPayload(order: order, userId: userId));
             await PublishEvent(producerEvent);
         } 
         catch (ProduceException<Null, string> ex)

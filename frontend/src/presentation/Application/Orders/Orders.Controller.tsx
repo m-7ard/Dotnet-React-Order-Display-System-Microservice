@@ -16,13 +16,13 @@ export default function OrdersController() {
     }, [orders]);
 
     useEffect(() => {
-        const createdListener = orderEventService.registerCreateOrder((order) => {
+        const createdIdentifier = orderEventService.registerCreateOrder((order) => {
             if (storedOrderIds.current.has(order.id)) return;
             setStoredOrders((prev) => [order, ...prev]);
             storedOrderIds.current.add(order.id);
         });
 
-        const updatedListener = orderEventService.registerUpdateOrder((order) => {
+        const updatedIdentifier = orderEventService.registerUpdateOrder((order) => {
             if (!storedOrderIds.current.has(order.id)) return;
             setStoredOrders((prev) => {
                 const newValue = [...prev];
@@ -33,8 +33,8 @@ export default function OrdersController() {
         });
 
         return () => {
-            orderEventService.removeListener(createdListener);
-            orderEventService.removeListener(updatedListener);
+            orderEventService.removeListener(createdIdentifier);
+            orderEventService.removeListener(updatedIdentifier);
         };
     }, [orderEventService]);
 
