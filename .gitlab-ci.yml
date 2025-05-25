@@ -17,9 +17,10 @@ deploy:
 
         if [ ! -d .git ]; then
           echo 'Cloning repository...';
-          git clone https://gitlab.com/m-7ard/Dotnet-React-Order-Display-System-Microservice.git .;
+          git clone https://${DEPLOY_TOKEN_USERNAME}:${DEPLOY_TOKEN_PASSWORD}@gitlab.com/m-7ard/Dotnet-React-Order-Display-System-Microservice.git .;
         else
           echo 'Repository exists, pulling latest changes...';
+          git remote set-url origin https://${DEPLOY_TOKEN_USERNAME}:${DEPLOY_TOKEN_PASSWORD}@gitlab.com/m-7ard/Dotnet-React-Order-Display-System-Microservice.git;
           git reset --hard;
           git pull origin master;
         fi;
