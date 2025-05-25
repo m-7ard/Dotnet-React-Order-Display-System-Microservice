@@ -6,11 +6,6 @@
 }
 
 :80 {
-	# log {
-	# 	output stdout
-	# 	format json
-	# }
-
     handle /upload {
         reverse_proxy proxy:3100
     }
