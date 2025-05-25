@@ -35,6 +35,7 @@ deploy:
         echo "VITE_AUTH_URL=http://${HETZNER_IPV4}:80/api/auth" >> frontend/.env.production;
         echo "VITE_LOGOUT_URL=http://${HETZNER_IPV4}:80/api/auth/logout" >> frontend/.env.production;
         echo "VITE_WEBSOCKET_URL=ws://${HETZNER_IPV4}:8080" >> frontend/.env.production;
+        echo "VITE_REGISTER_URL=http://${HETZNER_IPV4}:80/api/auth/register" >> frontend/.env.production;
 
         echo "CADDY_PORT_80=${HETZNER_IPV4}" > .env;
         echo "CADDY_PORT_443=${HETZNER_IPV4}" >> .env;
