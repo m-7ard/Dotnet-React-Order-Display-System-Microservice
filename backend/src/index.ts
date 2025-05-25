@@ -44,6 +44,10 @@ async function main() {
     const kafkaAddressValidator = union([literal("localhost:29092"), literal("kafka:29092")]);
     assert(kafkaAddress, kafkaAddressValidator);
 
+    const rabbitAddress = process.env.RABBIT_ADDRESS;
+    const rabbitAddressValidator = union([literal("localhost:5672"), literal("rabbitmq:5672")]);
+    assert(rabbitAddress, rabbitAddressValidator);
+
     const diContainer = new ProductionDIContainer();
     const kafka = new Kafka({
         clientId: "my-producer",
@@ -54,7 +58,7 @@ async function main() {
     await redis.connect();
     await redis.flushDb();
 
-    const rabbit = await amqp.connect('amqp://guest:guest@localhost:5672/');
+    const rabbit = await amqp.connect(`amqp://guest:guest@${rabbitAddress}/`);
     const channel = await rabbit.createChannel();
     await channel.assertQueue("apiQueue", { durable: true });
     

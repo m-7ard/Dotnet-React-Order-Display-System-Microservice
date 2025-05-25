@@ -28,6 +28,11 @@
         reverse_proxy proxy:3100
     }
 
+    handle /api/auth/register {
+        rewrite * /register
+        reverse_proxy proxy:3100
+    }
+
     handle_path /api/auth/* {
         reverse_proxy auth:8000
     }

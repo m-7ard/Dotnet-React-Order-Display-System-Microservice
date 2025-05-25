@@ -15,13 +15,19 @@ public class RabbitMqConsumerService : BackgroundService
     private readonly ConnectionFactory _factory;
     private readonly TenantDatabaseService _tenantDatabaseService;
 
-    public RabbitMqConsumerService(ILogger<RabbitMqConsumerService> logger, TenantDatabaseService tenantDatabaseService)
+    public RabbitMqConsumerService(ILogger<RabbitMqConsumerService> logger, TenantDatabaseService tenantDatabaseService, IConfiguration configuration)
     {
         _logger = logger;
 
+        var rabbitMqUri = configuration["RabbitMQ:Uri"];
+        if (string.IsNullOrWhiteSpace(rabbitMqUri))
+        {
+            throw new InvalidOperationException("RabbitMQ URI not configured.");
+        }
+        
         _factory = new ConnectionFactory
         {
-            Uri = new Uri("amqp://guest:guest@localhost:5672/")
+            Uri = new Uri(rabbitMqUri)
         };
         _tenantDatabaseService = tenantDatabaseService;
     }

@@ -23,9 +23,9 @@ import fetch from "node-fetch";
 import IApiError from "./errors/IApiError";
 import ApiErrorFactory from "./errors/ApiErrorFactory";
 import API_ERROR_CODES from "./errors/API_ERROR_CODES";
-import { Kafka, KafkaMessage } from "kafkajs";
+import { Kafka } from "kafkajs";
 import { WebSocketServer, WebSocket } from "ws";
-import { Channel, ChannelModel } from "amqplib";
+import { Channel } from "amqplib";
 import QueueService from "infrastructure/services/QueueService";
 import RegisterUserCommandHandler from "application/handlers/auth/RegisterUserCommandHandler";
 import RegisterAction from "./actions/auth/RegisterAction";
@@ -33,7 +33,6 @@ import RawEvent from "./events/RawEvent";
 import EVENT_TYPES from "./events/EVENT_TYPES";
 import AuthenticateUserEvent, { AuthenticateUserPayload } from "./events/websockets/AuthenticateUserEvent";
 import AbstractEvent from "infrastructure/events/AbstractEvent";
-import CreateOrderEventPayload from "./events/orders/CreateOrderEventPayload";
 import OrderEventPayload from "./events/orders/OrderEventPayload";
 
 export type RedisClientConnection = ReturnType<typeof createClient>;
@@ -59,7 +58,7 @@ export default function createProxyServer(config: {
         host: websocketServerHost,
     });
 
-    // User Id Key
+    // userSocketRegistry's key is a user id
     const socketRegistry = new Map<WebSocket, { timeoutFn: NodeJS.Timeout }>();
     const userSocketRegistry = new Map<string, Set<WebSocket>>();
 
@@ -179,6 +178,7 @@ export default function createProxyServer(config: {
         app.use(middleware);
     });
 
+    // dEPENDENCIES
     const authDataAccess = new AuthDataAccess(authServerUrl);
     const draftImageDataAccess = new DraftImageDataAccess(mainAppServerUrl);
     const tokenRepository = new RedisTokenRepository(redis);
@@ -188,6 +188,7 @@ export default function createProxyServer(config: {
 
     const authRouter = Router();
 
+    // Auth - Logout User
     registerAction({
         router: authRouter,
         initialiseAction: () => {
@@ -199,6 +200,7 @@ export default function createProxyServer(config: {
         guards: [express.json({ limit: "1mb" })],
     });
 
+    // Auth - Register User
     registerAction({
         router: authRouter,
         initialiseAction: () => {
@@ -210,8 +212,11 @@ export default function createProxyServer(config: {
         guards: [express.json({ limit: "1mb" })],
     });
 
+    // Hook up the Auth router
     app.use(authRouter);
 
+    // Authentication Middleware
+    // All endpoints below will require authentication
     app.use((req: Request, res: Response, next: NextFunction) => {
         const gateway = new JwtTokenGateway(tokenRepository, authDataAccess);
         const tokenService = new TokenValidationService(gateway);
