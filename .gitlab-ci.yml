@@ -17,9 +17,10 @@ deploy:
 
         if [ ! -d .git ]; then
           echo 'Cloning repository...';
-          git clone https://gitlab.com/m-7ard/Dotnet-React-Order-Display-System-Microservice.git .;
+          git clone https://${DEPLOY_TOKEN_USERNAME}:${DEPLOY_TOKEN_PASSWORD}@gitlab.com/m-7ard/Dotnet-React-Order-Display-System-Microservice.git .;
         else
           echo 'Repository exists, pulling latest changes...';
+          git remote set-url origin https://${DEPLOY_TOKEN_USERNAME}:${DEPLOY_TOKEN_PASSWORD}@gitlab.com/m-7ard/Dotnet-React-Order-Display-System-Microservice.git;
           git reset --hard;
           git pull origin master;
         fi;
@@ -35,6 +36,7 @@ deploy:
         echo "VITE_AUTH_URL=http://${HETZNER_IPV4}:80/api/auth" >> frontend/.env.production;
         echo "VITE_LOGOUT_URL=http://${HETZNER_IPV4}:80/api/auth/logout" >> frontend/.env.production;
         echo "VITE_WEBSOCKET_URL=ws://${HETZNER_IPV4}:8080" >> frontend/.env.production;
+        echo "VITE_REGISTER_URL=http://${HETZNER_IPV4}:80/api/auth/register" >> frontend/.env.production;
 
         echo "CADDY_PORT_80=${HETZNER_IPV4}" > .env;
         echo "CADDY_PORT_443=${HETZNER_IPV4}" >> .env;

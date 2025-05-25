@@ -57,6 +57,22 @@ services:
             timeout: 5s
             retries: 10
 
+    rabbitmq:
+      image: rabbitmq:3-management
+      ports:
+        - "5672:5672" 
+        - "15672:15672" 
+      environment:
+        RABBITMQ_DEFAULT_USER: guest
+        RABBITMQ_DEFAULT_PASS: guest
+      networks:
+          - app-net
+      healthcheck:
+          test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+          interval: 10s
+          timeout: 5s
+          retries: 10
+
     caddy:
         image: caddy:2.6-alpine
         container_name: caddy
@@ -109,6 +125,8 @@ services:
                 condition: service_started
             kafka:
                 condition: service_healthy
+            rabbitmq:
+                condition: service_healthy
         environment:
             REDIS_URL: redis://redis:6379
         image: order-platform-microservice/proxy:latest
@@ -131,7 +149,9 @@ services:
             - SqlServer_Database=Server=sqlserver;Database=SPOSM_client_{clientId};User Id=sa;Password=Your_password123;TrustServerCertificate=True;
         depends_on:
             kafka:
-                condition: service_healthy
+              condition: service_healthy
+            rabbitmq:
+              condition: service_healthy
         networks:
             - app-net
         image: order-platform-microservice/main-api:latest

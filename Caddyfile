@@ -6,11 +6,6 @@
 }
 
 :80 {
-	# log {
-	# 	output stdout
-	# 	format json
-	# }
-
     handle /upload {
         reverse_proxy proxy:3100
     }
@@ -25,6 +20,11 @@
 
     handle /api/auth/logout {
         rewrite * /logout
+        reverse_proxy proxy:3100
+    }
+
+    handle /api/auth/register {
+        rewrite * /register
         reverse_proxy proxy:3100
     }
 

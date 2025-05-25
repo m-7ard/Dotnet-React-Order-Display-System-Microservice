@@ -9,6 +9,7 @@ import ProductDataAccessBridgeProvider from "../components/DataAccess/ProductDat
 import { orderDataAccess, productDataAccess, userDataAccess } from "../deps/dataAccess";
 import OrderDataAccessBridgeProvider from "../components/DataAccess/OrderDataAccessBridge/OrderDataAccessBridgeProvider";
 import tokenStorage from "../deps/tokenStorage";
+import { websocketProducerService } from "../deps/eventServices";
 
 export default function ApplicationProvider({ children }: PropsWithChildren) {
     const location = useLocation();
@@ -18,7 +19,7 @@ export default function ApplicationProvider({ children }: PropsWithChildren) {
             <DataAccessProvider>
                 <ProductDataAccessBridgeProvider productDataAcess={productDataAccess}>
                     <OrderDataAccessBridgeProvider orderDataAccess={orderDataAccess}>
-                        <AuthServiceProvider href={location.href} userDataAccess={userDataAccess} tokenStorage={tokenStorage}>
+                        <AuthServiceProvider href={location.href} userDataAccess={userDataAccess} tokenStorage={tokenStorage} websocketProducerService={websocketProducerService}>
                             <EventServiceProvider>
                                 <GlobalDialogManager href={location.href}>{children}</GlobalDialogManager>
                             </EventServiceProvider>

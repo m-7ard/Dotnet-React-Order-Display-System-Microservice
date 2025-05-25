@@ -1,24 +1,29 @@
+using Api.Producers.Services;
 using Api.Services;
 using Infrastructure.Interfaces;
 
 namespace Api.Middleware;
 
-public class TenantMiddleware
+public class TenantMiddleware : IMiddleware
 {
-    private readonly RequestDelegate _next;
     private readonly IDatabaseProviderSingleton _databaseProvider;
+    private readonly TenantUserService _tenantUserService;
+    private readonly TenantDatabaseService _dbService;
+    private readonly ILogger<TenantMiddleware> _logger;
 
-    public TenantMiddleware(RequestDelegate next, IDatabaseProviderSingleton databaseProvider)
+    public TenantMiddleware(IDatabaseProviderSingleton databaseProvider, TenantUserService tenantUserService, TenantDatabaseService dbService, ILogger<TenantMiddleware> logger)
     {
-        _next = next;
         _databaseProvider = databaseProvider;
+        _tenantUserService = tenantUserService;
+        _dbService = dbService;
+        _logger = logger;
     }
 
-    public async Task InvokeAsync(HttpContext context, TenantDatabaseService dbService, ILogger<TenantMiddleware> logger)
+    public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
         if (_databaseProvider.IsTesting)
         {
-            await _next(context);
+            await next(context);
             return;
         }
 
@@ -42,15 +47,16 @@ public class TenantMiddleware
         try
         {
             // Ensure database exists for this tenant
-            await dbService.EnsureDatabaseCreatedAsync(clientId);
-            
+            await _dbService.EnsureDatabaseCreatedAsync(clientId);
+            _tenantUserService.UserId = clientId;
+
             // Continue processing the request
-            await _next(context);
+            await next(context);
 
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error processing request for client {ClientId}", clientId);
+            _logger.LogError(ex, "Error processing request for client {ClientId}", clientId);
             throw;
         }
     }

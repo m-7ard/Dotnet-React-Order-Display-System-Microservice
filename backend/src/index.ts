@@ -4,6 +4,7 @@ import { ProductionDIContainer } from "api/services/DIContainer";
 import { Kafka } from "kafkajs";
 import { createClient } from "redis";
 import { assert, literal, union } from "superstruct";
+import amqp from "amqplib";
 
 if (global.crypto == null) {
     global.crypto = require("crypto");
@@ -43,6 +44,10 @@ async function main() {
     const kafkaAddressValidator = union([literal("localhost:29092"), literal("kafka:29092")]);
     assert(kafkaAddress, kafkaAddressValidator);
 
+    const rabbitAddress = process.env.RABBIT_ADDRESS;
+    const rabbitAddressValidator = union([literal("localhost:5672"), literal("rabbitmq:5672")]);
+    assert(rabbitAddress, rabbitAddressValidator);
+
     const diContainer = new ProductionDIContainer();
     const kafka = new Kafka({
         clientId: "my-producer",
@@ -53,6 +58,10 @@ async function main() {
     await redis.connect();
     await redis.flushDb();
 
+    const rabbit = await amqp.connect(`amqp://guest:guest@${rabbitAddress}/`);
+    const channel = await rabbit.createChannel();
+    await channel.assertQueue("apiQueue", { durable: true });
+    
     const app = createProxyServer({
         middleware: [responseLogger],
         diContainer: diContainer,
@@ -61,7 +70,8 @@ async function main() {
         authServerUrl: authServerUrl,
         mainAppServerUrl: mainApiServerUrl,
         kafka: kafka,
-        websocketServerHost: host
+        websocketServerHost: host,
+        channel: channel
     });
 
     const server = app.listen(port, host, () => {

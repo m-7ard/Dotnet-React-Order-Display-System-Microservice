@@ -23,12 +23,12 @@ export default function ManageOrderController() {
 
     // effect
     useEffect(() => {
-        const fn = orderEventService.registerUpdateOrder((order) => {
+        const identifier = orderEventService.registerUpdateOrder((order) => {
             setStoredOrder(order);
         });
 
         return () => {
-            orderEventService.removeListener(fn);
+            orderEventService.removeListener(identifier);
         };
     }, [orderEventService]);
 

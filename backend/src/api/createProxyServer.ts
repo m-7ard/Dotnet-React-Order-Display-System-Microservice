@@ -25,6 +25,15 @@ import ApiErrorFactory from "./errors/ApiErrorFactory";
 import API_ERROR_CODES from "./errors/API_ERROR_CODES";
 import { Kafka } from "kafkajs";
 import { WebSocketServer, WebSocket } from "ws";
+import { Channel } from "amqplib";
+import QueueService from "infrastructure/services/QueueService";
+import RegisterUserCommandHandler from "application/handlers/auth/RegisterUserCommandHandler";
+import RegisterAction from "./actions/auth/RegisterAction";
+import RawEvent from "./events/RawEvent";
+import EVENT_TYPES from "./events/EVENT_TYPES";
+import AuthenticateUserEvent, { AuthenticateUserPayload } from "./events/websockets/AuthenticateUserEvent";
+import AbstractEvent from "infrastructure/events/AbstractEvent";
+import OrderEventPayload from "./events/orders/OrderEventPayload";
 
 export type RedisClientConnection = ReturnType<typeof createClient>;
 
@@ -37,8 +46,9 @@ export default function createProxyServer(config: {
     mainAppServerUrl: "http://localhost:5102" | "http://web:5000";
     websocketServerHost: "0.0.0.0" | "127.0.0.1";
     kafka: Kafka;
+    channel: Channel;
 }) {
-    const { redis, authServerUrl, fileServerUrl, mainAppServerUrl, kafka, websocketServerHost } = config;
+    const { redis, authServerUrl, fileServerUrl, mainAppServerUrl, kafka, websocketServerHost, channel } = config;
     const app = express();
     app.options("*", cors());
     app.use(cors());
@@ -48,11 +58,79 @@ export default function createProxyServer(config: {
         host: websocketServerHost,
     });
 
-    // wss.on("connection", (ws) => {
-    //     // ws.on("close", () => {});
-    // });
+    // userSocketRegistry's key is a user id
+    const socketRegistry = new Map<WebSocket, { timeoutFn: NodeJS.Timeout }>();
+    const userSocketRegistry = new Map<string, Set<WebSocket>>();
 
-    function broadcast(message: any) {
+    wss.on("connection", (ws) => {
+        ws.on("message", async (rawData) => {
+            const data: object = JSON.parse(rawData.toString());
+            if (!(data.hasOwnProperty("payload") && data.hasOwnProperty("type"))) {
+                console.error("Received event of invalid format: ", data);
+                return;
+            }
+
+            const typedEvent = data as RawEvent;
+            if (typedEvent.type === EVENT_TYPES.AUTHENTICATE_USER) {
+                const ev = new AuthenticateUserEvent(typedEvent.payload as AuthenticateUserPayload);
+                const validation = await tokenValidationService.validateToken(ev.payload.token);
+                if (validation.isErr()) {
+                    return;
+                }
+
+                // Token & date until expiry
+                const token = validation.value;
+                const timeSpan = token.expiryDate.getTime() - new Date().getTime();
+
+                // This socket's data
+                const socketData = socketRegistry.get(ws);
+
+                // All sockets belonging to this authenticated user
+                let nullishUserSockets = userSocketRegistry.get(token.userId);
+                if (nullishUserSockets == null) {
+                    const userSockets = new Set<WebSocket>();
+                    userSocketRegistry.set(token.userId, userSockets);
+                    nullishUserSockets = userSockets;
+                }
+                const userSockets = nullishUserSockets!;
+                userSockets.add(ws);
+
+                // Closes websocket, deletes socket from registry, removes socket from user sockets
+                // and deletes the user entry if there are no more sockets related to user
+                const newTimeoutFn = () => {
+                    ws.close();
+                    socketRegistry.delete(ws);
+                    userSockets.delete(ws);
+                    if (userSockets.size === 0) {
+                        userSocketRegistry.delete(token.userId);
+                    }
+                };
+
+                const fn = setTimeout(newTimeoutFn, timeSpan);
+
+                if (socketData == null) {
+                    socketRegistry.set(ws, { timeoutFn: fn });
+                } else {
+                    clearTimeout(socketData.timeoutFn);
+                    socketData.timeoutFn = fn;
+                }
+            } else {
+                console.error("No handler for event of type: ", typedEvent.type);
+            }
+        });
+
+        ws.on("close", () => {});
+    });
+
+    function broadcast(params: { event: AbstractEvent<object>; message: string }) {
+        const { event, message } = params;
+        if (event.type.startsWith("orders")) {
+            const payload = event.payload as OrderEventPayload;
+            const nullishUserSockets = userSocketRegistry.get(payload.userId);
+            nullishUserSockets?.forEach((ws) => ws.send(message));
+            return;
+        }
+
         wss.clients.forEach((client) => {
             if (client.readyState === WebSocket.OPEN) {
                 client.send(message);
@@ -77,7 +155,18 @@ export default function createProxyServer(config: {
 
         await consumer.run({
             eachMessage: async ({ topic, partition, message }) => {
-                broadcast(message.value?.toString());
+                const rawData = message.value?.toString();
+                if (rawData == null) {
+                    return;
+                }
+
+                try {
+                    const event: AbstractEvent<object> = JSON.parse(rawData);
+                    broadcast({ event: event, message: rawData });
+                } catch (e: unknown) {
+                    const timeStamp = `\x1b[33m${new Date().toLocaleTimeString()}\x1b[0m`;
+                    console.error(`[${timeStamp}] Consumer failed to parse message: `, rawData);
+                }
             },
         });
     }
@@ -89,12 +178,17 @@ export default function createProxyServer(config: {
         app.use(middleware);
     });
 
+    // dEPENDENCIES
     const authDataAccess = new AuthDataAccess(authServerUrl);
     const draftImageDataAccess = new DraftImageDataAccess(mainAppServerUrl);
     const tokenRepository = new RedisTokenRepository(redis);
+    const queueService = new QueueService(channel);
+    const jwtTokenGateway = new JwtTokenGateway(tokenRepository, authDataAccess);
+    const tokenValidationService = new TokenValidationService(jwtTokenGateway);
 
     const authRouter = Router();
 
+    // Auth - Logout User
     registerAction({
         router: authRouter,
         initialiseAction: () => {
@@ -106,8 +200,23 @@ export default function createProxyServer(config: {
         guards: [express.json({ limit: "1mb" })],
     });
 
+    // Auth - Register User
+    registerAction({
+        router: authRouter,
+        initialiseAction: () => {
+            const registerUserCommandHandler = new RegisterUserCommandHandler(authDataAccess, queueService);
+            return new RegisterAction(registerUserCommandHandler);
+        },
+        method: "POST",
+        path: "/register",
+        guards: [express.json({ limit: "1mb" })],
+    });
+
+    // Hook up the Auth router
     app.use(authRouter);
 
+    // Authentication Middleware
+    // All endpoints below will require authentication
     app.use((req: Request, res: Response, next: NextFunction) => {
         const gateway = new JwtTokenGateway(tokenRepository, authDataAccess);
         const tokenService = new TokenValidationService(gateway);
@@ -197,7 +306,7 @@ export default function createProxyServer(config: {
             changeOrigin: true,
             timeout: 10000,
             proxyTimeout: 10000,
-            xfwd: true, // IMPORTANT: sets X-Forwarded-For, X-Forwarded-Proto, Host, etc.
+            xfwd: true,
             preserveHeaderKeyCase: true,
         }),
     );

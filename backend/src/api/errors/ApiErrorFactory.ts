@@ -22,6 +22,7 @@ class ApiErrorFactory {
             };
         });
 
+        console.log(mappedErrors)
         return mappedErrors;
     }
 

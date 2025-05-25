@@ -1,15 +1,10 @@
 import Order from "../../../domain/models/Order";
-import IEventServiceListenerFn from "../../websocket/IEventServiceListenerFn";
-
-export enum OrderEventServiceEventTypes {
-    CREATED = "orders/create",
-    UPDATED = "orders/update",
-}
+import TEventServiceListenerIdentifier from "../../websocket/TEventServiceListenerIdentifier";
 
 interface IOrderEventService {
-    registerCreateOrder<T extends (order: Order) => void>(fn: T): IEventServiceListenerFn;
-    registerUpdateOrder<T extends (order: Order) => void>(fn: T): IEventServiceListenerFn;
-    removeListener(fn: IEventServiceListenerFn): void;
+    registerCreateOrder<T extends (order: Order) => void>(fn: T): TEventServiceListenerIdentifier;
+    registerUpdateOrder<T extends (order: Order) => void>(fn: T): TEventServiceListenerIdentifier;
+    removeListener(fn: TEventServiceListenerIdentifier): void;
 }
 
 export default IOrderEventService;

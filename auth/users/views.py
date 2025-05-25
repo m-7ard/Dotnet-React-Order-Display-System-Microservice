@@ -60,7 +60,8 @@ class ValidateTokenView(APIView):
         if not authorization_header:
             return Response({ "non_field_errors": ["Authorization Header is required."] }, status=status.HTTP_400_BAD_REQUEST)
 
-        token = authorization_header.split('Bearer ')[1]
+        parts = authorization_header.split('Bearer ')
+        token = parts[1] if len(parts) > 1 else None
 
         if not token:
             return Response({ "non_field_errors": ["Token is required."] }, status=status.HTTP_400_BAD_REQUEST)
