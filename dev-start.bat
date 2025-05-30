@@ -12,5 +12,8 @@ start cmd /k "cd /d auth && env\scripts\activate && python manage.py migrate && 
 echo Starting Node Proxy Server
 start cmd /k "cd /d backend && npm run dev"
 
+echo Starting Node Proxy Server
+start cmd /k "cd /d secrets && npm run dev"
+
 echo Starting Node File Server
 start cmd /k "cd /d fileServer && npm run dev"

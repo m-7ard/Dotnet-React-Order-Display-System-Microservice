@@ -102,6 +102,19 @@ services:
             - NODE_ENV=production
         image: order-platform-microservice/frontend:latest
 
+    secrets:
+        build:
+            context: ./secrets
+            dockerfile: Dockerfile
+        networks:
+            - app-net
+        image: order-platform-microservice/secrets:latest
+        healthcheck:
+          test: ["CMD", "curl", "-kfsS", "https://0.0.0.0:3443/health"]
+          interval: 10s
+          timeout: 5s
+          retries: 1
+
     file:
         build:
             context: ./fileServer
@@ -151,6 +164,8 @@ services:
             kafka:
               condition: service_healthy
             rabbitmq:
+              condition: service_healthy
+            secrets:
               condition: service_healthy
         networks:
             - app-net

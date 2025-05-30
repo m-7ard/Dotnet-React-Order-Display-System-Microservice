@@ -2,6 +2,7 @@ using System.Text;
 using System.Text.Json;
 using Api.Producers;
 using Api.Producers.Events;
+using Infrastructure.Values;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
@@ -14,22 +15,16 @@ public class RabbitMqConsumerService : BackgroundService
     private IChannel? _channel;
     private readonly ConnectionFactory _factory;
     private readonly TenantDatabaseService _tenantDatabaseService;
+    private readonly InitializationCoordinator _coordinator;
+    private readonly SecretsStore _secretsStore;
 
-    public RabbitMqConsumerService(ILogger<RabbitMqConsumerService> logger, TenantDatabaseService tenantDatabaseService, IConfiguration configuration)
+    public RabbitMqConsumerService(ILogger<RabbitMqConsumerService> logger, TenantDatabaseService tenantDatabaseService, InitializationCoordinator coordinator, SecretsStore secretsStore)
     {
         _logger = logger;
-
-        var rabbitMqUri = configuration["RabbitMQ:Uri"];
-        if (string.IsNullOrWhiteSpace(rabbitMqUri))
-        {
-            throw new InvalidOperationException("RabbitMQ URI not configured.");
-        }
-        
-        _factory = new ConnectionFactory
-        {
-            Uri = new Uri(rabbitMqUri)
-        };
+        _factory = new ConnectionFactory();
         _tenantDatabaseService = tenantDatabaseService;
+        _coordinator = coordinator;
+        _secretsStore = secretsStore;
     }
 
     private T AssertEventPayload<T>(RawEvent rawEvent)
@@ -50,6 +45,12 @@ public class RabbitMqConsumerService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        await _coordinator.WaitFor("SECRET_INIT");
+        var rabbitMqUri = _secretsStore.GetSecret(SecretKey.RABBIT_ADDRESS);
+        _factory.Uri = new Uri(rabbitMqUri);
+
+        // https://claude.ai/chat/b6657dbd-8e5d-413d-906b-d9359b5f4bb8
+        // implemenet the thing where we make a service to see if secrets has loaded
         _connection = await _factory.CreateConnectionAsync(stoppingToken);
         _channel = await _connection.CreateChannelAsync(cancellationToken: stoppingToken);
 

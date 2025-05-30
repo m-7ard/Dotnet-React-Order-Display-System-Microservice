@@ -5,14 +5,17 @@ import selfsigned from "selfsigned";
 
 function generateCert(params: {
     nodeEnv: "DOCKER" | "DEVELOPMENT" | "PRODUCTION",
-    host: "127.0.0.1" | "secrets-api"
+    host: "127.0.0.1" | "secrets"
 }) {
     if (!fs.existsSync(CERT_DIR)) {
         fs.mkdirSync(CERT_DIR, { recursive: true });
     }
 
     try {
-        const attrs = [{ name: "organizationName", value: params.nodeEnv }];
+        const attrs: Array<{
+            name: string;
+            value: string;
+        }> = [{ name: "organizationName", value: params.nodeEnv }];
 
         // Environment-specific configuration
         let commonName, altNames;
@@ -26,10 +29,10 @@ function generateCert(params: {
                 { type: 7, ip: "::1" },
             ];
         } else {
-            commonName = "secrets-api";
+            commonName = "secrets";
             altNames = [
-                { type: 2, value: "secrets-api" },
-                { type: 2, value: "secrets-api.internal" },
+                { type: 2, value: "secrets" },
+                { type: 2, value: "secrets.internal" },
                 { type: 2, value: "localhost" },
                 { type: 7, ip: "127.0.0.1" },
             ];

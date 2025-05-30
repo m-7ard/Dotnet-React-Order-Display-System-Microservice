@@ -1,5 +1,6 @@
 using Api.ApiModels;
 using Api.Producers.Events;
+using Api.Services;
 using Confluent.Kafka;
 
 namespace Api.Producers.Services;
@@ -8,7 +9,7 @@ public class OrderKafkaProducer : AbstractProducer
 {
     private readonly ILogger<OrderKafkaProducer> _logger;
 
-    public OrderKafkaProducer(ILogger<OrderKafkaProducer> logger, IConfiguration configuration) : base("orders", configuration)
+    public OrderKafkaProducer(ILogger<OrderKafkaProducer> logger, SecretsStore secretsStore) : base("orders", secretsStore)
     {
 
         _logger = logger;

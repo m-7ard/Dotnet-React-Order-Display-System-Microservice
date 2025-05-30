@@ -9,6 +9,7 @@ using Application.Handlers.Products.Create;
 using Application.Interfaces.Persistence;
 using Application.Interfaces.Services;
 using FluentValidation;
+using Infrastructure.DataAccess;
 using Infrastructure.Files;
 using Infrastructure.Interfaces;
 using Infrastructure.Persistence;
@@ -24,6 +25,24 @@ var databaseProviderSingleton = new DatabaseProviderSingleton(value: appSettings
 
 // HttpContextAccessor
 builder.Services.AddHttpContextAccessor();
+
+// Http client for data access services
+// -- This is only necessary for the self signed-cert and nothing else
+// -- Make sure to remove it when using a CA cert
+// -- Replace LocalSecretDataAccess' IHttpClientFactory with a regular HttpClient
+var handler = new HttpClientHandler
+{
+    ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+};
+builder.Services.AddHttpClient("InsecureClient")
+    .ConfigurePrimaryHttpMessageHandler(() =>
+    {
+        return new HttpClientHandler
+        {
+            // Disables SSL certificate validation completely
+            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+        };
+    });
 
 ///
 ///
@@ -96,11 +115,21 @@ services.AddCors(options =>
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateProductHandler).Assembly));
 
+
 ///
 ///
 /// Dependency Injection / DI / Services
 /// 
 
+// *Hosted service coordinator*
+builder.Services.AddSingleton<InitializationCoordinator>();
+
+// *Secrets*
+builder.Services.AddSingleton<SecretsStore>();
+builder.Services.AddSingleton<ISecretsDataAccess, LocalSecretDataAccess>();
+builder.Services.AddHostedService<SecretsInitializer>();
+
+// *Regular dependencies*
 builder.Services.AddSingleton<IDatabaseProviderSingleton>(databaseProviderSingleton);
 builder.Services.AddScoped<ISequenceService, SequenceService>();
 
@@ -129,7 +158,6 @@ builder.Services.AddScoped<OrderProducerService>();
 builder.Services.AddSingleton<OrderKafkaProducer>();
 builder.Services.AddScoped<TenantMiddleware>();
 builder.Services.AddScoped<TenantUserService>();
-
 
 ///
 ///

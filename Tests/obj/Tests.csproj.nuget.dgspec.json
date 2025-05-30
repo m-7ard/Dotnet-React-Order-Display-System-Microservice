@@ -324,6 +324,10 @@
             "Microsoft.EntityFrameworkCore.Relational": {
               "target": "Package",
               "version": "[8.0.8, )"
+            },
+            "Microsoft.Extensions.Http": {
+              "target": "Package",
+              "version": "[9.0.5, )"
             }
           },
           "imports": [
