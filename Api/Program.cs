@@ -44,6 +44,15 @@ builder.Services.AddHttpClient("InsecureClient")
         };
     });
 
+builder.Services.AddHealthChecks()
+    .AddUrlGroup(
+        new Uri($"{appSettings.SecretsServerUrl}/health"),
+        name: "secret server",
+        configurePrimaryHttpMessageHandler: (_) => new HttpClientHandler
+        {
+            ServerCertificateCustomValidationCallback = (_, _, _, _) => true
+        });
+
 ///
 ///
 /// DB / database / dbcontext
