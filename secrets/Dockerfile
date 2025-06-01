@@ -8,7 +8,6 @@ RUN npm run export:docker
 
 
 FROM node:20-alpine
-RUN apk add --no-cache curl
 WORKDIR /app
 COPY --from=builder /app .
 EXPOSE 3443
