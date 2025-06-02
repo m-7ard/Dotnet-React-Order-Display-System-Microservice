@@ -49,8 +49,6 @@ public class RabbitMqConsumerService : BackgroundService
         var rabbitMqUri = _secretsStore.GetSecret(SecretKey.RABBIT_ADDRESS);
         _factory.Uri = new Uri(rabbitMqUri);
 
-        // https://claude.ai/chat/b6657dbd-8e5d-413d-906b-d9359b5f4bb8
-        // implemenet the thing where we make a service to see if secrets has loaded
         _connection = await _factory.CreateConnectionAsync(stoppingToken);
         _channel = await _connection.CreateChannelAsync(cancellationToken: stoppingToken);
 

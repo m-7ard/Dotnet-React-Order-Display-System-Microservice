@@ -30,7 +30,7 @@ async function main() {
     const environment = process.env.NODE_ENV;
     console.log(environment);
 
-    const environmentValidator = union([literal("DEVELOPMENT"), literal("PRODUCTION"), literal("DOCKER")]);
+    const environmentValidator = union([literal("DEVELOPMENT"), literal("PRODUCTION"), literal("DOCKER"), literal("DOCKER-DEV")]);
     assert(environment, environmentValidator);
     require("dotenv").config({
         path: `${process.cwd()}/.env.${environment}`,

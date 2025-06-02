@@ -20,8 +20,17 @@ public class SecretsInitializer : IHostedService
 
     private async Task GetSecret(SecretKey key)
     {
-        var value = await _secretsDataAccess.GetKeyValue(key);
-        _store.SetSecret(key, value);
+        try
+        {
+            // Relevant during integration tests to only get the secrets once per test run
+            _store.GetSecret(key);
+            return;
+        }
+        catch
+        {
+            var value = await _secretsDataAccess.GetKeyValue(key);
+            _store.SetSecret(key, value);
+        }
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)

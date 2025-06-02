@@ -3,6 +3,10 @@ WORKDIR /app
 COPY package*.json ./ 
 RUN npm install
 COPY . ./ 
+
+
+ARG NODE_ENV=DOCKER
+ENV NODE_ENV=${NODE_ENV}
 RUN npm run export:docker
 # in /app/dist
 

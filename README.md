@@ -21,8 +21,8 @@ The documentation for the main application can be found at https://github.com/m-
 ```
 
 > [!WARNING]
-> You need to manually run Kafka for this to work. This project comes included with a kafka-dev-docker-compose.yml for convenience's sake. 
-> To run it, type >> docker compose -f kafka-dev-docker-compose.yml up 
+> You need to manually run Kafka for this to work. This project comes included with a docker-dev-compose.yml for convenience's sake. 
+> To run it, type >> docker compose -f docker-dev-compose.yml up 
 
 ### Manually (Dev mode)
 ```bash
