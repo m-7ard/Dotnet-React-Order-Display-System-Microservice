@@ -1,5 +1,7 @@
 using System.Text.Json;
+using Api.Services;
 using Confluent.Kafka;
+using Infrastructure.Values;
 
 namespace Api.Producers.Services;
 
@@ -8,11 +10,11 @@ public abstract class AbstractProducer
     protected readonly IProducer<Null, string> _producer;
     protected readonly string TopicName;
 
-    protected AbstractProducer(string topicName, IConfiguration configuration)
+    protected AbstractProducer(string topicName, SecretsStore secretsStore)
     {
         var config = new ProducerConfig
         {
-            BootstrapServers = configuration["Kafka:BootstrapServers"]
+            BootstrapServers = secretsStore.GetSecret(SecretKey.KAFKA_ADDRESS)
         };
 
         _producer = new ProducerBuilder<Null, string>(config).Build();

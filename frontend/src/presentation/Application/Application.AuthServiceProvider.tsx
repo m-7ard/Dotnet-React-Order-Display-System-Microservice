@@ -112,8 +112,6 @@ export default function AuthServiceProvider(props: React.PropsWithChildren<{ hre
 
     const logout = useCallback<IAuthService["logout"]>(async () => {
         try {
-            tokenStorage.setAccessToken(null);
-            tokenStorage.setRefreshToken(null);
             const result = await tryHandleRequest(userDataAccess.logout());
 
             if (result.isErr()) {
@@ -131,6 +129,9 @@ export default function AuthServiceProvider(props: React.PropsWithChildren<{ hre
             dispatchException(JSON.stringify(errors));
         } catch (error: unknown) {
             dispatchException(error);
+        } finally {
+            tokenStorage.setAccessToken(null);
+            tokenStorage.setRefreshToken(null);
         }
     }, [dispatchException, userDataAccess, currentUser, tokenStorage]);
 

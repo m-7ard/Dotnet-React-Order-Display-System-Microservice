@@ -41,10 +41,10 @@ export default function createProxyServer(config: {
     middleware: Array<(req: Request, res: Response, next: NextFunction) => void>;
     diContainer: IDIContainer;
     redis: RedisClientConnection;
-    authServerUrl: "http://127.0.0.1:8000" | "http://auth:8000";
-    fileServerUrl: "http://127.0.0.1:4300" | "http://127.0.0.1:3000" | "http://file:3000";
-    mainAppServerUrl: "http://localhost:5102" | "http://web:5000";
-    websocketServerHost: "0.0.0.0" | "127.0.0.1";
+    authServerUrl: string;
+    fileServerUrl: string;
+    mainAppServerUrl: string;
+    websocketServerHost: string;
     kafka: Kafka;
     channel: Channel;
 }) {

@@ -8,49 +8,32 @@ public static class BuilderUtils
     {
         public DatabaseProviderSingletonValue DatabaseProviderValue { get; }
         public string ConnectionString { get; }
+        public string SecretsServerUrl { get; }
 
-        public AppSettings(DatabaseProviderSingletonValue databaseProvidervalue, string connectionString)
+        public AppSettings(DatabaseProviderSingletonValue databaseProvidervalue, string connectionString, string secretsServerUrl)
         {
             DatabaseProviderValue = databaseProvidervalue;
             ConnectionString = connectionString;
+            SecretsServerUrl = secretsServerUrl;
         }
     }
 
     public static AppSettings ReadAppSettings(ConfigurationManager config)
     {
-        var dbProvider = config["Database:Provider"];
-        if (dbProvider is null)
-        {
-            throw new Exception("Database provider name cannot be null.");
-        }
-
-        var connectionString = config[$"{dbProvider}_Database"];
-        if (connectionString is null)
-        {
-            throw new Exception("Connection string cannot be null.");
-        }
-
+        var dbProvider = config["Database:Provider"] ?? throw new Exception("Database provider name cannot be null.");
+        var connectionString = config[$"{dbProvider}_Database"] ?? throw new Exception("Connection string cannot be null.");
+        var secretsServerUrl = config["LocalSecretServerUrl"] ?? throw new Exception("Secret server url cannot be null.");
         var dbProviderValue = DatabaseProviderSingletonValue.ExecuteCreate(dbProvider);
 
-        return new AppSettings(databaseProvidervalue: dbProviderValue, connectionString: connectionString);
+        return new AppSettings(databaseProvidervalue: dbProviderValue, connectionString: connectionString, secretsServerUrl: secretsServerUrl);
     }
 
     public static AppSettings ReadTestAppSettings(IConfiguration config)
     {
-        var dbProvider = config["Testing:Database:Provider"];
-        if (dbProvider is null)
-        {
-            throw new Exception("Database provider name cannot be null.");
-        }
-
-        var connectionString = config[$"Testing:{dbProvider}_Database"];
-        if (connectionString is null)
-        {
-            throw new Exception("Connection string cannot be null.");
-        }
-
+        var dbProvider = config["Testing:Database:Provider"] ?? throw new Exception("Database provider name cannot be null.");
+        var connectionString = config[$"Testing:{dbProvider}_Database"] ?? throw new Exception("Connection string cannot be null.");
+        var secretsServerUrl = config["LocalSecretServerUrl"] ?? throw new Exception("Secret server url cannot be null.");
         var dbProviderValue = DatabaseProviderSingletonValue.ExecuteCreate(dbProvider);
 
-        return new AppSettings(databaseProvidervalue: dbProviderValue, connectionString: connectionString);
-    }
+        return new AppSettings(databaseProvidervalue: dbProviderValue, connectionString: connectionString, secretsServerUrl: secretsServerUrl);    }
 }

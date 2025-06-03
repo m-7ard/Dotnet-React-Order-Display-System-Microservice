@@ -5,6 +5,10 @@ import { Kafka } from "kafkajs";
 import { createClient } from "redis";
 import { assert, literal, union } from "superstruct";
 import amqp from "amqplib";
+import LocalSecretDataAccess from "infrastructure/dataAccess/LocalSecretDataAccess";
+import secretsKeys from "infrastructure/values/secretKeys";
+import fetchWithRetry from "api/utils/fetchWithRetry";
+import { Agent } from "https";
 
 if (global.crypto == null) {
     global.crypto = require("crypto");
@@ -20,32 +24,52 @@ async function main() {
         path: `${process.cwd()}/.env.${environment}`,
     });
 
+    // Port
     const port = process.env.PORT == null ? null : parseInt(process.env.PORT);
     const portValidator = union([literal(4200), literal(3100)]);
     assert(port, portValidator);
 
+    // Host
     const host = process.env.HOST;
     const hostValidator = union([literal("127.0.0.1"), literal("0.0.0.0")]);
     assert(host, hostValidator);
 
-    const fileServerUrl = process.env.FILE_SERVER_URL;
+    // Secret Server
+    const secretServerUrl = process.env.SECRET_SERVER_URL;
+    const secretServerUrlValidator = union([literal("https://127.0.0.1:3443"), literal("https://secrets:3443")]);
+    assert(secretServerUrl, secretServerUrlValidator);
+
+    const insecureAgent = new Agent({
+        rejectUnauthorized: false, // Only for the local self-signed cert. remove with real CA
+    });
+    const localSecretDataAccess = new LocalSecretDataAccess(secretServerUrl, insecureAgent);
+    await fetchWithRetry(`${secretServerUrl}/health`, {
+        agent: insecureAgent,
+    });
+
+    // File Server
+    const fileServerUrl = await localSecretDataAccess.getKeyValue(secretsKeys.FILE_SERVER_URL);
     const fileServerUrlValidator = union([literal("http://127.0.0.1:4300"), literal("http://127.0.0.1:3000"), literal("http://file:3000")]);
     assert(fileServerUrl, fileServerUrlValidator);
 
-    const authServerUrl = process.env.AUTH_URL;
+    // Auth Server
+    const authServerUrl = await localSecretDataAccess.getKeyValue(secretsKeys.AUTH_SERVER_URL);
     const authServerUrlValidator = union([literal("http://127.0.0.1:8000"), literal("http://auth:8000")]);
     assert(authServerUrl, authServerUrlValidator);
 
-    const mainApiServerUrl = process.env.API_URL;
+    // Main Api Server
+    const mainApiServerUrl = await localSecretDataAccess.getKeyValue(secretsKeys.API_URL);
     const mainApiServerUrlValidator = union([literal("http://localhost:5102"), literal("http://web:5000")]);
     assert(mainApiServerUrl, mainApiServerUrlValidator);
 
-    const kafkaAddress = process.env.KAFKA_ADDRESS;
+    // Kafka
+    const kafkaAddress = await localSecretDataAccess.getKeyValue(secretsKeys.KAFKA_ADDRESS);
     const kafkaAddressValidator = union([literal("localhost:29092"), literal("kafka:29092")]);
     assert(kafkaAddress, kafkaAddressValidator);
 
-    const rabbitAddress = process.env.RABBIT_ADDRESS;
-    const rabbitAddressValidator = union([literal("localhost:5672"), literal("rabbitmq:5672")]);
+    // Rabbit
+    const rabbitAddress = await localSecretDataAccess.getKeyValue(secretsKeys.RABBIT_ADDRESS);
+    const rabbitAddressValidator = union([literal("amqp://guest:guest@localhost:5672"), literal("amqp://guest:guest@rabbitmq:5672")]);
     assert(rabbitAddress, rabbitAddressValidator);
 
     const diContainer = new ProductionDIContainer();
@@ -58,10 +82,12 @@ async function main() {
     await redis.connect();
     await redis.flushDb();
 
-    const rabbit = await amqp.connect(`amqp://guest:guest@${rabbitAddress}/`);
+    // TODO: make a data access to get the addresses
+
+    const rabbit = await amqp.connect(rabbitAddress);
     const channel = await rabbit.createChannel();
     await channel.assertQueue("apiQueue", { durable: true });
-    
+
     const app = createProxyServer({
         middleware: [responseLogger],
         diContainer: diContainer,
@@ -71,7 +97,7 @@ async function main() {
         mainAppServerUrl: mainApiServerUrl,
         kafka: kafka,
         websocketServerHost: host,
-        channel: channel
+        channel: channel,
     });
 
     const server = app.listen(port, host, () => {

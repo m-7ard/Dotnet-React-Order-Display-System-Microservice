@@ -75,7 +75,7 @@ class OrderEventService implements IOrderEventService {
         const eventListeners = this.listeners.get(eventType)!;
         eventListeners.add(listener);
 
-        const uuid = crypto.randomUUID();
+        const uuid = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
         uuidRegistry[uuid] = eventType;
 
         return {

@@ -23,6 +23,8 @@ public class TenantMiddleware : IMiddleware
     {
         if (_databaseProvider.IsTesting)
         {
+            // Database is currently created in the IntegrationWebApplicationFactory.cs
+            _tenantUserService.UserId = "TEST_USER_ID; The exact value doesn't matter for integration tests.";
             await next(context);
             return;
         }
