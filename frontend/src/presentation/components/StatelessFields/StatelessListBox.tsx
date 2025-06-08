@@ -1,4 +1,4 @@
-import { useAbstractTooltipContext } from "../AbtractTooltip/AbstractTooltip.Context";
+import { useAbstractTooltipContext } from "../renderAbstractTooltip/AbstractTooltip.Context";
 import AbstractTooltip, { AbstractTooltipTrigger, PolymorphicAbstractTooltipDefaultPanel } from "../renderAbstractTooltip/AbstractTooltip";
 import MixinButton from "../Resuables/MixinButton";
 

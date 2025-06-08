@@ -1,5 +1,6 @@
 import React from "react";
 import generateLabel from "../../utils/generateLabel";
+import { FormFieldContext } from "./FormField.Context";
 
 export default function FormField<T extends string>({
     errors,
@@ -12,30 +13,42 @@ export default function FormField<T extends string>({
     name: T;
     label?: string;
     row?: boolean;
-    children: React.ReactNode | ((props: { name: T; }) => React.ReactNode)
+    children: React.ReactNode | ((props: { name: T }) => React.ReactNode);
 }) {
+    const fieldId = name;
+    const errorId = errors?.length ? `${fieldId}-error` : undefined;
+    const finalLabel = label ?? generateLabel(name);
+
+    const fieldContent = (
+        <FormFieldContext.Provider value={{ id: fieldId, describedBy: errorId }}>{typeof children === "function" ? children({ name }) : children}</FormFieldContext.Provider>
+    );
+
     return (
         <div className="flex flex-col gap-y-1">
-            {row ?? false ? (
+            {row ? (
                 <div className="flex flex-row gap-3 items-center">
-                    {typeof children === "function" ? children({ name }) : children}
-                    <div className="text-sm font-medium">{label ?? generateLabel(name)}</div>
+                    {fieldContent}
+                    <label htmlFor={fieldId} className="text-sm font-medium">
+                        {finalLabel}
+                    </label>
                 </div>
             ) : (
                 <>
-                    <div className="text-sm font-medium leading-none">{label ?? generateLabel(name)}</div>
-                    {typeof children === "function" ? children({ name }) : children}
+                    <label htmlFor={fieldId} className="text-sm font-medium leading-none">
+                        {finalLabel}
+                    </label>
+                    {fieldContent}
                 </>
             )}
-            {errors == null ? null : (
-                <div className="flex flex-col gap-0.5">
-                    {errors.map((message) => (
-                        <div className="text-xs text-red-700" key={message}>
+            {errors?.length ? (
+                <div className="flex flex-col gap-0.5" id={errorId} role="alert" aria-live="polite">
+                    {errors.map((message, index) => (
+                        <div className="text-xs text-red-700" key={index}>
                             {message}
                         </div>
                     ))}
                 </div>
-            )}
+            ) : null}
         </div>
     );
 }

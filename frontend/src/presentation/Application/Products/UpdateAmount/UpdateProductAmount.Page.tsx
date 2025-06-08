@@ -1,4 +1,4 @@
-import StatelessCharField from "../../../components/StatelessFields/StatelessCharField";
+import StatelessCharField from "../../../components/StatelessFields/CharField/StatelessCharField";
 import FormField from "../../../components/Forms/FormField";
 import MixinButton from "../../../components/Resuables/MixinButton";
 import { useCallback } from "react";

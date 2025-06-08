@@ -2,12 +2,12 @@ import FormField from "../../../components/Forms/FormField";
 import MixinButton from "../../../components/Resuables/MixinButton";
 import { ErrorState, ValueState } from "./LoginUser.Controller";
 import { useCallback } from "react";
-import StatelessCharField from "../../../components/StatelessFields/StatelessCharField";
 import MixinPage, { MixinPageSection } from "../../../components/Resuables/MixinPage";
 import Divider from "../../../components/Resuables/Divider";
 import FormError from "../../../components/Forms/FormError,";
 import contentGridDirective from "../../../directives/contentGridDirective";
 import LinkBoxV2 from "../../../components/Resuables/LinkBoxV2";
+import FormFieldStatelessCharField from "../../../components/StatelessFields/CharField/Variants/FormFieldStatelessCharField";
 
 export default function LoginUserPage(props: {
     value: ValueState;
@@ -50,7 +50,7 @@ export default function LoginUserPage(props: {
                 <FormError title="Failed to Login User" errors={errors._} />
                 <div className="flex flex-col gap-4">
                     <FormField name="username" errors={errors.username}>
-                        <StatelessCharField
+                        <FormFieldStatelessCharField
                             onChange={(value) => updateField("username", value)}
                             value={value.username}
                             options={{
@@ -60,7 +60,7 @@ export default function LoginUserPage(props: {
                         />
                     </FormField>
                     <FormField name="password" errors={errors.password}>
-                        <StatelessCharField
+                        <FormFieldStatelessCharField
                             onChange={(value) => updateField("password", value)}
                             value={value.password}
                             options={{

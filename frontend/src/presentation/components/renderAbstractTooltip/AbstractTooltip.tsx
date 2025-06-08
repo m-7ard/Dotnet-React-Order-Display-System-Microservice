@@ -4,7 +4,7 @@ import { useTooltipContext } from "../TooltipProvider/TooltipProvider.TooltipCon
 import useFixedPositioning from "../../hooks/useFixedPositioning";
 import { createPortal } from "react-dom";
 import PolymorphicProps from "../../types/PolymorphicProps";
-import { AbstractTooltipContext, useAbstractTooltipContext } from "../AbtractTooltip/AbstractTooltip.Context";
+import { AbstractTooltipContext, useAbstractTooltipContext } from "./AbstractTooltip.Context";
 
 const defaultElement = "div";
 

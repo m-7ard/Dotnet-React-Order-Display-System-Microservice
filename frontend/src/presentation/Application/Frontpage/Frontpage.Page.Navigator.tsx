@@ -26,7 +26,7 @@ export default function Navigator(props: { title: string; imageUrl: string; butt
                         isStatic
                         className="w-full justify-center"
                     >
-                        <CoverImage src={imageUrl} className="h-full aspect-square" />
+                        <CoverImage src={imageUrl} className="h-full aspect-square" alt={`${title} thumbnail`} />
                         <div className="truncate">{title}</div>
                     </MixinButton>
                 </div>

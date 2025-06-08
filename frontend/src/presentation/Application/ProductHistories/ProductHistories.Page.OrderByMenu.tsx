@@ -1,7 +1,7 @@
 import { useSearch } from "@tanstack/react-router";
 import { useCallback } from "react";
 import StatelessRadioCheckboxField from "../../components/StatelessFields/StatelessRadioCheckboxField";
-import { useAbstractTooltipContext } from "../../components/AbtractTooltip/AbstractTooltip.Context";
+import { useAbstractTooltipContext } from "../../components/renderAbstractTooltip/AbstractTooltip.Context";
 import Divider from "../../components/Resuables/Divider";
 import { PolymorphicAbstractTooltipDefaultPanel } from "../../components/renderAbstractTooltip/AbstractTooltip";
 import { PolymorphicMixinPanel, PolymorphicMixinPanelSection } from "../../components/Resuables/MixinPanel";

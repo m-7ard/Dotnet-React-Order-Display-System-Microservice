@@ -41,11 +41,11 @@
         @apply text-white;
 
         &:not(&[data-active="true"]) {
-            @apply bg-emerald-500;
+            @apply bg-emerald-700;
         }
 
         &[data-active="true"], &:not(&--static):hover, &:not(&--static):focus {
-            @apply bg-emerald-600;
+            @apply bg-emerald-800;
         }
     }
 
@@ -54,11 +54,11 @@
         @apply text-white;
 
         &:not(&[data-active="true"]) {
-            @apply bg-red-500;
+            @apply bg-red-600;
         }
 
         &[data-active="true"], &:not(&--static):hover, &:not(&--static):focus {
-            @apply bg-red-600;
+            @apply bg-red-700;
         }
     }
 

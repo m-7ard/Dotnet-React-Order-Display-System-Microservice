@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import FormField from "../Forms/FormField";
-import StatelessCharField from "../StatelessFields/StatelessCharField";
-import StatelessTextArea from "../StatelessFields/StatelessTextArea";
+import StatelessCharField from "../StatelessFields/CharField/StatelessCharField";
+import StatelessTextArea from "../StatelessFields/TextArea/StatelessTextArea";
 
 export type FilterProductHistoriesFieldsetValueState = {
     name: string;

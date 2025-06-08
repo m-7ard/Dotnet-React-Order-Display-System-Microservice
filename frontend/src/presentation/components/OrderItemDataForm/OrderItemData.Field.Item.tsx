@@ -3,7 +3,7 @@ import IPresentationError from "../../interfaces/IPresentationError";
 import IProduct from "../../../domain/models/IProduct";
 import CoverImage from "../Resuables/CoverImage";
 import MixinButton from "../Resuables/MixinButton";
-import StatelessCharField from "../StatelessFields/StatelessCharField";
+import StatelessCharField from "../StatelessFields/CharField/StatelessCharField";
 import { Value } from "@sinclair/typebox/value";
 import MixinPrototypeCard, { MixinPrototypeCardSection } from "../Resuables/MixinPrototypeCard";
 import FormField from "../Forms/FormField";
