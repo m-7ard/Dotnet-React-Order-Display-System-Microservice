@@ -21,9 +21,9 @@ export default function ProductElement(props: { product: IProduct }) {
             hasShadow
         >
             <MixinPrototypeCardSection className="grid gap-3" style={{ gridTemplateColumns: "auto 1fr" }}>
-                <CoverImage className="token-default-avatar" src={productImages[0]} />
+                <CoverImage className="token-default-avatar" src={productImages[0]} alt={`Product ${product.id} thumbnail`} />
                 <div className="overflow-hidden">
-                    <div className="token-card--header--primary-text truncate" title={product.name}>
+                    <div className="token-card--header--primary-text truncate">
                         {product.name}
                     </div>
                     <div className="token-card--header--secondary-text truncate">${product.price}</div>

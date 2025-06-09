@@ -1,8 +1,8 @@
 import { useEffect, useRef } from "react";
 import Divider from "../components/Resuables/Divider";
-import MixinButton from "../components/Resuables/MixinButton";
 import { RenderedMixinPanel, PolymorphicMixinPanelSection } from "../components/Resuables/MixinPanel";
 import { useApplicationExceptionContext } from "./Application.ExceptionProvider.Context";
+import { RenderedMixinButton } from "../components/Resuables/MixinButton";
 
 export default function ApplicationExceptionNotice() {
     const { exception, dismissException } = useApplicationExceptionContext();
@@ -69,7 +69,7 @@ export default function ApplicationExceptionNotice() {
     return (
         <>
             {/* Backdrop for screen readers */}
-            <div className="fixed inset-0 bg-black bg-opacity-25" style={{ zIndex: 999999 }} aria-hidden="true" />
+            <div className="fixed inset-0 bg-black bg-opacity-0" style={{ zIndex: 999999 }} aria-hidden="true" />
 
             <RenderedMixinPanel
                 className="fixed mx-auto top-4 left-4 right-4"
@@ -94,8 +94,7 @@ export default function ApplicationExceptionNotice() {
                             <div id="exception-title" className="token-default-title">
                                 Exception
                             </div>
-                            <MixinButton
-                                ref={closeButtonRef}
+                            <RenderedMixinButton
                                 options={{
                                     size: "mixin-button-sm",
                                     theme: "theme-button-generic-white",
@@ -104,10 +103,14 @@ export default function ApplicationExceptionNotice() {
                                 onClick={dismissException}
                                 aria-label="Close exception dialog"
                             >
-                                Close
-                            </MixinButton>
+                                {(props) => (
+                                    <button ref={closeButtonRef} {...props}>
+                                        Close
+                                    </button>
+                                )}
+                            </RenderedMixinButton>
                         </PolymorphicMixinPanelSection>
-                        <Divider aria-hidden="true" />
+                        <Divider />
                         <PolymorphicMixinPanelSection>
                             <div id="exception-message">{exception.message}</div>
                         </PolymorphicMixinPanelSection>

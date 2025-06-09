@@ -88,6 +88,7 @@ export type ICommonRoute<Config extends IRouteConfig<any>, LoaderData> = {
 
     parent: null | ICommonRoute<any, any>;
     label: string | null;
+    description: string | null;
     isLayout: boolean;
     config?: Config;
 };

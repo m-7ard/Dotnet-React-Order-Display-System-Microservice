@@ -1,7 +1,7 @@
-import { ElementType, PropsWithChildren } from "react";
+import { ElementType, HTMLAttributes } from "react";
 import PolymorphicProps from "../../types/PolymorphicProps";
 
-type ButtonProps<E extends ElementType> = PolymorphicProps<E> & {
+type ButtonProps = {
     options: {
         size: "mixin-button-sm" | "mixin-button-base";
         theme?: "theme-button-generic-white" | "theme-button-generic-yellow" | "theme-button-generic-green" | "theme-button-generic-red";
@@ -9,19 +9,33 @@ type ButtonProps<E extends ElementType> = PolymorphicProps<E> & {
     isStatic?: boolean;
     active?: boolean;
     hasShadow?: boolean;
+} & Omit<HTMLAttributes<HTMLElement>, "children">;
+
+type PolymorphicMixinButtonProps<E extends ElementType> = PolymorphicProps<E> & ButtonProps;
+type RenderedMixinButtonProps = ButtonProps & { children: (props: HTMLAttributes<HTMLButtonElement>) => React.ReactElement };
+
+export default function MixinButton<E extends ElementType = "button">(props: PolymorphicMixinButtonProps<E>) {
+    const Component = props.as ?? "button";
+    const finalProps = _createButtonProps(props);
+
+    return <Component {...finalProps}>{props.children}</Component>;
 }
 
-export default function MixinButton<E extends ElementType = "button">(props: PropsWithChildren<ButtonProps<E>>) {
-    const { as, options, active = false, className, isStatic = false, hasShadow = false, children, ...HTMLattrs } = props;
-    const Component = as ?? "button";
+export function RenderedMixinButton(props: RenderedMixinButtonProps) {
+    const finalProps = _createButtonProps(props);
+    return props.children(finalProps);
+}
+
+function _createButtonProps(props: ButtonProps) {
+    const { options, active = false, className, isStatic = false, hasShadow = false, ...HTMLattrs } = props;
 
     const staticMixinClass = isStatic ? "mixin-button-like--static" : "";
     const staticThemeClass = isStatic ? `${options.theme}--static` : "";
     const hasShadowClass = hasShadow ? `shadow` : "";
 
-    return (
-        <Component data-active={active} className={["mixin-button-like", options.size, options.theme, className, staticMixinClass, staticThemeClass, hasShadowClass].join(" ")} {...HTMLattrs}>
-            {children}
-        </Component>
-    );
+    return {
+        "data-active": active,
+        className: ["mixin-button-like", options.size, options.theme, className, staticMixinClass, staticThemeClass, hasShadowClass].join(" "),
+        ...HTMLattrs,
+    };
 }

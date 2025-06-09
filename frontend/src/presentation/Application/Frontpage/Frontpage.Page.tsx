@@ -10,7 +10,6 @@ import LinkBoxV2 from "../../components/Resuables/LinkBoxV2";
 export default function FrontpagePage() {
     return (
         <MixinPage directives={[contentGridDirective(() => ({}))]} exp={(options) => ({ size: options.SIZE.BASE })}>
-            <h1 className="hidden">Frontpage</h1>
             <MixinPageSection className="flex flex-row gap-3 items-center justify-between">
                 <LinkBoxV2 exp={(routes) => routes.FRONTPAGE} params={{}} />
             </MixinPageSection>
