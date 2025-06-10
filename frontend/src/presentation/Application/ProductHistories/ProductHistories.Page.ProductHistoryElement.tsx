@@ -21,9 +21,9 @@ export default function ProductHistoryElement(props: { productHistory: ProductHi
             hasShadow
         >
             <MixinPrototypeCardSection className="grid gap-3" style={{ gridTemplateColumns: "auto 1fr" }}>
-                <CoverImage className="token-default-avatar" src={productImages[0]} />
+                <CoverImage className="token-default-avatar" src={productImages[0]} alt={`Product history ${productHistory.id} thumbnail`} />
                 <div className="overflow-hidden">
-                    <div className="token-card--header--primary-text truncate" title={productHistory.name}>
+                    <div className="token-card--header--primary-text truncate">
                         {productHistory.name}
                     </div>
                     <div className="token-card--header--secondary-text truncate">${productHistory.price}</div>

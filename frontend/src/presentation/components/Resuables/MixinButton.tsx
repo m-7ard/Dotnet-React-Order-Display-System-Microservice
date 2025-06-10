@@ -15,15 +15,17 @@ type PolymorphicMixinButtonProps<E extends ElementType> = PolymorphicProps<E> & 
 type RenderedMixinButtonProps = ButtonProps & { children: (props: HTMLAttributes<HTMLButtonElement>) => React.ReactElement };
 
 export default function MixinButton<E extends ElementType = "button">(props: PolymorphicMixinButtonProps<E>) {
-    const Component = props.as ?? "button";
-    const finalProps = _createButtonProps(props);
+    const { as, children, ...rest } = props;
+    const Component = as ?? "button";
+    const finalProps = _createButtonProps(rest);
 
-    return <Component {...finalProps}>{props.children}</Component>;
+    return <Component {...finalProps}>{children}</Component>;
 }
 
 export function RenderedMixinButton(props: RenderedMixinButtonProps) {
-    const finalProps = _createButtonProps(props);
-    return props.children(finalProps);
+    const { children, ...rest } = props;
+    const finalProps = _createButtonProps(rest);
+    return children(finalProps);
 }
 
 function _createButtonProps(props: ButtonProps) {

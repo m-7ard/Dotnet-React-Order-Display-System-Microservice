@@ -1,12 +1,10 @@
 import { useSearch } from "@tanstack/react-router";
 import { useCallback } from "react";
 import IListProductsRequestDTO from "../../../infrastructure/contracts/products/list/IListProductsRequestDTO";
-import StatelessRadioCheckboxField from "../../components/StatelessFields/StatelessRadioCheckboxField";
 import { useAbstractTooltipContext } from "../../components/renderAbstractTooltip/AbstractTooltip.Context";
-import Divider from "../../components/Resuables/Divider";
 import { PolymorphicAbstractTooltipDefaultPanel } from "../../components/renderAbstractTooltip/AbstractTooltip";
-import { PolymorphicMixinPanel, PolymorphicMixinPanelSection } from "../../components/Resuables/MixinPanel";
 import { useRouterNavigate } from "../../routes/RouterModule/RouterModule.hooks";
+import RadioButtonMenu from "../../components/Resuables/RadioButtonMenu";
 
 export default function OrderByMenu() {
     const { onClose } = useAbstractTooltipContext();
@@ -22,29 +20,23 @@ export default function OrderByMenu() {
         [navigate, searchParams, onClose],
     );
 
+    const options = [
+        { value: "newest", label: "Newest" },
+        { value: "oldest", label: "Oldest" },
+        { value: "price asc", label: "Price - Lowest to Highest" },
+        { value: "price desc", label: "Price - Highest to Lowest" },
+    ];
+
     return (
         <PolymorphicAbstractTooltipDefaultPanel className={`z-10 fixed mt-1`}>
-            <PolymorphicMixinPanel exp={(options) => ({ hasBorder: true, hasShadow: true, size: options.SIZE.BASE, theme: options.THEMES.GENERIC_WHITE })}>
-                <PolymorphicMixinPanelSection className="flex flex-row gap-5 items-center justify-between">
-                    <div className="text-sm">Newest</div>
-                    <StatelessRadioCheckboxField name={"orderBy"} onChange={onChange} value={"newest"} checked={orderBy === "newest"} />
-                </PolymorphicMixinPanelSection>
-                <Divider />
-                <PolymorphicMixinPanelSection className="flex flex-row gap-5 items-center justify-between">
-                    <div className="text-sm">Oldest</div>
-                    <StatelessRadioCheckboxField name={"orderBy"} onChange={onChange} value={"oldest"} checked={orderBy === "oldest"} />
-                </PolymorphicMixinPanelSection>
-                <Divider />
-                <PolymorphicMixinPanelSection className="flex flex-row gap-5 items-center justify-between">
-                    <div className="text-sm">Price - Lowest to Highest</div>
-                    <StatelessRadioCheckboxField name={"orderBy"} onChange={onChange} value={"price asc"} checked={orderBy === "price asc"} />
-                </PolymorphicMixinPanelSection>
-                <Divider />
-                <PolymorphicMixinPanelSection className="flex flex-row gap-5 items-center justify-between">
-                    <div className="text-sm">Price - Highest to Lowest</div>
-                    <StatelessRadioCheckboxField name={"orderBy"} onChange={onChange} value={"price desc"} checked={orderBy === "price desc"} />
-                </PolymorphicMixinPanelSection>
-            </PolymorphicMixinPanel>
+            <RadioButtonMenu
+                name="orderBy"
+                screenReaderDescription="Choose how to sort the product list. Selection will apply immediately."
+                options={options}
+                rulingValue={orderBy}
+                onChange={onChange}
+                onClose={onClose}
+            />
         </PolymorphicAbstractTooltipDefaultPanel>
     );
 }

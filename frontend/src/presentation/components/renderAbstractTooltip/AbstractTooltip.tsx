@@ -28,9 +28,12 @@ export default function AbstractTooltip(props: {
 }
 
 //
+//
+//
 // Panel
 //
-
+//
+//
 function useDefaultAbstractTooltipSetup() {
     const { onClose } = useAbstractTooltipContext();
 
@@ -61,6 +64,13 @@ function useDefaultAbstractTooltipSetup() {
     return { setTargetElement };
 }
 
+//
+//
+//
+// Panel--> Polymorphic
+//
+//
+//
 type PolymorphicAbstractTooltipPanelProps<E extends ElementType> = PolymorphicProps<E> & {};
 
 export function PolymorphicAbstractTooltipDefaultPanel<E extends ElementType = typeof defaultElement>(props: PolymorphicAbstractTooltipPanelProps<E>) {
@@ -76,11 +86,15 @@ export function PolymorphicAbstractTooltipDefaultPanel<E extends ElementType = t
     );
 }
 
+//
+//
+//
+// Panel--> Render
+//
+//
+//
 type THostElementProps = React.JSX.IntrinsicAttributes & PropsWithChildren<{ ref: React.Dispatch<React.SetStateAction<HTMLElement | null>> }>;
-
-type RenderedAbstractTooltipPanelProps = {
-    children: (tooltipPanelProps: THostElementProps) => React.ReactNode;
-};
+type RenderedAbstractTooltipPanelProps = { children: (tooltipPanelProps: THostElementProps) => React.ReactNode };
 
 export function RenderedAbstractTooltipDefaultPanel(props: RenderedAbstractTooltipPanelProps) {
     const { children } = props;
@@ -92,9 +106,12 @@ export function RenderedAbstractTooltipDefaultPanel(props: RenderedAbstractToolt
 }
 
 //
+//
+//
 // Trigger
 //
-
+//
+//
 type AbstractTooltipTriggerProps<E extends ElementType> = PolymorphicProps<E> & {};
 
 export function AbstractTooltipTrigger<E extends ElementType>(props: AbstractTooltipTriggerProps<E>) {

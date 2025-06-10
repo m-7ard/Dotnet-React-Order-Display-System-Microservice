@@ -1,7 +1,6 @@
 import { TextareaHTMLAttributes } from "react";
-import { useFormFieldContext } from "../../Forms/FormField.Context";
 
-interface IStatelessTextAreaProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "value" | "onChange"> {
+export interface IStatelessTextAreaProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "value" | "onChange"> {
     value: string;
     options: {
         size: "mixin-textarea-any";
@@ -11,8 +10,7 @@ interface IStatelessTextAreaProps extends Omit<TextareaHTMLAttributes<HTMLTextAr
 }
 
 function StatelessTextArea(props: IStatelessTextAreaProps) {
-    const { value, options, onChange, maxLength, ...htmlProps } = props;
-    const { id, describedBy } = useFormFieldContext();
+    const { value, options, onChange, maxLength, id, "aria-describedby": describedBy, ...htmlProps } = props;
     
     // Generate unique ID for character counter
     const counterId = id ? `${id}-counter` : undefined;
