@@ -1,6 +1,6 @@
 import IProduct from "../../../domain/models/IProduct";
 import CoverImage from "../Resuables/CoverImage";
-import MixinButton from "../Resuables/MixinButton";
+import MixinButton from "../Resuables/MixinButton/MixinButton";
 import MixinPrototypeCard, { MixinPrototypeCardSection } from "../Resuables/MixinPrototypeCard";
 
 type CountTrackerProductProps = { product: IProduct; onAdd: () => void; quantity: number | null; };

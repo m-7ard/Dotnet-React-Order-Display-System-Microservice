@@ -1,5 +1,5 @@
 import ProductHistory from "../../../domain/models/IProductHistory";
-import MixinButton from "../../components/Resuables/MixinButton";
+import MixinButton from "../../components/Resuables/MixinButton/MixinButton";
 import { useAbstractTooltipContext } from "../../components/renderAbstractTooltip/AbstractTooltip.Context";
 import Divider from "../../components/Resuables/Divider";
 import { PolymorphicAbstractTooltipDefaultPanel } from "../../components/renderAbstractTooltip/AbstractTooltip";

@@ -1,4 +1,4 @@
-import MixinButton from "../../components/Resuables/MixinButton";
+import MixinButton from "../../components/Resuables/MixinButton/MixinButton";
 import GlobalDialog from "../../components/Dialog/GlobalDialog";
 import ProductHistory from "../../../domain/models/IProductHistory";
 import OrderByMenu from "./ProductHistories.Page.OrderByMenu";

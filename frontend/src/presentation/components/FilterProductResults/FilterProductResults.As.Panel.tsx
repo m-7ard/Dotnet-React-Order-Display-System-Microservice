@@ -1,4 +1,4 @@
-import MixinButton from "../Resuables/MixinButton";
+import MixinButton from "../Resuables/MixinButton/MixinButton";
 import { useGlobalDialogPanelContext } from "../Dialog/GlobalDialog.Panel.Context";
 import FormPage from "./FilterProductResults.Pages.Form";
 import ResultsPage from "./FilterProductResults.Pages.Results";

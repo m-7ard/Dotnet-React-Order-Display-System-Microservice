@@ -1,6 +1,6 @@
 import IProduct from "../../../domain/models/IProduct";
 import GlobalDialog from "../../components/Dialog/GlobalDialog";
-import MixinButton from "../../components/Resuables/MixinButton";
+import MixinButton from "../../components/Resuables/MixinButton/MixinButton";
 import { useAbstractTooltipContext } from "../../components/renderAbstractTooltip/AbstractTooltip.Context";
 import DeleteProductFactory from "./Delete/DeleteProduct.Factory";
 import Divider from "../../components/Resuables/Divider";

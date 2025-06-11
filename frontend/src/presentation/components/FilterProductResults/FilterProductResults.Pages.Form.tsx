@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import IPresentationError from "../../interfaces/IPresentationError";
 import FilterProductsFieldset, { FilterProductsFieldsetValueState } from "../Fieldsets/FilterProductFieldset";
 import Divider from "../Resuables/Divider";
-import MixinButton from "../Resuables/MixinButton";
+import MixinButton from "../Resuables/MixinButton/MixinButton";
 
 export type FormPageValueState = FilterProductsFieldsetValueState;
 

@@ -1,6 +1,6 @@
 import IProduct from "../../../domain/models/IProduct";
 import CoverImage from "../../components/Resuables/CoverImage";
-import MixinButton from "../../components/Resuables/MixinButton";
+import MixinButton from "../../components/Resuables/MixinButton/MixinButton";
 import ProductOptionMenu from "./Products.Page.Product.OptionsMenu";
 import MixinPrototypeCard, { MixinPrototypeCardSection } from "../../components/Resuables/MixinPrototypeCard";
 import AbstractTooltip, { AbstractTooltipTrigger } from "../../components/renderAbstractTooltip/AbstractTooltip";

@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import CoverImage from "../../components/Resuables/CoverImage";
-import MixinButton from "../../components/Resuables/MixinButton";
+import MixinButton from "../../components/Resuables/MixinButton/MixinButton";
 import MixinPrototypeCard, { MixinPrototypeCardSection } from "../../components/Resuables/MixinPrototypeCard";
 
 export default function Navigator(props: { title: string; imageUrl: string; buttons: Array<{ label: string; href: string }> }) {

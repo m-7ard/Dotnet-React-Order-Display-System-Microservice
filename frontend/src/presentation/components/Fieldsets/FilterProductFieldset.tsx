@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import FormField from "../Forms/FormField";
-import StatelessTextArea from "../StatelessFields/TextArea/StatelessTextArea";
 import FormFieldStatelessCharField from "../StatelessFields/CharField/Variants/FormFieldStatelessCharField";
+import FormFieldStatelessTextArea from "../StatelessFields/TextArea/Variants/FormFieldStatelessTextArea";
 
 export type FilterProductsFieldsetValueState = {
     id: string;
@@ -74,7 +74,7 @@ export default function FilterProductsFieldset(props: { value: FilterProductsFie
                 </div>
             </div>
             <FormField name="description">
-                <StatelessTextArea
+                <FormFieldStatelessTextArea
                     onChange={(value) => updateField("description", value)}
                     value={value.description}
                     options={{

@@ -1,4 +1,4 @@
-import MixinButton from "../../../components/Resuables/MixinButton";
+import MixinButton from "../../../components/Resuables/MixinButton/MixinButton";
 import OrderItem from "../../../../domain/models/OrderItem";
 import IPresentationError from "../../../interfaces/IPresentationError";
 import OrderStatus from "../../../../domain/valueObjects/Order/OrderStatus";

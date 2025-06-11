@@ -1,5 +1,5 @@
 import IPresentationError from "../../interfaces/IPresentationError";
-import MixinButton from "../Resuables/MixinButton";
+import MixinButton from "../Resuables/MixinButton/MixinButton";
 import OrderItemDataFieldItem, { ValueSchema as OrderItemDataValueSchema } from "./OrderItemDataField.Item";
 import GlobalDialog from "../Dialog/GlobalDialog";
 import IProduct from "../../../domain/models/IProduct";
@@ -16,7 +16,15 @@ type ValueSchema = {
     [productId: number | string]: OrderItemDataValueSchema;
 };
 
-export default function OrderItemDataField(props: { onChange: (value: ValueSchema) => void; errors?: ErrorSchema; value: ValueSchema; "aria-describedby"?: string; id?: string }) {
+export interface IOrderItemDataFieldProps {
+    onChange: (value: ValueSchema) => void;
+    errors?: ErrorSchema;
+    value: ValueSchema;
+    "aria-describedby"?: string;
+    id?: string;
+}
+
+export default function OrderItemDataField(props: IOrderItemDataFieldProps) {
     const { errors, value, onChange, "aria-describedby": describedBy, id } = props;
 
     const deleteOrderItem = useCallback(
@@ -53,7 +61,9 @@ export default function OrderItemDataField(props: { onChange: (value: ValueSchem
     const itemCount = Object.entries(value).length;
 
     return (
-        <div role="group" aria-label={"Order items"} aria-describedby={describedBy} id={id}>
+        <div role="group" aria-label={"Order items"} aria-describedby={describedBy}>
+            {/* Hidden input for FormField label association */}
+            <input type="hidden" id={id} value={JSON.stringify(value)} readOnly aria-hidden="true" />
             <MixinPrototypeCard
                 options={{
                     size: "mixin-Pcard-base",

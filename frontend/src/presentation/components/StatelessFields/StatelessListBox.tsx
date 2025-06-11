@@ -1,6 +1,6 @@
 import { useAbstractTooltipContext } from "../renderAbstractTooltip/AbstractTooltip.Context";
 import AbstractTooltip, { AbstractTooltipTrigger, PolymorphicAbstractTooltipDefaultPanel } from "../renderAbstractTooltip/AbstractTooltip";
-import MixinButton from "../Resuables/MixinButton";
+import MixinButton from "../Resuables/MixinButton/MixinButton";
 
 type Choice = { value: string | number | null; label: string };
 

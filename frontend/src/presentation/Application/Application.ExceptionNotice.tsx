@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import Divider from "../components/Resuables/Divider";
 import { RenderedMixinPanel, PolymorphicMixinPanelSection } from "../components/Resuables/MixinPanel";
 import { useApplicationExceptionContext } from "./Application.ExceptionProvider.Context";
-import { RenderedMixinButton } from "../components/Resuables/MixinButton";
+import { RenderedMixinButton } from "../components/Resuables/MixinButton/MixinButton";
 
 export default function ApplicationExceptionNotice() {
     const { exception, dismissException } = useApplicationExceptionContext();

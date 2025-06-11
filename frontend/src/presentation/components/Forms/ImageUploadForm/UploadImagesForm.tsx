@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import IPresentationError from "../../../interfaces/IPresentationError";
 import CoverImage from "../../Resuables/CoverImage";
-import MixinButton from "../../Resuables/MixinButton";
+import MixinButton from "../../Resuables/MixinButton/MixinButton";
 import MixinPrototypeCard, { MixinPrototypeCardSection } from "../../Resuables/MixinPrototypeCard";
 
 export type RequiredImageFormData = {

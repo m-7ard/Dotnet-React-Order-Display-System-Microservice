@@ -1,6 +1,5 @@
 import FormField from "../../../components/Forms/FormField";
-import OrderItemDataField from "../../../components/OrderItemDataForm/OrderItemDataField";
-import MixinButton from "../../../components/Resuables/MixinButton";
+import MixinButton from "../../../components/Resuables/MixinButton/MixinButton";
 import { useCallback } from "react";
 import Divider from "../../../components/Resuables/Divider";
 import FormError from "../../../components/Forms/FormError";
@@ -8,6 +7,7 @@ import MixinPage, { MixinPageSection } from "../../../components/Resuables/Mixin
 import { ErrorState, ValueSchema } from "./CreateOrder.Controller";
 import contentGridDirective from "../../../directives/contentGridDirective";
 import LinkBoxV2 from "../../../components/Resuables/LinkBoxV2";
+import FormFieldOrderItemDataField from "../../../components/OrderItemDataForm/Variants/FormFieldOrderItemDataField";
 
 export default function CreateOrderPage(props: {
     onSubmit: () => void;
@@ -49,7 +49,7 @@ export default function CreateOrderPage(props: {
                 <div className="token-default-title">Create Order</div>
                 <FormError title="Failed to Create Order" errors={errors._} />
                 <FormField name="orderItemData" errors={errors.orderItemData?._}>
-                    <OrderItemDataField
+                    <FormFieldOrderItemDataField
                         value={value.orderItemData}
                         errors={errors.orderItemData}
                         onChange={(value) => {

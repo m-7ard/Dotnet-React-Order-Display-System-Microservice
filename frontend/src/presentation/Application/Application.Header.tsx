@@ -1,5 +1,5 @@
 import GlobalDialog from "../components/Dialog/GlobalDialog";
-import MixinButton from "../components/Resuables/MixinButton";
+import MixinButton from "../components/Resuables/MixinButton/MixinButton";
 import SidebarMenuDialog from "./Application.SidebarMenu";
 import Divider from "../components/Resuables/Divider";
 import MixinContentGrid, { MixinContentGridTrack } from "../components/Resuables/MixinContentGrid";

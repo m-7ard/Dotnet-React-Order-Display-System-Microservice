@@ -1,4 +1,4 @@
-import { useLoaderData, useLocation, useNavigate } from "@tanstack/react-router";
+import { useLoaderData, useLocation, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
     ICommonRoute,
     IRouteConfig,
@@ -209,12 +209,16 @@ function useRouterLoaderData<T extends TAnyGenericRoute>(exp: (keys: ICommonRout
     return data as TExtractGenericRouteLoaderData<T>;
 }
 
+const useRouteId = () => {
+    return useRouterState({ select: (s) => s }).matches.at(-1)?.routeId;
+};
+
 function useRouterLocationEq() {
-    const location = useLocation();
+    const pattern = useRouteId();
 
     return <T extends TAnyGenericRoute>(exp: (keys: ICommonRouteMapping) => T) => {
         const route = exp(genericRoutes);
-        return location.pathname === route.config?.pattern;
+        return pattern === route.config?.pattern;
     };
 }
 
@@ -248,11 +252,11 @@ function useRouterHref() {
 }
 
 function useRouterCurrentRoute() {
-    const location = useLocation();
+    const pattern = useRouteId();
 
     for (const key in genericRoutes) {
         const route = genericRoutes[key as keyof ICommonRouteMapping];
-        if (route.config?.pattern === location.pathname) {
+        if (route.config?.pattern === pattern) {
             return route;
         }
     }

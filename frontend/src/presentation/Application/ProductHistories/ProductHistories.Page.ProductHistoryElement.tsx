@@ -1,5 +1,5 @@
 import CoverImage from "../../components/Resuables/CoverImage";
-import MixinButton from "../../components/Resuables/MixinButton";
+import MixinButton from "../../components/Resuables/MixinButton/MixinButton";
 import OptionMenu from "./ProductHistories.Page.ProductHistoryElement.OptionMenu";
 import ProductHistory from "../../../domain/models/IProductHistory";
 import MixinPrototypeCard, { MixinPrototypeCardSection } from "../../components/Resuables/MixinPrototypeCard";

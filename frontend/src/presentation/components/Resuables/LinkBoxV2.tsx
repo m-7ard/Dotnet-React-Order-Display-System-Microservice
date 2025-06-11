@@ -1,5 +1,5 @@
 import React from "react";
-import MixinButton from "./MixinButton";
+import MixinButton from "./MixinButton/MixinButton";
 import { TAnyGenericRoute, ICommonRouteMapping, TExtractGenericRouteParams, isLayoutRoute } from "../../routes/routeTypes";
 import RouterLink from "./RouterLink";
 import { useRouterModule } from "../../routes/RouterModule/RouterModule.hooks";

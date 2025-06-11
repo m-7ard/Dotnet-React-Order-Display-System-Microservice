@@ -2,7 +2,7 @@ import OrderItem from "../../../../domain/models/OrderItem";
 import OrderItemStatus from "../../../../domain/valueObjects/OrderItem/OrderItemStatus";
 import GlobalDialog from "../../../components/Dialog/GlobalDialog";
 import CoverImage from "../../../components/Resuables/CoverImage";
-import MixinButton from "../../../components/Resuables/MixinButton";
+import MixinButton from "../../../components/Resuables/MixinButton/MixinButton";
 import MixinPrototypeCard, { MixinPrototypeCardSection } from "../../../components/Resuables/MixinPrototypeCard";
 import { ORDER_ITEM_STATUS_COLORS } from "../Orders.Constants";
 import OrderItemProgressPanel from "./ManageOrder.Page.OrderItem.ProgressPanel";
@@ -32,6 +32,7 @@ export default function OrderItemElement(props: { orderItem: OrderItem; onMarkOr
                             className="token-default-avatar"
                             src={orderItem.productHistory.images[i] == null ? undefined : `${orderItem.productHistory.images[i]}`}
                             key={i}
+                            alt={`Product ${orderItem.productHistory.name}'s image number ${i}`}
                         />
                     ))}
                 </div>

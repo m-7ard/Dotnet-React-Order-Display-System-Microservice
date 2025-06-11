@@ -2,7 +2,7 @@ import UploadImagesForm from "../../../components/Forms/ImageUploadForm/UploadIm
 import StatelessCharField from "../../../components/StatelessFields/CharField/StatelessCharField";
 import FormField from "../../../components/Forms/FormField";
 import StatelessTextArea from "../../../components/StatelessFields/TextArea/StatelessTextArea";
-import MixinButton from "../../../components/Resuables/MixinButton";
+import MixinButton from "../../../components/Resuables/MixinButton/MixinButton";
 import { useCallback } from "react";
 import { ErrorSchema, ValueSchema } from "./UpdateProduct.Controller";
 import IProduct from "../../../../domain/models/IProduct";

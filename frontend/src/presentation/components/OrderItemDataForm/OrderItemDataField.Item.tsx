@@ -2,12 +2,13 @@ import { Type } from "@sinclair/typebox";
 import IPresentationError from "../../interfaces/IPresentationError";
 import IProduct from "../../../domain/models/IProduct";
 import CoverImage from "../Resuables/CoverImage";
-import MixinButton from "../Resuables/MixinButton";
+import MixinButton from "../Resuables/MixinButton/MixinButton";
 import { Value } from "@sinclair/typebox/value";
 import MixinPrototypeCard, { MixinPrototypeCardSection } from "../Resuables/MixinPrototypeCard";
 import FormField from "../Forms/FormField";
 import FormError from "../Forms/FormError";
 import FormFieldStatelessCharField from "../StatelessFields/CharField/Variants/FormFieldStatelessCharField";
+import FormFieldMixinButton from "../Resuables/MixinButton/Variants/FormFieldMixinButton";
 
 export type ValueSchema = {
     product: IProduct;
@@ -41,7 +42,7 @@ export default function OrderItemDataFieldItem(props: OrderItemDataFormProps) {
     const quantityFieldId = `quantity-${product.id}`;
     const decreaseId = `decrease-${product.id}`;
     const increaseId = `increase-${product.id}`;
-    
+
     return (
         <article role="group" aria-labelledby={`product-name-${product.id}`} aria-describedby={`product-price-${product.id}`}>
             <MixinPrototypeCard
@@ -75,7 +76,7 @@ export default function OrderItemDataFieldItem(props: OrderItemDataFormProps) {
                                 Quantity for {product.name}
                             </label>
 
-                            <MixinButton
+                            <FormFieldMixinButton
                                 id={decreaseId}
                                 options={{
                                     size: "mixin-button-base",
@@ -84,12 +85,11 @@ export default function OrderItemDataFieldItem(props: OrderItemDataFormProps) {
                                 type="button"
                                 onClick={() => updateQuantity(value.quantity - 1)}
                                 aria-label={`Decrease quantity for ${product.name}`}
-                                aria-describedby={quantityFieldId}
                                 disabled={value.quantity <= 1}
                                 aria-disabled={value.quantity <= 1}
                             >
                                 <span aria-hidden="true">-</span>
-                            </MixinButton>
+                            </FormFieldMixinButton>
 
                             <FormFieldStatelessCharField
                                 id={quantityFieldId}
@@ -100,15 +100,13 @@ export default function OrderItemDataFieldItem(props: OrderItemDataFormProps) {
                                 value={value.quantity.toString()}
                                 onChange={(value) => updateQuantity(parseInt(value) || 1)}
                                 className="flex grow"
-                                aria-label={`Quantity for ${product.name}`}
-                                aria-describedby={`${decreaseId} ${increaseId}`}
                                 inputMode="numeric"
                                 pattern="[0-9]*"
                                 min="1"
                                 step="1"
                             />
 
-                            <MixinButton
+                            <FormFieldMixinButton
                                 id={increaseId}
                                 options={{
                                     size: "mixin-button-base",
@@ -117,10 +115,9 @@ export default function OrderItemDataFieldItem(props: OrderItemDataFormProps) {
                                 type="button"
                                 onClick={() => updateQuantity(value.quantity + 1)}
                                 aria-label={`Increase quantity for ${product.name}`}
-                                aria-describedby={quantityFieldId}
                             >
                                 <span aria-hidden="true">+</span>
-                            </MixinButton>
+                            </FormFieldMixinButton>
                         </div>
                     </FormField>
                 </MixinPrototypeCardSection>

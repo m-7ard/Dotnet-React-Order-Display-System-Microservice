@@ -1,6 +1,6 @@
 import FilterOrdersFieldset from "../../../components/Fieldsets/FilterOrdersFieldset";
 import Divider from "../../../components/Resuables/Divider";
-import MixinButton from "../../../components/Resuables/MixinButton";
+import MixinButton from "../../../components/Resuables/MixinButton/MixinButton";
 import { RenderedMixinPanel, PolymorphicMixinPanelSection } from "../../../components/Resuables/MixinPanel";
 import { ValueSchema } from "./FilterOrders.Controller";
 

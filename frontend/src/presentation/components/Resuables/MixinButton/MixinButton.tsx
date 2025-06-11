@@ -1,5 +1,5 @@
 import { ElementType, HTMLAttributes } from "react";
-import PolymorphicProps from "../../types/PolymorphicProps";
+import PolymorphicProps from "../../../types/PolymorphicProps";
 
 type ButtonProps = {
     options: {
@@ -11,7 +11,7 @@ type ButtonProps = {
     hasShadow?: boolean;
 } & Omit<HTMLAttributes<HTMLElement>, "children">;
 
-type PolymorphicMixinButtonProps<E extends ElementType> = PolymorphicProps<E> & ButtonProps;
+export type PolymorphicMixinButtonProps<E extends ElementType> = PolymorphicProps<E> & ButtonProps;
 type RenderedMixinButtonProps = ButtonProps & { children: (props: HTMLAttributes<HTMLButtonElement>) => React.ReactElement };
 
 export default function MixinButton<E extends ElementType = "button">(props: PolymorphicMixinButtonProps<E>) {

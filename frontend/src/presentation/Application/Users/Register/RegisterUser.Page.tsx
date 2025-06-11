@@ -1,5 +1,5 @@
 import FormField from "../../../components/Forms/FormField";
-import MixinButton from "../../../components/Resuables/MixinButton";
+import MixinButton from "../../../components/Resuables/MixinButton/MixinButton";
 import { ErrorState, ValueState } from "./RegisterUser.Controller";
 import { useCallback } from "react";
 import MixinPage, { MixinPageSection } from "../../../components/Resuables/MixinPage";

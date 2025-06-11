@@ -1,6 +1,6 @@
 import FormField from "../../../components/Forms/FormField";
 import StatelessTextArea from "../../../components/StatelessFields/TextArea/StatelessTextArea";
-import MixinButton from "../../../components/Resuables/MixinButton";
+import MixinButton from "../../../components/Resuables/MixinButton/MixinButton";
 import { ErrorState, ValueState } from "./CreateProduct.Controller";
 import { useCallback } from "react";
 import MixinPage, { MixinPageSection } from "../../../components/Resuables/MixinPage";
