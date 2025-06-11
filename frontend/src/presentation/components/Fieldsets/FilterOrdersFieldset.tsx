@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import OrderStatus from "../../../domain/valueObjects/Order/OrderStatus";
 import FormField from "../Forms/FormField";
-import StatelessCharField from "../StatelessFields/StatelessCharField";
+import StatelessCharField from "../StatelessFields/CharField/StatelessCharField";
 import StatelessListBox from "../StatelessFields/StatelessListBox";
 
 export type FilterOrdersFieldsetValueState = {

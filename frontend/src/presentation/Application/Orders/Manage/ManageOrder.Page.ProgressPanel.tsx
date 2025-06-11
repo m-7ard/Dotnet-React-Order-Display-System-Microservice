@@ -1,7 +1,7 @@
 import Order from "../../../../domain/models/Order";
 import { useGlobalDialogPanelContext } from "../../../components/Dialog/GlobalDialog.Panel.Context";
 import Divider from "../../../components/Resuables/Divider";
-import MixinButton from "../../../components/Resuables/MixinButton";
+import MixinButton from "../../../components/Resuables/MixinButton/MixinButton";
 import { PolymorphicMixinPanel, PolymorphicMixinPanelSection } from "../../../components/Resuables/MixinPanel";
 
 export default function OrderProgressPanel(props: { order: Order }) {

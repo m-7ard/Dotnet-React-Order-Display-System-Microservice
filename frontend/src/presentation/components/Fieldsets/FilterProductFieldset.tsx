@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import FormField from "../Forms/FormField";
-import StatelessCharField from "../StatelessFields/StatelessCharField";
-import StatelessTextArea from "../StatelessFields/StatelessTextArea";
+import FormFieldStatelessCharField from "../StatelessFields/CharField/Variants/FormFieldStatelessCharField";
+import FormFieldStatelessTextArea from "../StatelessFields/TextArea/Variants/FormFieldStatelessTextArea";
 
 export type FilterProductsFieldsetValueState = {
     id: string;
@@ -13,22 +13,22 @@ export type FilterProductsFieldsetValueState = {
     createdBefore: string;
 };
 
-export default function FilterProductsFieldset(props: {
-    value: FilterProductsFieldsetValueState;
-    onChange: (value: FilterProductsFieldsetValueState) => void;
-}) {
+export default function FilterProductsFieldset(props: { value: FilterProductsFieldsetValueState; onChange: (value: FilterProductsFieldsetValueState) => void }) {
     const { value, onChange } = props;
 
-    const updateField = useCallback(<K extends keyof FilterProductsFieldsetValueState>(fieldName: K, fieldValue: FilterProductsFieldsetValueState[K]) => {
-        const newValue = {...value};
-        newValue[fieldName] = fieldValue;
-        onChange(newValue);
-    }, [onChange, value]);
+    const updateField = useCallback(
+        <K extends keyof FilterProductsFieldsetValueState>(fieldName: K, fieldValue: FilterProductsFieldsetValueState[K]) => {
+            const newValue = { ...value };
+            newValue[fieldName] = fieldValue;
+            onChange(newValue);
+        },
+        [onChange, value],
+    );
 
     return (
         <>
             <FormField name="id">
-                <StatelessCharField
+                <FormFieldStatelessCharField
                     options={{
                         size: "mixin-char-input-base",
                         theme: "theme-input-generic-white",
@@ -38,7 +38,7 @@ export default function FilterProductsFieldset(props: {
                 />
             </FormField>
             <FormField name="name">
-                <StatelessCharField
+                <FormFieldStatelessCharField
                     options={{
                         size: "mixin-char-input-base",
                         theme: "theme-input-generic-white",
@@ -50,7 +50,7 @@ export default function FilterProductsFieldset(props: {
             <div className="flex flex-row gap-3">
                 <div className="basis-1/2">
                     <FormField name="minPrice">
-                        <StatelessCharField
+                        <FormFieldStatelessCharField
                             options={{
                                 size: "mixin-char-input-base",
                                 theme: "theme-input-generic-white",
@@ -62,7 +62,7 @@ export default function FilterProductsFieldset(props: {
                 </div>
                 <div className="basis-1/2">
                     <FormField name="maxPrice">
-                        <StatelessCharField
+                        <FormFieldStatelessCharField
                             options={{
                                 size: "mixin-char-input-base",
                                 theme: "theme-input-generic-white",
@@ -74,7 +74,7 @@ export default function FilterProductsFieldset(props: {
                 </div>
             </div>
             <FormField name="description">
-                <StatelessTextArea
+                <FormFieldStatelessTextArea
                     onChange={(value) => updateField("description", value)}
                     value={value.description}
                     options={{
@@ -86,7 +86,7 @@ export default function FilterProductsFieldset(props: {
                 />
             </FormField>
             <FormField name="createdBefore">
-                <StatelessCharField
+                <FormFieldStatelessCharField
                     options={{
                         size: "mixin-char-input-base",
                         theme: "theme-input-generic-white",
@@ -97,7 +97,7 @@ export default function FilterProductsFieldset(props: {
                 />
             </FormField>
             <FormField name="createdAfter">
-                <StatelessCharField
+                <FormFieldStatelessCharField
                     options={{
                         size: "mixin-char-input-base",
                         theme: "theme-input-generic-white",

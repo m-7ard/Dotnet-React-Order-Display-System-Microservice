@@ -1,6 +1,6 @@
 import IProduct from "../../../domain/models/IProduct";
 import CoverImage from "../../components/Resuables/CoverImage";
-import MixinButton from "../../components/Resuables/MixinButton";
+import MixinButton from "../../components/Resuables/MixinButton/MixinButton";
 import ProductOptionMenu from "./Products.Page.Product.OptionsMenu";
 import MixinPrototypeCard, { MixinPrototypeCardSection } from "../../components/Resuables/MixinPrototypeCard";
 import AbstractTooltip, { AbstractTooltipTrigger } from "../../components/renderAbstractTooltip/AbstractTooltip";
@@ -21,9 +21,9 @@ export default function ProductElement(props: { product: IProduct }) {
             hasShadow
         >
             <MixinPrototypeCardSection className="grid gap-3" style={{ gridTemplateColumns: "auto 1fr" }}>
-                <CoverImage className="token-default-avatar" src={productImages[0]} />
+                <CoverImage className="token-default-avatar" src={productImages[0]} alt={`Product ${product.id} thumbnail`} />
                 <div className="overflow-hidden">
-                    <div className="token-card--header--primary-text truncate" title={product.name}>
+                    <div className="token-card--header--primary-text truncate">
                         {product.name}
                     </div>
                     <div className="token-card--header--secondary-text truncate">${product.price}</div>

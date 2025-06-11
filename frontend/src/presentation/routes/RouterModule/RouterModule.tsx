@@ -12,6 +12,7 @@ export interface IRouterModule {
         search?: Record<string, string>;
     }) => void;
     useRouterHref: () => string;
+    useRouterCurrentRoute: () => TAnyGenericRoute;
 }
 
 export default function RouterModule({ children, ...routerModule }: PropsWithChildren<IRouterModule>) {

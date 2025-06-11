@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import CoverImage from "../../components/Resuables/CoverImage";
-import MixinButton from "../../components/Resuables/MixinButton";
+import MixinButton from "../../components/Resuables/MixinButton/MixinButton";
 import MixinPrototypeCard, { MixinPrototypeCardSection } from "../../components/Resuables/MixinPrototypeCard";
 
 export default function Navigator(props: { title: string; imageUrl: string; buttons: Array<{ label: string; href: string }> }) {
@@ -26,7 +26,7 @@ export default function Navigator(props: { title: string; imageUrl: string; butt
                         isStatic
                         className="w-full justify-center"
                     >
-                        <CoverImage src={imageUrl} className="h-full aspect-square" />
+                        <CoverImage src={imageUrl} className="h-full aspect-square" alt={`${title} thumbnail`} />
                         <div className="truncate">{title}</div>
                     </MixinButton>
                 </div>

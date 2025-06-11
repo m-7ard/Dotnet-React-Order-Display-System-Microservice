@@ -1,4 +1,4 @@
-import MixinButton from "../../../components/Resuables/MixinButton";
+import MixinButton from "../../../components/Resuables/MixinButton/MixinButton";
 import FilterProductHistoriesFieldset from "../../../components/Fieldsets/FilterProductHistoriesFieldset";
 import { ValueSchema } from "./FilterProductHistories.Controller";
 import Divider from "../../../components/Resuables/Divider";

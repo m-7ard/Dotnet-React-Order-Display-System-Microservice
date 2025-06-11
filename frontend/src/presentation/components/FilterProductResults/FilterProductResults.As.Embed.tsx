@@ -1,4 +1,4 @@
-import MixinButton from "../Resuables/MixinButton";
+import MixinButton from "../Resuables/MixinButton/MixinButton";
 import FormPage from "./FilterProductResults.Pages.Form";
 import ResultsPage from "./FilterProductResults.Pages.Results";
 import Divider from "../Resuables/Divider";

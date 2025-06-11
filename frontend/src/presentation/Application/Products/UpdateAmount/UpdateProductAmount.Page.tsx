@@ -1,6 +1,6 @@
-import StatelessCharField from "../../../components/StatelessFields/StatelessCharField";
+import StatelessCharField from "../../../components/StatelessFields/CharField/StatelessCharField";
 import FormField from "../../../components/Forms/FormField";
-import MixinButton from "../../../components/Resuables/MixinButton";
+import MixinButton from "../../../components/Resuables/MixinButton/MixinButton";
 import { useCallback } from "react";
 import { ErrorSchema, ValueSchema } from "./UpdateProductAmount.Controller";
 import IProduct from "../../../../domain/models/IProduct";

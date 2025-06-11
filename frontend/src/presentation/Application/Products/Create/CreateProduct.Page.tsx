@@ -1,15 +1,15 @@
-import UploadImagesForm from "../../../components/Forms/ImageUploadForm";
 import FormField from "../../../components/Forms/FormField";
-import StatelessTextArea from "../../../components/StatelessFields/StatelessTextArea";
-import MixinButton from "../../../components/Resuables/MixinButton";
+import StatelessTextArea from "../../../components/StatelessFields/TextArea/StatelessTextArea";
+import MixinButton from "../../../components/Resuables/MixinButton/MixinButton";
 import { ErrorState, ValueState } from "./CreateProduct.Controller";
 import { useCallback } from "react";
-import StatelessCharField from "../../../components/StatelessFields/StatelessCharField";
 import MixinPage, { MixinPageSection } from "../../../components/Resuables/MixinPage";
 import Divider from "../../../components/Resuables/Divider";
-import FormError from "../../../components/Forms/FormError,";
+import FormError from "../../../components/Forms/FormError";
 import contentGridDirective from "../../../directives/contentGridDirective";
 import LinkBoxV2 from "../../../components/Resuables/LinkBoxV2";
+import FormFieldStatelessCharField from "../../../components/StatelessFields/CharField/Variants/FormFieldStatelessCharField";
+import FormFieldImageUploadForm from "../../../components/Forms/ImageUploadForm/Variants/FormFieldUploadImagesForm";
 
 export default function CreateProductPage(props: {
     value: ValueState;
@@ -53,7 +53,7 @@ export default function CreateProductPage(props: {
                 <FormError title="Failed to Create Product" errors={errors._} />
                 <div className="flex flex-col gap-4">
                     <FormField name="name" errors={errors.name}>
-                        <StatelessCharField
+                        <FormFieldStatelessCharField
                             onChange={(value) => updateField("name", value)}
                             value={value.name}
                             options={{
@@ -63,10 +63,10 @@ export default function CreateProductPage(props: {
                         />
                     </FormField>
                     <FormField name="images" errors={errors.images?._}>
-                        <UploadImagesForm onSubmit={uploadImages} onChange={(value) => updateField("images", value)} errors={errors.images} value={value.images} />
+                        <FormFieldImageUploadForm onSubmit={uploadImages} onChange={(value) => updateField("images", value)} errors={errors.images} value={value.images} />
                     </FormField>
                     <FormField name="price" errors={errors.price}>
-                        <StatelessCharField
+                        <FormFieldStatelessCharField
                             onChange={(value) => updateField("price", value)}
                             value={value.price.toString()}
                             options={{
@@ -88,7 +88,7 @@ export default function CreateProductPage(props: {
                         />
                     </FormField>
                     <FormField name="amount" errors={errors.amount}>
-                        <StatelessCharField
+                        <FormFieldStatelessCharField
                             onChange={(value) => updateField("amount", value)}
                             value={value.amount}
                             options={{

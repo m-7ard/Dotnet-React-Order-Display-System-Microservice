@@ -25,3 +25,8 @@ export function useRouterNavigate() {
     const { useRouterNavigate } = useRouterModuleContext();
     return useRouterNavigate();
 }
+
+export function useRouterCurrentRoute() {
+    const { useRouterCurrentRoute } = useRouterModuleContext();
+    return useRouterCurrentRoute();
+}

@@ -1,5 +1,5 @@
 import IProduct from "../../../../domain/models/IProduct";
-import MixinButton from "../../../components/Resuables/MixinButton";
+import MixinButton from "../../../components/Resuables/MixinButton/MixinButton";
 import { DeleteProductErrorSchema } from "./DeleteProduct.Controller";
 import Divider from "../../../components/Resuables/Divider";
 import { PolymorphicMixinPanel, PolymorphicMixinPanelSection } from "../../../components/Resuables/MixinPanel";

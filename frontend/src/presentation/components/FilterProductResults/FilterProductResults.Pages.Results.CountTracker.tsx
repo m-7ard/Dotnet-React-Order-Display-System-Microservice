@@ -1,6 +1,6 @@
 import IProduct from "../../../domain/models/IProduct";
 import CoverImage from "../Resuables/CoverImage";
-import MixinButton from "../Resuables/MixinButton";
+import MixinButton from "../Resuables/MixinButton/MixinButton";
 import MixinPrototypeCard, { MixinPrototypeCardSection } from "../Resuables/MixinPrototypeCard";
 
 type CountTrackerProductProps = { product: IProduct; onAdd: () => void; quantity: number | null; };
@@ -14,9 +14,9 @@ export default function CountTrackerProduct(props: CountTrackerProductProps) {
     return (
         <MixinPrototypeCard options={{ size: "mixin-Pcard-base", theme: "theme-Pcard-generic-white" }} hasBorder hasShadow hasDivide>
             <MixinPrototypeCardSection className="grid gap-3" style={{ gridTemplateColumns: "auto 1fr" }}>
-                <CoverImage className="token-default-avatar" src={productImages[0]} />
+                <CoverImage className="token-default-avatar" src={productImages[0]} alt={`Product ${product.id} thumbnail`}/>
                 <div className="overflow-hidden">
-                    <div className="text-base font-bold truncate" title={product.name}>
+                    <div className="text-base font-bold truncate">
                         {product.name}
                     </div>
                     <div className="text-sm truncate">${product.price}</div>

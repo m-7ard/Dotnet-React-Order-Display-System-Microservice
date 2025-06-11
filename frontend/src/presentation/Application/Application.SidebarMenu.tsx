@@ -1,5 +1,5 @@
 import { useGlobalDialogPanelContext } from "../components/Dialog/GlobalDialog.Panel.Context";
-import MixinButton from "../components/Resuables/MixinButton";
+import MixinButton from "../components/Resuables/MixinButton/MixinButton";
 import Divider from "../components/Resuables/Divider";
 import { RenderedMixinPanel, PolymorphicMixinPanelSection } from "../components/Resuables/MixinPanel";
 import RouterLink from "../components/Resuables/RouterLink";
