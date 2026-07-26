@@ -114,6 +114,8 @@ services:
         build:
             context: ./fileServer
             dockerfile: Dockerfile
+            additional_contexts:
+              frontend: service:frontend
         volumes:
             - uploaded-media:/app/media
         depends_on:
